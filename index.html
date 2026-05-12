@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Imperio Hotelero</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="contenedor">
+
+  <header>
+    <h1>🏨 Imperio Hotelero</h1>
+    <p>Administra, mejora y mantén vivo tu hotel</p>
+  </header>
+
+  <section class="panel">
+    <div>💰 Dinero: $<span id="dinero">5000</span></div>
+    <div>📅 Día: <span id="dia">1</span></div>
+    <div>🕒 Hora: <span id="hora">08:00</span></div>
+    <div>⭐ Reputación: <span id="reputacion">50</span></div>
+    <div>🛏️ Habitaciones: <span id="ocupadas">0</span>/<span id="totales">5</span></div>
+  </section>
+
+  <main class="principal">
+
+    <section class="hotel">
+      <h2>Mi Hotel</h2>
+      <div class="edificio" id="edificio"></div>
+
+      <div class="entrada">
+        <h3>Entrada del Hotel</h3>
+        <div id="entradaHotel"></div>
+      </div>
+    </section>
+
+    <section class="ladoDerecho">
+
+      <div class="acciones">
+        <h2>Controles</h2>
+        <button id="btnIniciar">▶ Iniciar Juego</button>
+        <button id="btnPausar">⏸ Pausar</button>
+        <button id="btnHora">⏩ Avanzar Hora</button>
+      </div>
+
+      <div class="catalogoBox">
+        <h2>🛒 Catálogo</h2>
+        <div id="catalogo"></div>
+      </div>
+
+      <div class="estadoBox">
+        <h2>🔧 Vida útil</h2>
+        <div id="estadoObjetos"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <section class="mensajesBox">
+    <h2>📋 Movimiento del Hotel</h2>
+    <div id="mensajes"></div>
+  </section>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
