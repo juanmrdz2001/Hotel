@@ -12,59 +12,154 @@
 
   <header>
     <h1>🏨 Imperio Hotelero</h1>
-    <p>Administra, mejora y mantén vivo tu hotel</p>
+    <p>Compra cuartos, compra muebles y arrástralos donde quieras</p>
   </header>
 
   <section class="panel">
-    <div>💰 Dinero: $<span id="dinero">5000</span></div>
+    <div>💰 Dinero: $<span id="dinero">100000</span></div>
     <div>📅 Día: <span id="dia">1</span></div>
     <div>🕒 Hora: <span id="hora">08:00</span></div>
     <div>⭐ Reputación: <span id="reputacion">50</span></div>
-    <div>🛏️ Habitaciones: <span id="ocupadas">0</span>/<span id="totales">5</span></div>
+    <div>🛏️ Ocupación: <span id="ocupadas">0</span>/<span id="compradas">0</span></div>
   </section>
 
   <main class="principal">
 
-    <section class="hotel">
-      <h2>Mi Hotel</h2>
-      <div class="edificio" id="edificio"></div>
+    <!-- INVENTARIO IZQUIERDO -->
 
-      <div class="entrada">
-        <h3>Entrada del Hotel</h3>
-        <div id="entradaHotel"></div>
+    <section class="inventarioLateral">
+
+      <div class="inventarioBox">
+        <h2>🎒 Inventario</h2>
+
+        <p class="ayuda">
+          Arrastra un objeto hacia un cuarto comprado.
+        </p>
+
+        <div id="inventario"></div>
       </div>
+
+      <div class="detalleBox">
+        <h2>📋 Cuarto seleccionado</h2>
+
+        <div id="detalleCuarto">
+          Haz clic en un cuarto.
+        </div>
+      </div>
+
     </section>
 
-    <section class="ladoDerecho">
+    <!-- HOTEL -->
 
-      <div class="acciones">
-        <h2>Controles</h2>
-        <button id="btnIniciar">▶ Iniciar Juego</button>
-        <button id="btnPausar">⏸ Pausar</button>
-        <button id="btnHora">⏩ Avanzar Hora</button>
+    <section class="hotelBox">
+
+      <h2>Mi Hotel</h2>
+
+      <div class="hotelVisual">
+
+        <!-- LADO IZQUIERDO -->
+
+        <div class="ladoHotel" id="ladoIzquierdo"></div>
+
+        <!-- CENTRO -->
+
+        <div class="centroHotel" id="centroHotel">
+
+          <div class="letreroElevador">
+            ELEVADOR
+          </div>
+
+          <div class="elevador">
+            🛗
+          </div>
+
+        </div>
+
+        <!-- LADO DERECHO -->
+
+        <div class="ladoHotel" id="ladoDerecho"></div>
+
+        <!-- SERVICIOS -->
+
+        <div class="servicio lavanderia">
+          🧺 Lavandería
+        </div>
+
+        <div class="servicio mantenimiento">
+          🔧 Mantenimiento
+        </div>
+
+        <div class="servicio recepcion">
+          🛎️ Recepción
+        </div>
+
+        <div class="servicio cafeteria">
+          ☕ Cafetería
+        </div>
+
       </div>
+
+      <!-- ENTRADA -->
+
+      <div class="entrada">
+
+        <h3>Entrada del Hotel</h3>
+
+        <div id="entradaHotel"></div>
+
+      </div>
+
+    </section>
+
+    <!-- PANEL DERECHO -->
+
+    <section class="panelDerecho">
+
+      <div class="controles">
+
+        <h2>Controles</h2>
+
+        <button id="btnIniciar">
+          ▶ Iniciar
+        </button>
+
+        <button id="btnHora">
+          ⏩ Avanzar Hora
+        </button>
+
+        <button id="btnPausar">
+          ⏸ Pausar
+        </button>
+
+      </div>
+
+      <!-- CATALOGO -->
 
       <div class="catalogoBox">
-        <h2>🛒 Catálogo</h2>
-        <div id="catalogo"></div>
-      </div>
 
-      <div class="estadoBox">
-        <h2>🔧 Vida útil</h2>
-        <div id="estadoObjetos"></div>
+        <h2>🛒 Catálogo</h2>
+
+        <div id="catalogo"></div>
+
       </div>
 
     </section>
 
   </main>
 
+  <!-- MENSAJES -->
+
   <section class="mensajesBox">
-    <h2>📋 Movimiento del Hotel</h2>
+
+    <h2>📜 Movimiento del Hotel</h2>
+
     <div id="mensajes"></div>
+
   </section>
 
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>

@@ -1,279 +1,651 @@
-let dinero = 5000;
+let dinero = 100000;
 let dia = 1;
 let hora = 8;
-
-let habitacionesTotales = 5;
-let habitacionesOcupadas = 0;
-
 let reputacion = 50;
+
+let tieneElevador = false;
 let juegoActivo = false;
 let intervalo = null;
 
-let tieneElevador = false;
+let cuartoSeleccionado = null;
+let siguienteCarrilCliente = 0;
 
-const vidaObjetos = {
-  camas: { nombre:"🛏️ Camas", vida:100, desgaste:2, costo:900 },
-  televisiones: { nombre:"📺 Televisiones", vida:100, desgaste:1, costo:700 },
-  lamparas: { nombre:"💡 Lámparas", vida:100, desgaste:3, costo:400 },
-  sabanas: { nombre:"🛏️ Sábanas", vida:100, desgaste:5, costo:300 },
-  alfombras: { nombre:"🟥 Alfombras", vida:100, desgaste:2, costo:600 },
-  elevador: { nombre:"🛗 Elevador", vida:100, desgaste:2, costo:1200 }
-};
+const cuartos = [];
+
+const numerosCuartos = [
+  101,102,103,104,105,
+  106,107,108,109,110
+];
+
+numerosCuartos.forEach((numero, index)=>{
+  cuartos.push({
+    id:index,
+    numero:numero,
+    comprada:index < 2,
+    ocupada:false,
+    objetos:{
+      cama:null,
+      tv:null,
+      lampara:null,
+      alfombra:null,
+      sabanas:null,
+      extinguidor:null
+    }
+  });
+});
 
 const tiposClientes = [
-  {nombre:"Turista",emoji:"🚶",paga:500},
-  {nombre:"Ejecutivo",emoji:"👔",paga:900},
-  {nombre:"Familia",emoji:"👨‍👩‍👧",paga:1400},
-  {nombre:"VIP",emoji:"🕴️",paga:2500},
-  {nombre:"Mochilero",emoji:"🎒",paga:400}
+  { nombre:"Turista", emoji:"🚶", pagaBase:500 },
+  { nombre:"Ejecutivo", emoji:"👔", pagaBase:900 },
+  { nombre:"Familia", emoji:"👨‍👩‍👧", pagaBase:1400 },
+  { nombre:"VIP", emoji:"🕴️", pagaBase:2500 },
+  { nombre:"Mochilero", emoji:"🎒", pagaBase:400 }
 ];
 
-const catalogoMejoras = [
+const catalogo = [
   {
-    nombre:"🛏️ Habitación Nueva",
+    nombre:"Comprar cuarto",
+    tipo:"cuarto",
+    icono:"🚪",
     costo:15000,
-    descripcion:"Agrega una habitación más.",
-    accion:()=>{
-      habitacionesTotales++;
-    }
+    descripcion:"Desbloquea el siguiente cuarto disponible."
+  },
+
+  {
+    nombre:"Cama sencilla",
+    tipo:"cama",
+    icono:"🛏️",
+    costo:5000,
+    lujo:10,
+    descripcion:"Necesaria para rentar el cuarto."
   },
   {
-    nombre:"📺 Televisión",
+    nombre:"Cama King",
+    tipo:"cama",
+    icono:"🛌",
+    costo:15000,
+    lujo:25,
+    descripcion:"Aumenta mucho el valor del cuarto."
+  },
+
+  {
+    nombre:"TV sencilla",
+    tipo:"tv",
+    icono:"📺",
     costo:6000,
-    descripcion:"Mejora la reputación y comodidad.",
-    accion:()=>{
-      reputacion += 5;
-      vidaObjetos.televisiones.vida = 100;
-    }
+    lujo:8,
+    descripcion:"Televisión básica para huéspedes."
   },
   {
-    nombre:"💡 Lámparas",
-    costo:400,
-    descripcion:"Hace más elegante el hotel.",
-    accion:()=>{
-      reputacion += 3;
-      vidaObjetos.lamparas.vida = 100;
-    }
+    nombre:"TV HD",
+    tipo:"tv",
+    icono:"🖥️",
+    costo:15000,
+    lujo:18,
+    descripcion:"Mejora la comodidad del cuarto."
   },
   {
-    nombre:"🖼️ Cuadros",
-    costo:700,
-    descripcion:"Decoración fina para mejorar reputación.",
-    accion:()=>{
-      reputacion += 6;
-    }
+    nombre:"TV 5K",
+    tipo:"tv",
+    icono:"📺",
+    costo:40000,
+    lujo:35,
+    descripcion:"Televisión de lujo para clientes VIP."
   },
+
   {
-    nombre:"🛜 WiFi",
-    costo:1200,
-    descripcion:"Llegan más huéspedes.",
-    accion:()=>{
-      reputacion += 10;
-    }
-  },
-  {
-    nombre:"❄️ Aire acondicionado",
-    costo:1800,
-    descripcion:"Mayor comodidad para los clientes.",
-    accion:()=>{
-      reputacion += 12;
-    }
-  },
-  {
-    nombre:"☕ Cafetería",
-    costo:2500,
-    descripcion:"Genera ingresos extra.",
-    accion:()=>{
-      dinero += 800;
-      reputacion += 15;
-    }
-  },
-  {
-    nombre:"🛗 Elevador",
+    nombre:"Lámpara sencilla",
+    tipo:"lampara",
+    icono:"💡",
     costo:4000,
-    descripcion:"Permite crecer y atrae clientes VIP.",
-    accion:()=>{
-      tieneElevador = true;
-      habitacionesTotales += 2;
-      reputacion += 20;
-      vidaObjetos.elevador.vida = 100;
-      agregarMensaje("🛗 Se instaló un elevador nuevo.");
-    }
+    lujo:6,
+    descripcion:"Iluminación básica."
+  },
+  {
+    nombre:"Lámpara elegante",
+    tipo:"lampara",
+    icono:"🏮",
+    costo:10000,
+    lujo:15,
+    descripcion:"Da elegancia al cuarto."
+  },
+
+  {
+    nombre:"Alfombra básica",
+    tipo:"alfombra",
+    icono:"🟥",
+    costo:5000,
+    lujo:7,
+    descripcion:"Decora el piso del cuarto."
+  },
+  {
+    nombre:"Alfombra fina",
+    tipo:"alfombra",
+    icono:"🟫",
+    costo:18000,
+    lujo:22,
+    descripcion:"Sube el nivel del cuarto."
+  },
+
+  {
+    nombre:"Sábanas limpias",
+    tipo:"sabanas",
+    icono:"🧺",
+    costo:3000,
+    lujo:5,
+    descripcion:"Necesarias para rentar."
+  },
+  {
+    nombre:"Sábanas premium",
+    tipo:"sabanas",
+    icono:"✨",
+    costo:12000,
+    lujo:18,
+    descripcion:"Mejor descanso y más lujo."
+  },
+
+  {
+    nombre:"Extinguidor",
+    tipo:"extinguidor",
+    icono:"🧯",
+    costo:3500,
+    lujo:3,
+    descripcion:"Seguridad básica del cuarto."
+  },
+  {
+  nombre:"Elevador",
+  tipo:"elevador",
+  icono:"🛗",
+  costo:80000,
+  descripcion:"Permite construir más pisos."
   }
 ];
+
+let inventario = [];
 
 const dineroSpan = document.getElementById("dinero");
 const diaSpan = document.getElementById("dia");
 const horaSpan = document.getElementById("hora");
 const reputacionSpan = document.getElementById("reputacion");
 const ocupadasSpan = document.getElementById("ocupadas");
-const totalesSpan = document.getElementById("totales");
+const compradasSpan = document.getElementById("compradas");
 
-const edificio = document.getElementById("edificio");
+const ladoIzquierdo = document.getElementById("ladoIzquierdo");
+const ladoDerecho = document.getElementById("ladoDerecho");
+const catalogoDiv = document.getElementById("catalogo");
+const inventarioDiv = document.getElementById("inventario");
+const detalleCuarto = document.getElementById("detalleCuarto");
 const mensajes = document.getElementById("mensajes");
 const entradaHotel = document.getElementById("entradaHotel");
-const catalogo = document.getElementById("catalogo");
-const estadoObjetos = document.getElementById("estadoObjetos");
 
 const btnIniciar = document.getElementById("btnIniciar");
-const btnPausar = document.getElementById("btnPausar");
 const btnHora = document.getElementById("btnHora");
+const btnPausar = document.getElementById("btnPausar");
 
 function actualizarPantalla(){
-  dineroSpan.textContent = dinero;
+
+  dineroSpan.textContent = dinero.toLocaleString();
   diaSpan.textContent = dia;
-  horaSpan.textContent = `${hora.toString().padStart(2,"0")}:00`;
+
+  horaSpan.textContent =
+    `${hora.toString().padStart(2,"0")}:00`;
+
   reputacionSpan.textContent = reputacion;
-  ocupadasSpan.textContent = habitacionesOcupadas;
-  totalesSpan.textContent = habitacionesTotales;
+
+  ocupadasSpan.textContent =
+    cuartos.filter(c => c.ocupada).length;
+
+  compradasSpan.textContent =
+    cuartos.filter(c => c.comprada).length;
+
+  const centroHotel = document.getElementById("centroHotel");
+
+  if(centroHotel){
+    if(tieneElevador){
+      centroHotel.style.visibility = "visible";
+    }else{
+      centroHotel.style.visibility = "hidden";
+    }
+  }
 
   dibujarHotel();
-  mostrarEstadoObjetos();
+  dibujarInventario();
+  mostrarDetalleCuarto();
 }
 
 function dibujarHotel(){
-  edificio.innerHTML = "";
+  ladoIzquierdo.innerHTML = "";
+  ladoDerecho.innerHTML = "";
 
-  for(let i=1;i<=habitacionesTotales;i++){
-    const hab = document.createElement("div");
-    hab.classList.add("habitacion");
+  cuartos.forEach((cuarto)=>{
+    const div = document.createElement("div");
+    div.classList.add("cuarto");
 
-    if(i <= habitacionesOcupadas){
-      hab.classList.add("ocupada");
-      hab.innerHTML = `
-        <div class="contenidoHabitacion">
-          <span class="cama">🛌</span>
-          <span class="tv">📺</span>
-        </div>
-      `;
+    if(!cuarto.comprada){
+      div.classList.add("bloqueado");
+      div.innerHTML = "🔒";
     }else{
-      hab.innerHTML = `
-        <div class="contenidoHabitacion">
-          <span class="puerta">🚪</span>
-          <span class="tv">📺</span>
-        </div>
-      `;
+      div.classList.add("comprado");
+
+      if(cuarto.ocupada){
+        div.classList.add("ocupado");
+      }
+
+      div.innerHTML = generarContenidoCuarto(cuarto);
+
+      div.addEventListener("dragover", permitirSoltar);
+      div.addEventListener("drop", (e)=>soltarEnCuarto(e, cuarto.id));
     }
 
-    edificio.appendChild(hab);
-  }
+    div.addEventListener("click", ()=>{
+      cuartoSeleccionado = cuarto.id;
+      mostrarDetalleCuarto();
+    });
 
-  if(tieneElevador){
-    const elevador = document.createElement("div");
-    elevador.classList.add("elevador");
-    elevador.textContent = "🛗";
-    edificio.appendChild(elevador);
-  }
-}
+    const ultimoDigito = cuarto.numero % 100;
 
-function crearCatalogo(){
-  catalogo.innerHTML = "";
-
-  catalogoMejoras.forEach((item,index)=>{
-    const div = document.createElement("div");
-    div.classList.add("item");
-
-    div.innerHTML = `
-      <h3>${item.nombre}</h3>
-      <p>${item.descripcion}</p>
-      <p>💰 $${item.costo}</p>
-      <button onclick="comprar(${index})">Comprar</button>
-    `;
-
-    catalogo.appendChild(div);
+    if(ultimoDigito >= 1 && ultimoDigito <= 5){
+      ladoIzquierdo.appendChild(div);
+    }else{
+      ladoDerecho.appendChild(div);
+    }
   });
 }
 
-function comprar(index){
-  const item = catalogoMejoras[index];
+function generarContenidoCuarto(cuarto){
+  let html = `
+    <span class="numeroCuarto">${cuarto.numero}</span>
+  `;
 
-  if(dinero >= item.costo){
-    dinero -= item.costo;
-    item.accion();
-
-    if(reputacion > 100) reputacion = 100;
-
-    agregarMensaje(`🛒 Compraste ${item.nombre}`);
-    actualizarPantalla();
+  if(cuarto.ocupada){
+    html += `<span class="estadoCuarto">🛌</span>`;
+  }else if(cuartoListo(cuarto)){
+    html += `<span class="estadoCuarto">✅</span>`;
   }else{
-    agregarMensaje(`❌ No alcanza para ${item.nombre}`);
+    html += `<span class="estadoCuarto">⚠️</span>`;
   }
+
+  const obj = cuarto.objetos;
+
+  if(obj.cama){
+    html += `<span class="objetoCuarto objeto-cama">${obj.cama.icono}</span>`;
+  }
+
+  if(obj.tv){
+    html += `<span class="objetoCuarto objeto-tv">${obj.tv.icono}</span>`;
+  }
+
+  if(obj.lampara){
+    html += `<span class="objetoCuarto objeto-lampara">${obj.lampara.icono}</span>`;
+  }
+
+  if(obj.alfombra){
+    html += `<span class="objetoCuarto objeto-alfombra">${obj.alfombra.icono}</span>`;
+  }
+
+  if(obj.sabanas){
+    html += `<span class="objetoCuarto objeto-sabanas">${obj.sabanas.icono}</span>`;
+  }
+
+  if(obj.extinguidor){
+    html += `<span class="objetoCuarto objeto-extinguidor">${obj.extinguidor.icono}</span>`;
+  }
+
+  html += `<span class="precioCuarto">$${precioCuarto(cuarto)}</span>`;
+
+  return html;
 }
 
-function mostrarEstadoObjetos(){
-  estadoObjetos.innerHTML = "";
+function crearCatalogo(){
+  catalogoDiv.innerHTML = "";
 
-  for(let clave in vidaObjetos){
-    if(clave === "elevador" && !tieneElevador) continue;
-
-    const obj = vidaObjetos[clave];
-
-    let clase = "";
-    if(obj.vida <= 30) clase = "malo";
-    else if(obj.vida <= 60) clase = "medio";
-
+  catalogo.forEach((item, index)=>{
     const div = document.createElement("div");
-    div.classList.add("objetoEstado");
+    div.classList.add("itemCatalogo");
 
     div.innerHTML = `
-      <strong>${obj.nombre}: ${obj.vida}%</strong>
-      <div class="barra">
-        <div class="relleno ${clase}" style="width:${obj.vida}%"></div>
+      <div class="iconoCatalogo">${item.icono}</div>
+      <div>
+        <h3>${item.nombre}</h3>
+        <p>${item.descripcion}</p>
+        <p>💰 $${item.costo.toLocaleString()}</p>
       </div>
-      <button onclick="repararObjeto('${clave}')">
-        Reparar $${obj.costo}
-      </button>
+      <button onclick="comprarCatalogo(${index})">Comprar</button>
     `;
 
-    estadoObjetos.appendChild(div);
-  }
+    catalogoDiv.appendChild(div);
+  });
 }
 
-function repararObjeto(clave){
-  const obj = vidaObjetos[clave];
+function comprarCatalogo(index){
 
-  if(dinero >= obj.costo){
-    dinero -= obj.costo;
-    obj.vida = 100;
-    reputacion += 3;
+  const item = catalogo[index];
 
-    if(reputacion > 100) reputacion = 100;
+  if(dinero < item.costo){
+    agregarMensaje(`❌ No alcanza para ${item.nombre}.`);
+    return;
+  }
 
-    agregarMensaje(`🔧 Reparaste ${obj.nombre}.`);
+  // COMPRAR CUARTO
+
+  if(item.tipo === "cuarto"){
+    comprarCuarto(item.costo);
+    return;
+  }
+
+  // COMPRAR ELEVADOR
+
+  if(item.tipo === "elevador"){
+
+    if(tieneElevador){
+      agregarMensaje("❌ Ya tienes elevador.");
+      return;
+    }
+
+    dinero -= item.costo;
+
+    tieneElevador = true;
+
+    reputacion += 10;
+
+    if(reputacion > 100){
+      reputacion = 100;
+    }
+
+    agregarMensaje("🛗 Compraste un elevador para el hotel.");
+
     actualizarPantalla();
-  }else{
-    agregarMensaje(`❌ No tienes dinero para reparar ${obj.nombre}.`);
+
+    return;
+  }
+
+  // OBJETOS NORMALES
+
+  dinero -= item.costo;
+
+  inventario.push({
+    id: Date.now() + Math.random(),
+
+    nombre: item.nombre,
+
+    tipo: item.tipo,
+
+    icono: item.icono,
+
+    lujo: item.lujo,
+
+    costo: item.costo
+  });
+
+  agregarMensaje(
+    `🛒 Compraste ${item.nombre}. Está en tu inventario.`
+  );
+
+  actualizarPantalla();
+}
+
+function comprarCuarto(costo){
+  let cuarto = cuartos.find(c => !c.comprada);
+
+  if(cuarto){
+    dinero -= costo;
+    cuarto.comprada = true;
+    agregarMensaje(`🚪 Compraste el cuarto ${cuarto.numero}.`);
+    actualizarPantalla();
+    return;
+  }
+
+  crearNuevoPiso();
+
+  cuarto = cuartos.find(c => !c.comprada);
+
+  dinero -= costo;
+  cuarto.comprada = true;
+
+  agregarMensaje(`🏢 Se construyó un nuevo piso.`);
+  agregarMensaje(`🚪 Compraste el cuarto ${cuarto.numero}.`);
+
+  actualizarPantalla();
+}
+
+function crearNuevoPiso(){
+  const totalPisos = Math.floor(cuartos.length / 10);
+  const nuevoPiso = totalPisos + 1;
+
+  for(let i = 1; i <= 10; i++){
+    cuartos.push({
+      id: cuartos.length,
+      numero: nuevoPiso * 100 + i,
+      comprada: false,
+      ocupada: false,
+      objetos:{
+        cama:null,
+        tv:null,
+        lampara:null,
+        alfombra:null,
+        sabanas:null,
+        extinguidor:null
+      }
+    });
   }
 }
 
-function desgastarObjetos(){
-  for(let clave in vidaObjetos){
-    if(clave === "elevador" && !tieneElevador) continue;
+function dibujarInventario(){
+  inventarioDiv.innerHTML = "";
 
-    vidaObjetos[clave].vida -= vidaObjetos[clave].desgaste;
+  if(inventario.length === 0){
+    inventarioDiv.innerHTML = "<p>No tienes objetos comprados.</p>";
+    return;
+  }
 
-    if(vidaObjetos[clave].vida < 0){
-      vidaObjetos[clave].vida = 0;
-    }
+  inventario.forEach((item)=>{
+    const div = document.createElement("div");
+    div.classList.add("itemInventario");
+    div.draggable = true;
+    div.dataset.id = item.id;
 
-    if(vidaObjetos[clave].vida <= 25){
-      reputacion -= 2;
-      agregarMensaje(`⚠️ ${vidaObjetos[clave].nombre} está muy desgastado.`);
+    div.innerHTML = `
+      ${item.icono}
+      <small>${item.nombre}</small>
+    `;
+
+    div.addEventListener("dragstart", arrastrarItem);
+
+    inventarioDiv.appendChild(div);
+  });
+}
+
+function arrastrarItem(e){
+  e.dataTransfer.setData("itemId", e.currentTarget.dataset.id);
+}
+
+function permitirSoltar(e){
+  e.preventDefault();
+}
+
+function soltarEnCuarto(e, cuartoId){
+
+  e.preventDefault();
+
+  const itemId =
+    e.dataTransfer.getData("itemId");
+
+  const item =
+    inventario.find(
+      i => String(i.id) === String(itemId)
+    );
+
+  const cuarto =
+    cuartos.find(
+      c => c.id === cuartoId
+    );
+
+  if(!item || !cuarto || !cuarto.comprada){
+    return;
+  }
+
+  const objetoActual =
+    cuarto.objetos[item.tipo];
+
+  // SI YA EXISTE UNO DEL MISMO TIPO
+
+  if(objetoActual){
+
+    // SI EL NUEVO ES MEJOR
+
+    if(item.lujo > objetoActual.lujo){
+
+      cuarto.objetos[item.tipo] = item;
+
+      inventario =
+        inventario.filter(
+          i => String(i.id) !== String(itemId)
+        );
+
+      reputacion += 2;
+
+      if(reputacion > 100){
+        reputacion = 100;
+      }
+
+      agregarMensaje(
+        `⬆️ Mejoraste ${item.tipo} del cuarto ${cuarto.numero}: ${objetoActual.nombre} → ${item.nombre}.`
+      );
+
+      actualizarPantalla();
+
+      return;
+
+    }else{
+
+      agregarMensaje(
+        `❌ El cuarto ${cuarto.numero} ya tiene un objeto igual o mejor.`
+      );
+
+      return;
     }
   }
 
-  if(reputacion < 0) reputacion = 0;
+  // SI NO EXISTE
+
+  cuarto.objetos[item.tipo] = item;
+
+  inventario =
+    inventario.filter(
+      i => String(i.id) !== String(itemId)
+    );
+
+  reputacion += 1;
+
+  if(reputacion > 100){
+    reputacion = 100;
+  }
+
+  agregarMensaje(
+    `🧰 Pusiste ${item.nombre} en el cuarto ${cuarto.numero}.`
+  );
+
+  actualizarPantalla();
 }
 
-function agregarMensaje(texto){
-  const div = document.createElement("div");
-  div.classList.add("mensaje");
-  div.textContent = texto;
-  mensajes.prepend(div);
+function cuartoListo(cuarto){
+  return cuarto.comprada &&
+         cuarto.objetos.cama &&
+         cuarto.objetos.sabanas &&
+         cuarto.objetos.lampara;
 }
 
-function numero(min,max){
-  return Math.floor(Math.random()*(max-min+1))+min;
+function lujoCuarto(cuarto){
+  let total = 0;
+
+  for(let tipo in cuarto.objetos){
+    if(cuarto.objetos[tipo]){
+      total += cuarto.objetos[tipo].lujo;
+    }
+  }
+
+  return total;
+}
+
+function precioCuarto(cuarto){
+  if(!cuarto.comprada) return 0;
+  if(!cuartoListo(cuarto)) return 0;
+
+  return 500 + lujoCuarto(cuarto) * 40;
+}
+
+function mostrarDetalleCuarto(){
+  if(cuartoSeleccionado === null){
+    detalleCuarto.innerHTML = "Haz clic en un cuarto.";
+    return;
+  }
+
+  const cuarto = cuartos.find(c=>c.id === cuartoSeleccionado);
+
+  if(!cuarto.comprada){
+    detalleCuarto.innerHTML = `
+      <strong>Cuarto ${cuarto.numero}</strong><br>
+      🔒 No comprado
+    `;
+    return;
+  }
+
+  detalleCuarto.innerHTML = `
+    <strong>Cuarto ${cuarto.numero}</strong><br>
+    Estado: ${cuarto.ocupada ? "Ocupado 🛌" : "Disponible"}<br>
+    Listo para rentar: ${cuartoListo(cuarto) ? "Sí ✅" : "No ⚠️"}<br>
+    Lujo: ${lujoCuarto(cuarto)}<br>
+    Precio por noche: $${precioCuarto(cuarto)}<br><br>
+
+    Cama: ${cuarto.objetos.cama ? cuarto.objetos.cama.nombre : "No tiene"}<br>
+    TV: ${cuarto.objetos.tv ? cuarto.objetos.tv.nombre : "No tiene"}<br>
+    Lámpara: ${cuarto.objetos.lampara ? cuarto.objetos.lampara.nombre : "No tiene"}<br>
+    Alfombra: ${cuarto.objetos.alfombra ? cuarto.objetos.alfombra.nombre : "No tiene"}<br>
+    Sábanas: ${cuarto.objetos.sabanas ? cuarto.objetos.sabanas.nombre : "No tiene"}<br>
+    Extinguidor: ${cuarto.objetos.extinguidor ? cuarto.objetos.extinguidor.nombre : "No tiene"}
+  `;
+}
+
+function avanzarHora(){
+  hora++;
+
+  if(hora >= 24){
+    hora = 8;
+    dia++;
+    liberarHabitaciones();
+    agregarMensaje(`🌙 Terminó el día ${dia - 1}.`);
+  }
+
+  recibirClientes();
+  actualizarPantalla();
+}
+
+function recibirClientes(){
+  const cantidad = calcularClientes();
+
+  agregarMensaje(`🕒 ${hora}:00 llegaron ${cantidad} posibles huéspedes.`);
+
+  for(let i=0; i<cantidad; i++){
+    const cliente = tiposClientes[numero(0, tiposClientes.length - 1)];
+
+    mostrarCliente(cliente);
+
+    const cuarto = cuartos.find(c=>cuartoListo(c) && !c.ocupada);
+
+    if(cuarto){
+      cuarto.ocupada = true;
+
+      const pago = precioCuarto(cuarto) + cliente.pagaBase;
+      dinero += pago;
+
+      agregarMensaje(`${cliente.emoji} ${cliente.nombre} rentó el cuarto ${cuarto.numero} y pagó $${pago}.`);
+    }else{
+      reputacion--;
+      if(reputacion < 0) reputacion = 0;
+
+      agregarMensaje(`❌ ${cliente.nombre} se fue porque no había cuarto listo.`);
+    }
+  }
 }
 
 function calcularClientes(){
@@ -289,93 +661,52 @@ function calcularClientes(){
     base = numero(0,2);
   }
 
-  base += Math.floor(reputacion / 20);
-
-  if(tieneElevador){
-    base += 1;
-  }
-
-  if(vidaObjetos.sabanas.vida < 30) base -= 1;
-  if(vidaObjetos.camas.vida < 30) base -= 1;
-  if(tieneElevador && vidaObjetos.elevador.vida < 30) base -= 2;
-
-  if(base < 0) base = 0;
+  base += Math.floor(reputacion / 25);
 
   return base;
 }
 
-function recibirClientes(){
-  const cantidad = calcularClientes();
+function liberarHabitaciones(){
+  const ocupados = cuartos.filter(c=>c.ocupada);
 
-  agregarMensaje(`🕒 ${hora}:00 llegaron ${cantidad} huéspedes.`);
+  if(ocupados.length === 0) return;
 
-  for(let i=0;i<cantidad;i++){
-    const cliente = tiposClientes[numero(0,tiposClientes.length-1)];
-
-    mostrarCliente(cliente);
-
-    if(habitacionesOcupadas < habitacionesTotales){
-      habitacionesOcupadas++;
-      dinero += cliente.paga;
-
-      agregarMensaje(`${cliente.emoji} ${cliente.nombre} pagó $${cliente.paga}`);
-    }else{
-      reputacion--;
-      agregarMensaje(`❌ ${cliente.nombre} se fue por falta de habitaciones`);
+  ocupados.forEach(c=>{
+    if(Math.random() < 0.55){
+      c.ocupada = false;
+      agregarMensaje(`🧳 Salió el huésped del cuarto ${c.numero}.`);
     }
-  }
-
-  if(reputacion < 0) reputacion = 0;
+  });
 }
 
 function mostrarCliente(cliente){
   const div = document.createElement("div");
   div.classList.add("cliente");
-  div.style.top = numero(5,30)+"px";
+
+  const carriles = [5, 30, 55, 80, 105, 130];
+
+  div.style.top = carriles[siguienteCarrilCliente] + "px";
+
+  siguienteCarrilCliente++;
+
+  if(siguienteCarrilCliente >= carriles.length){
+    siguienteCarrilCliente = 0;
+  }
+
   div.textContent = `${cliente.emoji} ${cliente.nombre}`;
 
   entradaHotel.appendChild(div);
 
   setTimeout(()=>{
     div.remove();
-  },2000);
-}
-
-function liberarHabitaciones(){
-  if(habitacionesOcupadas <= 0) return;
-
-  const salen = numero(1,habitacionesOcupadas);
-  habitacionesOcupadas -= salen;
-
-  if(habitacionesOcupadas < 0){
-    habitacionesOcupadas = 0;
-  }
-
-  agregarMensaje(`🧳 Salieron ${salen} huéspedes.`);
-}
-
-function avanzarHora(){
-  hora++;
-
-  if(hora >= 24){
-    dia++;
-    hora = 8;
-
-    liberarHabitaciones();
-    desgastarObjetos();
-
-    agregarMensaje(`🌙 Terminó el día ${dia - 1}`);
-  }
-
-  recibirClientes();
-  actualizarPantalla();
+  },3500);
 }
 
 function iniciarJuego(){
   if(juegoActivo) return;
 
   juegoActivo = true;
-  agregarMensaje("▶ Juego iniciado");
+  agregarMensaje("▶ Juego iniciado.");
 
   intervalo = setInterval(()=>{
     avanzarHora();
@@ -385,13 +716,24 @@ function iniciarJuego(){
 function pausarJuego(){
   juegoActivo = false;
   clearInterval(intervalo);
-  agregarMensaje("⏸ Juego pausado");
+  agregarMensaje("⏸ Juego pausado.");
 }
 
-btnIniciar.addEventListener("click",iniciarJuego);
-btnPausar.addEventListener("click",pausarJuego);
-btnHora.addEventListener("click",avanzarHora);
+function agregarMensaje(texto){
+  const div = document.createElement("div");
+  div.classList.add("mensaje");
+  div.textContent = texto;
+  mensajes.prepend(div);
+}
+
+function numero(min,max){
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+btnIniciar.addEventListener("click", iniciarJuego);
+btnHora.addEventListener("click", avanzarHora);
+btnPausar.addEventListener("click", pausarJuego);
 
 crearCatalogo();
 actualizarPantalla();
-agregarMensaje("🏨 Bienvenido a Imperio Hotelero");
+agregarMensaje("🏨 Bienvenido a Imperio Hotelero.");
