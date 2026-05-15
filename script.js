@@ -683,7 +683,7 @@ function mostrarCliente(cliente){
   const div = document.createElement("div");
   div.classList.add("cliente");
 
-  const carriles = [5, 30, 55, 80, 105, 130];
+  const carriles = [130,105,80,55,30,5];
 
   div.style.top = carriles[siguienteCarrilCliente] + "px";
 

@@ -10,7 +10,7 @@ body{
 
 .contenedor{
   width:96%;
-  max-width:1600px;
+  max-width:2400px;
   margin:auto;
   padding:20px;
 }
@@ -18,9 +18,9 @@ body{
 header{
   background:white;
   border-radius:18px;
-  padding:20px;
+  padding:10px;
   text-align:center;
-  margin-bottom:20px;
+  margin-bottom:10px;
   box-shadow:0 4px 12px rgba(0,0,0,0.2);
 }
 
@@ -38,7 +38,7 @@ header h1{
 
 .panel div{
   background:white;
-  padding:15px;
+  padding:10px;
   border-radius:14px;
   text-align:center;
   font-weight:bold;
@@ -48,7 +48,7 @@ header h1{
 .principal{
   display:grid;
   grid-template-columns:260px 1fr 360px;
-  gap:20px;
+  gap:10px;
   align-items:start;
 }
 
@@ -60,7 +60,7 @@ header h1{
 .mensajesBox{
   background:white;
   border-radius:18px;
-  padding:18px;
+  padding:10px;
   box-shadow:0 4px 12px rgba(0,0,0,0.15);
   margin-bottom:20px;
 }
