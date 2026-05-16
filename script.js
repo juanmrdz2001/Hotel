@@ -1,7 +1,8 @@
-let dinero = 100000;
+let dinero = 300000;
 let dia = 1;
 let hora = 8;
 let reputacion = 50;
+let pisoElevador = 1;
 
 let tieneElevador = false;
 let juegoActivo = false;
@@ -184,27 +185,28 @@ const btnPausar = document.getElementById("btnPausar");
 
 function actualizarPantalla(){
 
-  dineroSpan.textContent = dinero.toLocaleString();
+  dineroSpan.textContent =
+    dinero.toLocaleString();
   diaSpan.textContent = dia;
-
   horaSpan.textContent =
     `${hora.toString().padStart(2,"0")}:00`;
-
   reputacionSpan.textContent = reputacion;
-
   ocupadasSpan.textContent =
     cuartos.filter(c => c.ocupada).length;
-
   compradasSpan.textContent =
     cuartos.filter(c => c.comprada).length;
 
-  const centroHotel = document.getElementById("centroHotel");
-
+  const centroHotel =
+    document.getElementById("centroHotel");
   if(centroHotel){
     if(tieneElevador){
-      centroHotel.style.visibility = "visible";
+      centroHotel.classList.add(
+        "elevadorComprado"
+      );
     }else{
-      centroHotel.style.visibility = "hidden";
+      centroHotel.classList.remove(
+        "elevadorComprado"
+      );
     }
   }
 
@@ -214,42 +216,63 @@ function actualizarPantalla(){
 }
 
 function dibujarHotel(){
+
   ladoIzquierdo.innerHTML = "";
   ladoDerecho.innerHTML = "";
 
-  cuartos.forEach((cuarto)=>{
-    const div = document.createElement("div");
-    div.classList.add("cuarto");
+  const pisos = [...new Set(
+    cuartos.map(c => Math.floor(c.numero / 100))
+  )];
 
-    if(!cuarto.comprada){
-      div.classList.add("bloqueado");
-      div.innerHTML = "🔒";
-    }else{
-      div.classList.add("comprado");
+  pisos.sort((a,b) => b - a);
 
-      if(cuarto.ocupada){
-        div.classList.add("ocupado");
-      }
+  pisos.forEach(piso => {
 
-      div.innerHTML = generarContenidoCuarto(cuarto);
+    const cuartosDelPiso = cuartos.filter(c =>
+      Math.floor(c.numero / 100) === piso
+    );
 
-      div.addEventListener("dragover", permitirSoltar);
-      div.addEventListener("drop", (e)=>soltarEnCuarto(e, cuarto.id));
-    }
+    const izquierda = cuartosDelPiso.filter(c =>
+      c.numero % 100 >= 1 && c.numero % 100 <= 5
+    );
 
-    div.addEventListener("click", ()=>{
-      cuartoSeleccionado = cuarto.id;
-      mostrarDetalleCuarto();
+    const derecha = cuartosDelPiso.filter(c =>
+      c.numero % 100 >= 6 && c.numero % 100 <= 10
+    );
+
+    izquierda.forEach(cuarto => {
+      ladoIzquierdo.appendChild(crearDivCuarto(cuarto));
     });
 
-    const ultimoDigito = cuarto.numero % 100;
+    derecha.forEach(cuarto => {
+      ladoDerecho.appendChild(crearDivCuarto(cuarto));
+    });
 
-    if(ultimoDigito >= 1 && ultimoDigito <= 5){
-      ladoIzquierdo.appendChild(div);
-    }else{
-      ladoDerecho.appendChild(div);
-    }
   });
+}
+
+function crearDivCuarto(cuarto){
+  const div = document.createElement("div");
+  div.classList.add("cuarto");
+  if(!cuarto.comprada){
+    div.classList.add("bloqueado");
+    div.innerHTML = "🔒";
+  }else{
+    div.classList.add("comprado");
+    if(cuarto.ocupada){
+      div.classList.add("ocupado");
+    }
+    div.innerHTML = generarContenidoCuarto(cuarto);
+    div.addEventListener("dragover", permitirSoltar);
+    div.addEventListener("drop", (e)=>{
+      soltarEnCuarto(e, cuarto.id);
+    });
+  }
+  div.addEventListener("click", ()=>{
+    cuartoSeleccionado = cuarto.id;
+    mostrarDetalleCuarto();
+  });
+  return div;
 }
 
 function generarContenidoCuarto(cuarto){

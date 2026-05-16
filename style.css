@@ -72,7 +72,7 @@ header h1{
 
 .hotelVisual{
   position:relative;
-  min-height:650px;
+  min-height:900px;
   background:#deb887;
   border:8px solid #6d421f;
   border-radius:12px;
@@ -80,33 +80,58 @@ header h1{
   grid-template-columns:1fr 120px 1fr;
   gap:15px;
   padding:8px 8px 90px 8px;
+  align-items:stretch;
 }
 
 .ladoHotel{
   display:grid;
   grid-template-columns:repeat(5,1fr);
   gap:4px;
-  align-content:start;
+  align-content:end;
 }
 
 .centroHotel{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-end;
-  padding-bottom:5px;
+  position:relative;
+  width:120px;
+  height:calc(100% + 90px);
+  margin-bottom:-90px;
   background:#c9a77d;
-  border-left:5px solid #5d3519;
-  border-right:5px solid #5d3519;
+  border-left:6px solid #5d3519;
+  border-right:6px solid #5d3519;
+  z-index:1;
+  overflow:hidden;
+}
+
+.centroHotel::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 108px,
+      rgba(0,0,0,0.18) 110px,
+      transparent 112px
+    );
 }
 
 .letreroElevador{
+  position:absolute;
+  left:50%;
+  bottom:185px;
+  transform:translateX(-50%);
   background:#333;
   color:white;
   padding:6px;
   border-radius:6px;
   font-weight:bold;
-  margin-bottom:8px;
+  z-index:5;
 }
 
 .elevador{
@@ -119,6 +144,12 @@ header h1{
   justify-content:center;
   align-items:center;
   font-size:45px;
+  position:absolute;
+  left:50%;
+  bottom:30px;
+  transform:translateX(-50%);
+  animation:moverElevador 12s ease-in-out infinite;
+  z-index:4;
 }
 
 .cuarto{
@@ -235,24 +266,29 @@ header h1{
   text-align:center;
 }
 
-.lavanderia{
+.plantaLuz{
   left:20px;
-  width:130px;
+  width:100px;
+}
+
+.lavanderia{
+  left:130px;
+  width:200px;
 }
 
 .mantenimiento{
-  left:160px;
-  width:160px;
+  left:340px;
+  width:200px;
 }
 
 .recepcion{
-  left:330px;
+  left:550px;
   width:220px;
 }
 
 .cafeteria{
   right:20px;
-  width:320px;
+  width:720px;
 }
 
 .entrada{
@@ -425,3 +461,109 @@ button:hover{
     grid-template-columns:repeat(2,1fr);
   }
 }
+
+.elevador{
+  position:absolute;
+  left:50%;
+  bottom:20px;
+  transform:translateX(-50%);
+
+  width:80px;
+  height:110px;
+
+  background:transparent;
+
+  z-index:4;
+}
+
+.cabinaElevador{
+  width:80px;
+  height:110px;
+  background:#b0bec5;
+  border:4px solid #546e7a;
+  border-radius:8px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:45px;
+  animation:moverCabina 10s ease-in-out infinite;
+}
+
+@keyframes moverCabina{
+
+  0%{
+    transform:translateY(20px);
+  }
+  5%{
+    transform:translateY(-20px);
+  }
+  10%{
+    transform:translateY(-110px);
+  }
+  15%{
+    transform:translateY(-190px);
+  }
+  20%{
+    transform:translateY(-270px);
+  }
+  25%{
+    transform:translateY(-350px);
+  }
+  30%{
+    transform:translateY(-430px);
+  }
+  35%{
+    transform:translateY(-510px);
+  }
+  40%{
+    transform:translateY(-590px);
+  }
+  45%{
+    transform:translateY(-670px);
+  }
+  50%{
+    transform:translateY(-740px);
+  }
+  55%{
+    transform:translateY(-670px);
+  }
+  60%{
+    transform:translateY(-590px);
+  }
+  65%{
+    transform:translateY(-510px);
+  }
+  70%{
+    transform:translateY(-430px);
+  }
+  75%{
+    transform:translateY(-350px);
+  }
+  80%{
+    transform:translateY(-270px);
+  }
+  85%{
+    transform:translateY(-190px);
+  }
+  90%{
+    transform:translateY(-110px);
+  }
+  95%{
+    transform:translateY(-30px);
+  }
+
+  100%{
+    transform:translateY(20px);
+  }
+}
+
+.centroHotel .letreroElevador,
+.centroHotel .elevador{
+  visibility:hidden;
+}
+
+.centroHotel.elevadorComprado .letreroElevador,
+.centroHotel.elevadorComprado .elevador{
+  visibility:visible;
+}
+
