@@ -16,6 +16,7 @@
   </header>
 
   <section class="panel">
+    <div>🏨 Valor Hotel:$<span id="valorHotel">0</span></div>
     <div>💰 Dinero: $<span id="dinero">100000</span></div>
     <div>📅 Día: <span id="dia">1</span></div>
     <div>🕒 Hora: <span id="hora">08:00</span></div>
@@ -100,17 +101,502 @@
           ☕ Cafetería
         </div>
 
+        <div class="servicio alberca">
+          🏊 Alberca
+        </div>
+
       </div>
 
       <!-- ENTRADA -->
 
-      <div class="entrada">
+<div class="zonaInferior">
 
-        <h3>Entrada del Hotel</h3>
+  <!-- ENTRADA -->
 
-        <div id="entradaHotel"></div>
+  <div class="entrada">
+
+    <h3>Entrada del Hotel</h3>
+
+    <div id="entradaHotel"></div>
+
+  </div>
+
+  <!-- MANTENIMIENTO -->
+
+  <div class="mantenimientoPanel">
+
+    <h3>🔧 Indicadores</h3>
+    <div id="indicadoresMantenimiento">
+
+<div id="indicadoresMantenimiento">
+
+<!-- CAMAS -->
+<div class="indicador">
+
+  <div class="indicadorTitulo">
+
+    <div class="tituloIzquierda">
+      <span>🛏️ Camas</span>
+    </div>
+
+    <div class="zonaDerechaIndicador">
+
+      <span id="vidaCamas">
+        100%
+      </span>
+
+      <button class="btnReparar"
+        onclick="repararTipo('cama')">
+
+        Reparar
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="barraExterior">
+
+    <div class="barraInterior"
+      id="barraCamas"
+      style="width:100%">
+
+    </div>
+
+  </div>
+
+  <div class="costoReparacion"
+    id="costoCamas">
+
+    💰 $0
+
+  </div>
+
+</div>
+
+  <!-- TV -->
+<!-- TV -->
+
+<div class="indicador">
+
+  <div class="indicadorTitulo">
+
+    <div class="tituloIzquierda">
+      <span>📺 TVs</span>
+    </div>
+
+    <div class="zonaDerechaIndicador">
+
+      <span id="vidaTv">
+        100%
+      </span>
+
+      <button class="btnReparar"
+        onclick="repararTipo('tv')">
+
+        Reparar
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="barraExterior">
+
+    <div class="barraInterior"
+      id="barraTv"
+      style="width:100%">
+
+    </div>
+
+  </div>
+
+  <div class="costoReparacion"
+    id="costoTv">
+
+    💰 $0
+
+  </div>
+
+</div>
+
+<!-- LAMPARAS -->
+
+<div class="indicador">
+
+  <div class="indicadorTitulo">
+
+    <div class="tituloIzquierda">
+      <span>💡 Lámparas</span>
+    </div>
+
+    <div class="zonaDerechaIndicador">
+
+      <span id="vidaLamparas">
+        100%
+      </span>
+
+      <button class="btnReparar"
+        onclick="repararTipo('lampara')">
+
+        Reparar
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="barraExterior">
+
+    <div class="barraInterior"
+      id="barraLamparas"
+      style="width:100%">
+
+    </div>
+
+  </div>
+
+  <div class="costoReparacion"
+    id="costoLamparas">
+
+    💰 $0
+
+  </div>
+
+</div>
+
+<!-- SABANAS -->
+
+<div class="indicador">
+
+  <div class="indicadorTitulo">
+
+    <div class="tituloIzquierda">
+      <span>🧺 Sábanas</span>
+    </div>
+
+    <div class="zonaDerechaIndicador">
+
+      <span id="vidaSabanas">
+        100%
+      </span>
+
+      <button class="btnReparar"
+        onclick="repararTipo('sabanas')">
+
+        Reparar
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="barraExterior">
+
+    <div class="barraInterior"
+      id="barraSabanas"
+      style="width:100%">
+
+    </div>
+
+  </div>
+
+  <div class="costoReparacion"
+    id="costoSabanas">
+
+    💰 $0
+
+  </div>
+
+</div>
+
+<!-- INTERNET -->
+
+<div class="indicador">
+
+  <div class="indicadorTitulo">
+
+    <div class="tituloIzquierda">
+      <span>📶 Internet</span>
+    </div>
+
+    <div class="zonaDerechaIndicador">
+
+      <span id="vidaInternet">
+        100%
+      </span>
+
+      <button class="btnReparar"
+        onclick="repararTipo('internet')">
+
+        Reparar
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="barraExterior">
+
+    <div class="barraInterior"
+      id="barraInternet"
+      style="width:100%">
+
+    </div>
+
+  </div>
+
+  <div class="costoReparacion"
+    id="costoInternet">
+
+    💰 $0
+
+  </div>
+
+</div>
+
+<!-- CLIMA -->
+
+<div class="indicador">
+
+  <div class="indicadorTitulo">
+
+    <div class="tituloIzquierda">
+      <span>❄️ Clima</span>
+    </div>
+
+    <div class="zonaDerechaIndicador">
+
+      <span id="vidaClima">
+        100%
+      </span>
+
+      <button class="btnReparar"
+        onclick="repararTipo('clima')">
+
+        Reparar
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="barraExterior">
+
+    <div class="barraInterior"
+      id="barraClima"
+      style="width:100%">
+
+    </div>
+
+  </div>
+
+  <div class="costoReparacion"
+    id="costoClima">
+
+    💰 $0
+
+  </div>
+
+</div>
+
+<!-- EXTINGUIDOR -->
+
+<div class="indicador">
+
+  <div class="indicadorTitulo">
+
+    <div class="tituloIzquierda">
+      <span>🧯 Extinguidor</span>
+    </div>
+
+    <div class="zonaDerechaIndicador">
+
+      <span id="vidaExtinguidor">
+        100%
+      </span>
+
+      <button class="btnReparar"
+        onclick="repararTipo('extinguidor')">
+
+        Reparar
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="barraExterior">
+
+    <div class="barraInterior"
+      id="barraExtinguidor"
+      style="width:100%">
+
+    </div>
+
+  </div>
+
+  <div class="costoReparacion"
+    id="costoExtinguidor">
+
+    💰 $0
+
+  </div>
+
+</div>
+
+<!-- CUADROS -->
+
+<div class="indicador">
+
+  <div class="indicadorTitulo">
+
+    <div class="tituloIzquierda">
+      <span>🖼️ Cuadros</span>
+    </div>
+
+    <div class="zonaDerechaIndicador">
+
+      <span id="vidaCuadro">
+        100%
+      </span>
+
+      <button class="btnReparar"
+        onclick="repararTipo('cuadro')">
+
+        Reparar
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="barraExterior">
+
+    <div class="barraInterior"
+      id="barraCuadro"
+      style="width:100%">
+
+    </div>
+
+  </div>
+
+  <div class="costoReparacion"
+    id="costoCuadro">
+
+    💰 $0
+
+  </div>
+
+</div>
+
+<!-- ELEVADOR -->
+
+<div class="indicador">
+
+  <div class="indicadorTitulo">
+
+    <div class="tituloIzquierda">
+      <span>🛗 Elevador</span>
+    </div>
+
+    <div class="zonaDerechaIndicador">
+
+      <span id="vidaElevador">
+        100%
+      </span>
+
+      <button class="btnReparar"
+        onclick="repararTipo('elevador')">
+
+        Reparar
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="barraExterior">
+
+    <div class="barraInterior"
+      id="barraElevador"
+      style="width:100%">
+
+    </div>
+
+  </div>
+
+  <div class="costoReparacion"
+    id="costoElevador">
+
+    💰 $0
+
+  </div>
+
+</div>
+
+
+    </section>
+
+    <!-- PANEL DERECHO -->
+
+    <section class="panelDerecho">
+
+      <div class="controles">
+
+        <h2>Controles</h2>
+
+        <button id="btnIniciar">
+          ▶ Iniciar
+        </button>
+
+        <button id="btnHora">
+          ⏩ Avanzar Hora
+        </button>
+
+        <button id="btnPausar">
+          ⏸ Pausar
+        </button>
 
       </div>
+
+      <div class="catalogoBox">
+
+        <h2>🛒 Catálogo</h2>
+
+        <div id="catalogo"></div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- MENSAJES -->
+
+  <section class="mensajesBox">
+
+    <h2>📜 Movimiento del Hotel</h2>
+
+    <div id="mensajes"></div>
+
+  </section>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
 
     </section>
 
