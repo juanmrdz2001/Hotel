@@ -118,9 +118,31 @@
     <h3>Entrada del Hotel</h3>
 
     <div id="entradaHotel"></div>
+  <div class="panelEmpleados">
+
+  <h3>👨‍💼 Empleados</h3>
+
+  <div class="tablaEmpleados">
+
+    <div class="filaEmpleado encabezadoEmpleado">
+
+    <div>Puesto</div>
+    <div>Cantidad</div>
+    <div>Sueldo</div>
+    <div>Total</div>
+    <div>Capacidad</div>
+    <div>Indicador</div>
+    <div>+</div>
+    <div>-</div>
+      
+    </div>
+
+    <div id="contenidoEmpleados"></div>
 
   </div>
-
+  </div>
+  </div>
+  
   <!-- MANTENIMIENTO -->
 
   <div class="mantenimientoPanel">
@@ -129,6 +151,33 @@
     <div id="indicadoresMantenimiento">
 
 <div id="indicadoresMantenimiento">
+
+  <!-- CUARTOS -->
+
+<div class="indicador">
+  <div class="indicadorTitulo">
+    <div class="tituloIzquierda">
+      <span>🏨 Cuartos</span>
+    </div>
+    <div class="zonaDerechaIndicador">
+      <span id="vidaCuartos">100%</span>
+      <button class="btnReparar"
+        onclick="repararTipo('cuarto')">
+        Reparar
+      </button>
+    </div>
+  </div>
+  <div class="barraExterior">
+    <div class="barraInterior"
+      id="barraCuartos"
+      style="width:100%">
+    </div>
+  </div>
+  <div class="costoReparacion"
+    id="costoCuartos">
+    💰 $0
+  </div>
+</div>
 
 <!-- CAMAS -->
 <div class="indicador">
