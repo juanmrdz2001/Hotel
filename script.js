@@ -231,7 +231,7 @@ const dineroSpan = document.getElementById("dinero");
 const diaSpan = document.getElementById("dia");
 const horaSpan = document.getElementById("hora");
 const reputacionSpan = document.getElementById("reputacion");
-const ocupadasSpan = document.getElementById("ocupadas");
+ocupadasSpan = document.getElementById("ocupadas");
 const compradasSpan = document.getElementById("compradas");
 
 const ladoIzquierdo = document.getElementById("ladoIzquierdo");
@@ -473,6 +473,206 @@ function despedirEmpleado(index) {
   actualizarPantalla();
 }
 
+const materiales = [
+  {
+    nombre: "🧻 Papel de baño",
+    cantidad: 1000,
+    precio: 2,
+    maximo: 1000,
+  },
+  {
+    nombre: "🧼 Fabuloso",
+    cantidad: 100,
+    precio: 50,
+    maximo: 100,
+  },
+  {
+    nombre: "💧 Aguas",
+    cantidad: 1000,
+    precio: 3,
+    maximo: 1000,
+  },
+  {
+    nombre: "🧪 Ácido",
+    cantidad: 20,
+    precio: 30,
+    maximo: 20,
+  },
+  {
+    nombre: "🧴 Shampoo",
+    cantidad: 20,
+    precio: 50,
+    maximo: 20,
+  },
+  {
+    nombre: "🧴 Acondicionado",
+    cantidad: 20,
+    precio: 50,
+    maximo: 20,
+  },
+];
+
+function costoLimpiezaDiaria() {
+  const cuartosRentados = pagosHoy;
+
+  const capacidad = cantidadLimpieza * 6;
+
+  const cuartosQuePuedeLimpiar = Math.min(cuartosRentados, capacidad);
+
+  return cuartosQuePuedeLimpiar * 30;
+}
+
+function dibujarMateriales() {
+  const contenedor = document.getElementById("contenidoMateriales");
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = "";
+
+  materiales.forEach((mat, index) => {
+    const valor = mat.cantidad * mat.precio;
+
+    const porcentaje = Math.round((mat.cantidad / mat.maximo) * 100);
+
+    let color = "#5ea600";
+
+    if (porcentaje <= 50) {
+      color = "#d4b000";
+    }
+
+    if (porcentaje <= 20) {
+      color = "#d10000";
+    }
+
+    let cantidadMostrar = mat.cantidad;
+
+    if (
+      mat.nombre.includes("Fabuloso") ||
+      mat.nombre.includes("Ácido") ||
+      mat.nombre.includes("Shampoo") ||
+      mat.nombre.includes("Acondicionado")
+    ) {
+      cantidadMostrar = Number(mat.cantidad).toFixed(3);
+    }
+
+    contenedor.innerHTML += `
+
+      <div class="filaMaterial">
+
+        <div>${mat.nombre}</div>
+
+        <div>${mat.maximo}</div>
+
+        <div>${cantidadMostrar}</div>
+
+        <div>$${mat.precio}</div>
+
+        <div>$${valor.toLocaleString()}</div>
+
+        <div>
+          <div class="barraMaterial">
+            <div
+              class="barraInternaMaterial"
+              style="width:${porcentaje}%; background:${color};">
+
+              <span class="textoBarraMaterial">
+                ${porcentaje}%
+              </span>
+
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <button onclick="pedirMaterial(${index})">
+            Pedir
+          </button>
+        </div>
+
+      </div>
+
+    `;
+  });
+
+  contenedor.innerHTML += `
+
+    <div class="filaMaterial totalMateriales">
+
+      <div><strong>TOTAL</strong></div>
+      <div></div>
+      <div></div>
+      <div></div>
+
+      <div>
+        <strong>$${valorMateriales().toLocaleString()}</strong>
+      </div>
+
+      <div></div>
+      <div></div>
+
+    </div>
+
+  `;
+}
+
+function valorMateriales() {
+  let total = 0;
+  materiales.forEach((mat) => {
+    total += mat.cantidad * mat.precio;
+  });
+  return total;
+}
+
+function pedirMaterial(index) {
+  const material = materiales[index];
+
+  const cantidadFaltante = material.maximo - material.cantidad;
+
+  if (cantidadFaltante <= 0) {
+    agregarMensaje(`✅ ${material.nombre} ya está al máximo.`);
+    return;
+  }
+
+  const costoPedido = cantidadFaltante * material.precio;
+
+  if (dinero < costoPedido) {
+    agregarMensaje(`❌ No alcanza para pedir ${material.nombre}.`);
+    return;
+  }
+
+  dinero -= costoPedido;
+  material.cantidad = material.maximo;
+
+  agregarMensaje(
+    `📦 Compraste ${cantidadFaltante} de ${material.nombre} por $${costoPedido.toLocaleString()}.`,
+  );
+
+  actualizarPantalla();
+}
+
+function consumirMaterialesPorRenta() {
+  descontarMaterial("🧻 Papel de baño", 2);
+  descontarMaterial("🧼 Fabuloso", 0.1);
+  descontarMaterial("💧 Aguas", 2);
+  descontarMaterial("🧪 Ácido", 0.05);
+  descontarMaterial("🧴 Shampoo", 0.02);
+  descontarMaterial("🧴 Acondicionado", 0.02);
+}
+
+function descontarMaterial(nombre, cantidad) {
+  const material = materiales.find((m) => m.nombre.includes(nombre));
+
+  if (!material) return;
+
+  material.cantidad -= cantidad;
+
+  if (material.cantidad < 0) {
+    material.cantidad = 0;
+  }
+}
+
 function promedioVidaTipo(tipo) {
   // CUARTOS
 
@@ -663,6 +863,7 @@ function actualizarPantalla() {
   mostrarDetalleCuarto();
   actualizarIndicadoresMantenimiento();
   dibujarEmpleados();
+  dibujarMateriales();
 }
 
 function dibujarHotel() {
@@ -1100,6 +1301,10 @@ function valorHotel() {
     }
   });
 
+  // MATERIALES
+
+  total += valorMateriales();
+
   // ELEVADOR
 
   if (tieneElevador) {
@@ -1357,7 +1562,7 @@ function avanzarHora() {
   if (hora === 6 && !nominaPagadaHoy) {
     const pagoNomina = nominaDiaria();
 
-    dinero -= pagoNomina;
+    dinero -= pagoNomina / 2;
 
     nominaPagadaHoy = true;
 
@@ -1439,6 +1644,7 @@ function recibirClientes() {
 
       dinero += pago;
       pagosHoy++;
+      consumirMaterialesPorRenta();
 
       agregarMensaje(
         `${cliente.emoji} ${cliente.nombre} rentó el cuarto ${cuarto.numero} y pagó $${pago.toLocaleString()}.`,
