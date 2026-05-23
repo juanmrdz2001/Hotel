@@ -1243,11 +1243,6 @@ function valorHotel() {
         }
       }
     }
-    if (valorHotel() >= 1000000 && !millónDetectado) {
-      millónDetectado = true;
-
-      gtag("event", "hotel_1_millon");
-    }
   });
 
   // INVENTARIO
