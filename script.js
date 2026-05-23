@@ -11,6 +11,7 @@ let intervalo = null;
 let cuartoSeleccionado = null;
 let siguienteCarrilCliente = 0;
 let nominaPagadaHoy = false;
+let millónDetectado = false;
 
 const cuartos = [];
 
@@ -258,6 +259,7 @@ const vidaUtilPorTipo = {
   alfombra: 120,
 };
 
+let cuartosRentados20 = 0;
 let costoElevador = 80000;
 let vidaElevador = 100;
 let vidaMaximaElevador = 100;
@@ -333,133 +335,86 @@ const empleados = [
 
 function nominaDiaria() {
   let total = 0;
-
   document.querySelectorAll(".filaEmpleado").forEach((fila) => {
     const columnas = fila.querySelectorAll("div");
-
     // La columna 4 es TOTAL
     if (columnas[3]) {
       const texto = columnas[3].textContent
         .replace("$", "")
         .replace(/,/g, "")
         .trim();
-
       const valor = Number(texto);
-
       if (!isNaN(valor)) {
         total += valor;
       }
     }
   });
-
   return total;
 }
 
 function dibujarEmpleados() {
   const contenedor = document.getElementById("contenidoEmpleados");
-
   const totalNomina = document.getElementById("totalNomina");
-
   if (!contenedor) {
     return;
   }
-
   contenedor.innerHTML = "";
-
   empleados.forEach((emp, index) => {
-    const totalPuesto = emp.cantidad * emp.sueldo;
-
+    let totalPuesto = emp.cantidad * emp.sueldo;
+    let indicador = emp.indicador;
+    if (emp.puesto.includes("Limpieza")) {
+      const capacidadIdeal = emp.cantidad * 6;
+      totalPuesto = cuartosRentados20 * 30;
+      if (cuartosRentados20 > capacidadIdeal) {
+        indicador = `⚠️ ${cuartosRentados20} / ${capacidadIdeal}`;
+      } else {
+        indicador = `✅ ${cuartosRentados20} / ${capacidadIdeal}`;
+      }
+    }
     contenedor.innerHTML += `
-
       <div class="filaEmpleado">
-
+        <div>${emp.puesto}</div>
+        <div>${emp.cantidad}</div>
+        <div>$${emp.sueldo.toLocaleString()}</div>
+        <div>$${totalPuesto.toLocaleString()}</div>
+        <div>${emp.capacidad}</div>
+        <div>${indicador}</div>
         <div>
-          ${emp.puesto}
+        <button onclick="contratarEmpleado(${index})">
+          +
+        </button>
         </div>
-
         <div>
-          ${emp.cantidad}
-        </div>
-
-        <div>
-          $${emp.sueldo.toLocaleString()}
-        </div>
-
-        <div>
-          $${totalPuesto.toLocaleString()}
-        </div>
-
-        <div>
-          ${emp.capacidad}
-        </div>
-
-        <div>
-          ${emp.indicador}
-        </div>
-
-        <div>
-          <button
-            onclick="contratarEmpleado(${index})">
-            +
-          </button>
-        </div>
-
-        <div>
-          <button
-            onclick="despedirEmpleado(${index})">
+          <button onclick="despedirEmpleado(${index})">
             -
           </button>
         </div>
-
       </div>
-
     `;
   });
-
-  // FILA TOTAL NOMINA
-
   contenedor.innerHTML += `
-
     <div class="filaEmpleado totalFila">
-
-      <div>
-        <strong>
-          TOTAL NÓMINA
-        </strong>
-      </div>
-
+      <div><strong>TOTAL NÓMINA</strong></div>
       <div></div>
-
       <div></div>
-
       <div>
         <strong>
           $${nominaDiaria().toLocaleString()}
         </strong>
       </div>
-
       <div></div>
-
       <div></div>
-
       <div></div>
-
       <div></div>
-
     </div>
-
   `;
-
-  // TEXTO ABAJO
-
   if (totalNomina) {
-    totalNomina.textContent = nominaDiaria().toLocaleString();
+    totalNomina.textContent = nominaDiaria().toLocaleString() / 2;
   }
 }
 
 function contratarEmpleado(index) {
   empleados[index].cantidad++;
-
   actualizarPantalla();
 }
 
@@ -467,9 +422,7 @@ function despedirEmpleado(index) {
   if (empleados[index].cantidad <= 0) {
     return;
   }
-
   empleados[index].cantidad--;
-
   actualizarPantalla();
 }
 
@@ -1248,11 +1201,16 @@ function comprarCuarto(costo) {
     return;
   }
   dinero -= costo;
+
+  gtag("event", "comprar_cuarto", {
+    costo: costo,
+  });
   cuartoDisponible.comprada = true;
   cuartoDisponible.costo = costo;
   agregarMensaje(
     `🛏️ Compraste el cuarto ${cuartoDisponible.numero} por $${costo.toLocaleString()}.`,
   );
+
   actualizarPantalla();
 }
 
@@ -1284,6 +1242,11 @@ function valorHotel() {
           total += costo * (vida / vidaMaxima);
         }
       }
+    }
+    if (valorHotel() >= 1000000 && !millónDetectado) {
+      millónDetectado = true;
+
+      gtag("event", "hotel_1_millon");
     }
   });
 
@@ -1547,33 +1510,28 @@ function mostrarDetalleCuarto() {
 
 function avanzarHora() {
   hora++;
-
-  // NUEVO DÍA
+  if (hora === 20) {
+    cuartosRentados20 = cuartos.filter((c) => c.ocupada).length;
+    agregarMensaje(
+      `🧾 A las 20:00 había ${cuartosRentados20} cuartos rentados para limpieza.`,
+    );
+  }
   if (hora >= 24) {
     hora = 0;
     dia++;
-
     nominaPagadaHoy = false;
-
     cerrarDiaHotel();
   }
-
-  // PAGO DE NÓMINA
   if (hora === 6 && !nominaPagadaHoy) {
     const pagoNomina = nominaDiaria();
-
-    dinero -= pagoNomina / 2;
+    dinero -= pagoNomina;
 
     nominaPagadaHoy = true;
-
     agregarMensaje(
       `💵 Se pagó nómina diaria por $${pagoNomina.toLocaleString()}.`,
     );
   }
-
-  // CLIENTES
   recibirClientes();
-
   actualizarPantalla();
 }
 
@@ -1740,6 +1698,9 @@ function numero(min, max) {
 }
 
 btnIniciar.addEventListener("click", iniciarJuego);
+gtag("event", "iniciar_partida", {
+  juego: "Imperio Hotelero",
+});
 btnHora.addEventListener("click", avanzarHora);
 btnPausar.addEventListener("click", pausarJuego);
 
