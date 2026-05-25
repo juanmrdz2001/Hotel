@@ -8,11 +8,23 @@ let tieneElevador = false;
 let juegoActivo = false;
 let intervalo = null;
 
+let prestamo = {
+  saldo: 700000,
+  capitalOriginal: 700000,
+  pagosTotales: 35,
+  pagosRealizados: 0,
+  amortizacion: 20000,
+  interes: 0.02,
+  frecuenciaDias: 10,
+};
+
 let cuartoSeleccionado = null;
 let siguienteCarrilCliente = 0;
 let nominaPagadaHoy = false;
 let millónDetectado = false;
-
+let vidaFachada = 100;
+const costoFachada = 650000;
+let diasDesgasteFachada = 0;
 const cuartos = [];
 
 const numerosCuartos = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110];
@@ -350,6 +362,36 @@ function nominaDiaria() {
     }
   });
   return total;
+}
+
+function actualizarPanelPrestamo() {
+  const saldo = document.getElementById("saldoPrestamo");
+
+  const diaPago = document.getElementById("diaPagoPrestamo");
+
+  const montoPago = document.getElementById("montoPagoPrestamo");
+
+  if (!prestamo) {
+    return;
+  }
+
+  const intereses = prestamo.saldo * prestamo.interes;
+
+  const siguientePago = prestamo.amortizacion + intereses;
+
+  const siguienteDia = (prestamo.pagosRealizados + 1) * prestamo.frecuenciaDias;
+
+  if (saldo) {
+    saldo.textContent = `$${Math.round(prestamo.saldo).toLocaleString()}`;
+  }
+
+  if (diaPago) {
+    diaPago.textContent = siguienteDia;
+  }
+
+  if (montoPago) {
+    montoPago.textContent = `$${Math.round(siguientePago).toLocaleString()}`;
+  }
 }
 
 function dibujarEmpleados() {
@@ -749,6 +791,65 @@ function actualizarIndicador(tipo, idVida, idBarra, idCosto) {
   costoElemento.textContent = "💰 $" + costo.toLocaleString();
 }
 
+function pagarCuotaPrestamo() {
+  if (prestamo.saldo <= 0) {
+    return;
+  }
+
+  const amortizacion = prestamo.amortizacion;
+
+  const intereses = prestamo.saldo * prestamo.interes;
+
+  const pago = amortizacion + intereses;
+
+  if (dinero < pago) {
+    agregarMensaje("⚠️ No alcanzó para pagar el préstamo.");
+    return;
+  }
+
+  dinero -= pago;
+
+  prestamo.saldo -= amortizacion;
+
+  prestamo.pagosRealizados++;
+
+  if (prestamo.saldo < 0) {
+    prestamo.saldo = 0;
+  }
+
+  agregarMensaje(
+    `🏦 Pago préstamo ${prestamo.pagosRealizados}/35: $${pago.toLocaleString()}. Saldo: $${prestamo.saldo.toLocaleString()}.`,
+  );
+}
+
+function actualizarPantalla() {
+  dineroSpan.textContent = dinero.toLocaleString();
+  diaSpan.textContent = dia;
+  horaSpan.textContent = `${hora.toString().padStart(2, "0")}:00`;
+  reputacionSpan.textContent = reputacion;
+  ocupadasSpan.textContent = cuartos.filter((c) => c.ocupada).length;
+  compradasSpan.textContent = cuartos.filter((c) => c.comprada).length;
+
+  const centroHotel = document.getElementById("centroHotel");
+  if (centroHotel) {
+    if (tieneElevador) {
+      centroHotel.classList.add("elevadorComprado");
+    } else {
+      centroHotel.classList.remove("elevadorComprado");
+    }
+  }
+
+  valorHotelSpan.textContent = valorHotel().toLocaleString();
+
+  dibujarHotel();
+  dibujarInventario();
+  mostrarDetalleCuarto();
+  actualizarIndicadoresMantenimiento();
+  dibujarEmpleados();
+  dibujarMateriales();
+  actualizarPanelPrestamo();
+}
+
 function actualizarIndicadoresMantenimiento() {
   actualizarIndicador("cuarto", "vidaCuartos", "barraCuartos", "costoCuartos");
   actualizarIndicador("cama", "vidaCamas", "barraCamas", "costoCamas");
@@ -780,43 +881,29 @@ function actualizarIndicadoresMantenimiento() {
     "barraElevador",
     "costoElevador",
   );
-}
 
-function actualizarIndicador(tipo, idVida, idBarra, idCosto) {
-  const vida = promedioVidaTipo(tipo);
-  const costo = costoReparacionTipo(tipo);
+  const spanFachada = document.getElementById("vidaFachada");
+  const barraFachada = document.getElementById("barraFachada");
+  const costoFachadaSpan = document.getElementById("costoFachada");
 
-  document.getElementById(idVida).textContent = vida + "%";
-  document.getElementById(idBarra).style.width = vida + "%";
-  document.getElementById(idCosto).textContent =
-    "💰 $" + costo.toLocaleString();
-}
-
-function actualizarPantalla() {
-  dineroSpan.textContent = dinero.toLocaleString();
-  diaSpan.textContent = dia;
-  horaSpan.textContent = `${hora.toString().padStart(2, "0")}:00`;
-  reputacionSpan.textContent = reputacion;
-  ocupadasSpan.textContent = cuartos.filter((c) => c.ocupada).length;
-  compradasSpan.textContent = cuartos.filter((c) => c.comprada).length;
-
-  const centroHotel = document.getElementById("centroHotel");
-  if (centroHotel) {
-    if (tieneElevador) {
-      centroHotel.classList.add("elevadorComprado");
-    } else {
-      centroHotel.classList.remove("elevadorComprado");
-    }
+  if (spanFachada) {
+    spanFachada.textContent = `${vidaFachada.toFixed(0)}%`;
   }
 
-  valorHotelSpan.textContent = valorHotel().toLocaleString();
+  if (barraFachada) {
+    barraFachada.style.width = `${vidaFachada}%`;
+    barraFachada.style.background = "";
+  }
 
-  dibujarHotel();
-  dibujarInventario();
-  mostrarDetalleCuarto();
-  actualizarIndicadoresMantenimiento();
-  dibujarEmpleados();
-  dibujarMateriales();
+  const desgastePorDia = costoFachada / 365;
+
+  const diasDesgastados = (100 - vidaFachada) / (100 / 365);
+
+  const costoActualFachada = desgastePorDia * diasDesgastados;
+
+  if (costoFachadaSpan) {
+    costoFachadaSpan.textContent = `💰 $${Math.round(costoActualFachada).toLocaleString()}`;
+  }
 }
 
 function dibujarHotel() {
@@ -1217,30 +1304,38 @@ function comprarCuarto(costo) {
 function valorHotel() {
   let total = Number(dinero) || 0;
 
-  // CUARTOS Y MUEBLES COLOCADOS
+  // CUARTOS
 
   cuartos.forEach((cuarto) => {
-    if (cuarto.comprada) {
-      const costoCuarto = Number(cuarto.costo) || 15000;
+    if (!cuarto.comprada) {
+      return;
+    }
 
-      const vidaCuarto = Number(cuarto.vida) || 0;
+    const costoCuarto = Number(cuarto.costo || 15000);
 
-      const vidaMaximaCuarto = Number(cuarto.vidaMaxima) || 100;
+    const vidaCuarto = Number(cuarto.vida || 100);
 
-      total += costoCuarto * (vidaCuarto / vidaMaximaCuarto);
+    const vidaMaximaCuarto = Number(cuarto.vidaMaxima || 100);
 
+    total += costoCuarto * (vidaCuarto / vidaMaximaCuarto);
+
+    // OBJETOS
+
+    if (cuarto.objetos) {
       for (let tipo in cuarto.objetos) {
         const obj = cuarto.objetos[tipo];
 
-        if (obj) {
-          const costo = Number(obj.costo) || 0;
-
-          const vida = Number(obj.vida) || 0;
-
-          const vidaMaxima = Number(obj.vidaMaxima) || 100;
-
-          total += costo * (vida / vidaMaxima);
+        if (!obj) {
+          continue;
         }
+
+        const costo = Number(obj.costo || 0);
+
+        const vida = Number(obj.vida || 100);
+
+        const vidaMaxima = Number(obj.vidaMaxima || 100);
+
+        total += costo * (vida / vidaMaxima);
       }
     }
   });
@@ -1248,15 +1343,17 @@ function valorHotel() {
   // INVENTARIO
 
   inventario.forEach((obj) => {
-    if (obj) {
-      const costo = Number(obj.costo) || 0;
-
-      const vida = Number(obj.vida) || 0;
-
-      const vidaMaxima = Number(obj.vidaMaxima) || 100;
-
-      total += costo * (vida / vidaMaxima);
+    if (!obj) {
+      return;
     }
+
+    const costo = Number(obj.costo || 0);
+
+    const vida = Number(obj.vida || 100);
+
+    const vidaMaxima = Number(obj.vidaMaxima || 100);
+
+    total += costo * (vida / vidaMaxima);
   });
 
   // MATERIALES
@@ -1266,13 +1363,16 @@ function valorHotel() {
   // ELEVADOR
 
   if (tieneElevador) {
-    const costo = Number(costoElevador) || 80000;
+    total += 80000 * ((vidaElevador || 100) / 100);
+  }
 
-    const vida = Number(vidaElevador) || 0;
+  // FACHADA
 
-    const vidaMaxima = Number(vidaMaximaElevador) || 100;
+  total += costoFachada * ((vidaFachada || 100) / 100);
 
-    total += costo * (vida / vidaMaxima);
+  // DEUDA BANCARIA
+  if (prestamo) {
+    total -= prestamo.saldo;
   }
 
   return Math.round(total);
@@ -1563,12 +1663,24 @@ function cerrarDiaHotel() {
 
     if (cuarto.ocupada) {
       cuarto.ocupada = false;
-
       agregarMensaje(`🧳 Salió el huésped del cuarto ${cuarto.numero}.`);
     }
   });
 
   desgastarObjetosPorDia();
+
+  diasDesgasteFachada++;
+
+  vidaFachada = 100 - diasDesgasteFachada * (100 / 365);
+
+  if (vidaFachada < 0) {
+    vidaFachada = 0;
+  }
+
+  // COBRO DE PRÉSTAMO AL INICIAR DÍA 10, 20, 30...
+  if (dia % prestamo.frecuenciaDias === 0) {
+    pagarCuotaPrestamo();
+  }
 }
 
 function recibirClientes() {
@@ -1626,6 +1738,31 @@ function calcularClientes() {
   base += Math.floor(reputacion / 25);
 
   return base;
+}
+
+function repararFachada() {
+  const costoActual = diasDesgasteFachada * (costoFachada / 365);
+
+  if (costoActual <= 0) {
+    agregarMensaje("✅ La fachada ya está al 100%.");
+    return;
+  }
+
+  if (dinero < costoActual) {
+    agregarMensaje("❌ No alcanza para restaurar la fachada.");
+    return;
+  }
+
+  dinero -= Math.round(costoActual);
+
+  diasDesgasteFachada = 0;
+  vidaFachada = 100;
+
+  agregarMensaje(
+    `🏨 Restauraste la fachada por $${Math.round(costoActual).toLocaleString()}.`,
+  );
+
+  actualizarPantalla();
 }
 
 function liberarHabitaciones() {
