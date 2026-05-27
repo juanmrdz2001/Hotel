@@ -850,12 +850,7 @@ function pagarCuotaPrestamo() {
 
   const pago = amortizacion + intereses;
 
-  if (dinero < pago) {
-    agregarMensaje("⚠️ No alcanzó para pagar el préstamo.");
-    return;
-  }
-
-  dinero -= pago;
+  dinero -= Math.round(pago);
 
   prestamo.saldo -= amortizacion;
 
@@ -866,8 +861,10 @@ function pagarCuotaPrestamo() {
   }
 
   agregarMensaje(
-    `🏦 Pago préstamo ${prestamo.pagosRealizados}/35: $${pago.toLocaleString()}. Saldo: $${prestamo.saldo.toLocaleString()}.`,
+    `🏦 Pago préstamo ${prestamo.pagosRealizados}/35: $${Math.round(pago).toLocaleString()}. Saldo: $${prestamo.saldo.toLocaleString()}.`,
   );
+
+  actualizarPantalla();
 }
 
 function verificarQuiebra() {
@@ -1549,6 +1546,23 @@ function arrastrarItem(e) {
 function permitirSoltar(e) {
   e.preventDefault();
 }
+
+function supervisionEmpleadosCorrecta() {
+  const gerente = empleados.find((e) => e.puesto.includes("Gerente"));
+  const subgerente = empleados.find((e) => e.puesto.includes("Subgerente"));
+
+  const totalOperativos =
+    empleados.reduce((sum, e) => sum + e.cantidad, 0) -
+    (gerente ? gerente.cantidad : 0) -
+    (subgerente ? subgerente.cantidad : 0);
+
+  const capacidad =
+    (gerente ? gerente.cantidad * 10 : 0) +
+    (subgerente ? subgerente.cantidad * 7 : 0);
+
+  return capacidad >= totalOperativos;
+}
+
 function calcularReputacion() {
   let reputacionTotal = 0;
 
@@ -1556,9 +1570,9 @@ function calcularReputacion() {
   // 40% LUJO
   // =====================================
 
-  let totalLujo = 0;
-
   const cuartosComprados = cuartos.filter((c) => c.comprada);
+
+  let totalLujo = 0;
 
   cuartosComprados.forEach((cuarto) => {
     totalLujo += lujoCuarto(cuarto);
@@ -1567,9 +1581,7 @@ function calcularReputacion() {
   const maximoLujo = cuartosComprados.length * 40;
 
   if (maximoLujo > 0) {
-    const porcentajeLujo = totalLujo / maximoLujo;
-
-    reputacionTotal += porcentajeLujo * 40;
+    reputacionTotal += (totalLujo / maximoLujo) * 40;
   }
 
   // =====================================
@@ -1602,19 +1614,7 @@ function calcularReputacion() {
   // 25% EMPLEADOS
   // =====================================
 
-  const habitaciones = cuartos.filter((c) => c.comprada).length;
-
-  const limpiezaNecesaria = Math.ceil(cuartosRentados20 / 6);
-
-  const botonesNecesarios = Math.ceil(habitaciones / 20);
-
-  const mantenimientoNecesario = Math.ceil(habitaciones / 20);
-
-  const recepcionNecesaria = Math.ceil(habitaciones / 15);
-
-  const lavanderiaNecesaria = Math.ceil(habitaciones / 15);
-
-  const vigilanciaNecesaria = Math.ceil(habitaciones / 30);
+  const habitaciones = cuartosComprados.length;
 
   const gerente = empleados.find((e) => e.puesto.includes("Gerente"));
 
@@ -1634,36 +1634,67 @@ function calcularReputacion() {
 
   const vigilancia = empleados.find((e) => e.puesto.includes("Vigilante"));
 
-  if (gerente && gerente.cantidad >= 1) {
-    reputacionTotal += 2;
-  }
+  // CAPACIDAD GERENCIAL
 
-  if (subgerente && subgerente.cantidad >= 1) {
-    reputacionTotal += 1;
-  }
+  const totalOperativos =
+    empleados.reduce((sum, e) => {
+      return sum + e.cantidad;
+    }, 0) -
+    (gerente ? gerente.cantidad : 0) -
+    (subgerente ? subgerente.cantidad : 0);
 
-  if (botones && botones.cantidad >= botonesNecesarios) {
-    reputacionTotal += 2;
-  }
+  const capacidadGerencial =
+    (gerente ? gerente.cantidad * 10 : 0) +
+    (subgerente ? subgerente.cantidad * 7 : 0);
 
-  if (limpieza && limpieza.cantidad >= limpiezaNecesaria) {
-    reputacionTotal += 10;
-  }
+  const supervisionCorrecta = capacidadGerencial >= totalOperativos;
 
-  if (mantenimiento && mantenimiento.cantidad >= mantenimientoNecesario) {
-    reputacionTotal += 5;
-  }
+  // SOLO SI HAY SUPERVISIÓN CORRECTA
 
-  if (recepcion && recepcion.cantidad >= recepcionNecesaria) {
-    reputacionTotal += 3;
-  }
+  if (supervisionCorrecta) {
+    if (gerente && gerente.cantidad >= 1) {
+      reputacionTotal += 2;
+    }
 
-  if (lavanderia && lavanderia.cantidad >= lavanderiaNecesaria) {
-    reputacionTotal += 1;
-  }
+    if (subgerente && subgerente.cantidad >= 1) {
+      reputacionTotal += 1;
+    }
 
-  if (vigilancia && vigilancia.cantidad >= vigilanciaNecesaria) {
-    reputacionTotal += 1;
+    const limpiezaNecesaria = Math.ceil(cuartosRentados20 / 6);
+
+    const botonesNecesarios = Math.ceil(habitaciones / 20);
+
+    const mantenimientoNecesario = Math.ceil(habitaciones / 20);
+
+    const recepcionNecesaria = Math.ceil(habitaciones / 15);
+
+    const lavanderiaNecesaria = Math.ceil(habitaciones / 15);
+
+    const vigilanciaNecesaria = Math.ceil(habitaciones / 30);
+
+    if (botones && botones.cantidad >= botonesNecesarios) {
+      reputacionTotal += 2;
+    }
+
+    if (limpieza && limpieza.cantidad >= limpiezaNecesaria) {
+      reputacionTotal += 10;
+    }
+
+    if (mantenimiento && mantenimiento.cantidad >= mantenimientoNecesario) {
+      reputacionTotal += 5;
+    }
+
+    if (recepcion && recepcion.cantidad >= recepcionNecesaria) {
+      reputacionTotal += 3;
+    }
+
+    if (lavanderia && lavanderia.cantidad >= lavanderiaNecesaria) {
+      reputacionTotal += 1;
+    }
+
+    if (vigilancia && vigilancia.cantidad >= vigilanciaNecesaria) {
+      reputacionTotal += 1;
+    }
   }
 
   // =====================================
@@ -1680,7 +1711,9 @@ function calcularReputacion() {
   // 4% RECHAZOS
   // =====================================
 
-  reputacionTotal -= Math.min(clientesRechazados * 0.5, 4);
+  const penalizacionRechazos = Math.min(clientesRechazados * 0.5, 4);
+
+  reputacionTotal -= penalizacionRechazos;
 
   // =====================================
 
