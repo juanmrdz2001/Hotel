@@ -50,7 +50,7 @@ header h1{
 
 .principal{
   display:grid;
-  grid-template-columns:260px 1fr 360px;
+  grid-template-columns:260px minmax(600px, 1fr) 280px;
   gap:10px;
   align-items:start;
 }
@@ -1077,3 +1077,144 @@ header p{
   align-items:center;
   margin:4px 0;
 }
+
+.filtrosCatalogo{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-bottom:10px;
+  justify-content:center;
+}
+
+.filtrosCatalogo button{
+  width:36px;
+  height:36px;
+  border:1px solid #000;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:18px;
+  background:#ececec;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+}
+
+.filtrosCatalogo button:hover{
+
+  background:#d4d4d4;
+
+}
+
+.filtrosCatalogo{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:5px;
+
+  margin-bottom:10px;
+
+}
+
+.filtrosCatalogo button{
+
+  width:36px;
+
+  height:36px;
+
+  border:none;
+
+  border-radius:8px;
+
+  cursor:pointer;
+
+  font-size:18px;
+
+  background:#ececec;
+
+}
+
+.filtrosCatalogo button:hover{
+
+  background:#d4d4d4;
+
+}
+
+.zonaServicios{
+  display:grid;
+  grid-template-columns:
+    1fr
+    1fr
+    1fr
+    1fr
+    1fr
+    2fr
+    1fr;
+  gap:6px;
+  width:100%;
+  margin-top:6px;
+}
+
+.servicio{
+  min-height:55px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  font-size:12px;
+  font-weight:bold;
+  border:3px solid #4e342e;
+  border-radius:8px;
+  background:#fff3cd;
+}
+
+.alberca{
+  background:#81d4fa;
+  border-color:#0277bd;
+}
+
+.hotelBox{
+  min-width:0;
+  overflow-x:auto;
+}
+
+.hotelVisual{
+  min-width:600px;
+}
+
+.zonaServicios{
+  min-width:600px;
+}
+
+.bandaMensajes{
+  position:sticky;
+  top:110px; /* ajusta según la altura de tu encabezado */
+  z-index:999;
+  background:#111;
+  color:#00ff7f;
+  font-family:monospace;
+  font-weight:bold;
+  padding:2px;
+  overflow:hidden;
+  white-space:nowrap;
+  border-top:2px solid #333;
+  border-bottom:2px solid #333;
+}
+
+#textoBanda{
+  display:inline-block;
+  animation:moverBanda 32s linear infinite;
+}
+
+@keyframes moverBanda{
+  from{
+    transform:translateX(100vw);
+  }
+  to{
+    transform:translateX(-200vw);
+  }
+}
+
+

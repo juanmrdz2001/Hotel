@@ -34,7 +34,9 @@
     <div>🛏️ Ocupación: <span id="ocupadas">0</span>/<span id="compradas">0</span></div>
   </section>
 </div>
-
+<div class="bandaMensajes">
+  <span id="textoBanda">🏨 Bienvenido a Imperio Hotelero</span>
+</div>
   
   <main class="principal">
 
@@ -731,7 +733,38 @@
 
         <h2>🛒 Catálogo</h2>
 
+<div id="filtrosCatalogo" class="filtrosCatalogo">
+
+  <button onclick="filtrarCatalogo('todos')">🛒</button>
+
+<button onclick="filtrarCatalogo('cuarto')">🚪</button>
+
+  <button onclick="filtrarCatalogo('cama')">🛏️</button>
+
+  <button onclick="filtrarCatalogo('tv')">📺</button>
+
+  <button onclick="filtrarCatalogo('lampara')">💡</button>
+
+  <button onclick="filtrarCatalogo('alfombra')">🟥</button>
+
+  <button onclick="filtrarCatalogo('sabanas')">🧺</button>
+
+  <button onclick="filtrarCatalogo('extinguidor')">🧯</button>
+
+  <button onclick="filtrarCatalogo('internet')">📶</button>
+
+  <button onclick="filtrarCatalogo('clima')">❄️</button>
+
+  <button onclick="filtrarCatalogo('cuadro')">🖼️</button>
+
+  <button onclick="filtrarCatalogo('elevador')">🏢</button>
+
+</div>
+
+
+
         <div id="catalogo"></div>
+
 
       </div>
 

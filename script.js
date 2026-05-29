@@ -66,7 +66,7 @@ const tiposClientes = [
 
 const catalogo = [
   {
-    nombre: "Comprar cuarto",
+    nombre: "Comprar Cuarto",
     tipo: "cuarto",
     icono: "🚪",
     costo: 15000,
@@ -74,7 +74,7 @@ const catalogo = [
     descripcion: "Desbloquea el siguiente cuarto disponible.",
   },
   {
-    nombre: "Cama sencilla",
+    nombre: "Cama Sencilla",
     tipo: "cama",
     icono: "🛏️",
     costo: 5000,
@@ -91,7 +91,7 @@ const catalogo = [
   },
 
   {
-    nombre: "TV sencilla",
+    nombre: "TV Sencilla",
     tipo: "tv",
     icono: "📺",
     costo: 6000,
@@ -116,7 +116,7 @@ const catalogo = [
   },
 
   {
-    nombre: "Lámpara sencilla",
+    nombre: "Lámpara Sencilla",
     tipo: "lampara",
     icono: "💡",
     costo: 4000,
@@ -124,7 +124,7 @@ const catalogo = [
     descripcion: "Iluminación básica.",
   },
   {
-    nombre: "Lámpara elegante",
+    nombre: "Lámpara Elegante",
     tipo: "lampara",
     icono: "🏮",
     costo: 10000,
@@ -133,7 +133,7 @@ const catalogo = [
   },
 
   {
-    nombre: "Alfombra básica",
+    nombre: "Alfombra Básica",
     tipo: "alfombra",
     icono: "🟥",
     costo: 5000,
@@ -141,7 +141,7 @@ const catalogo = [
     descripcion: "Decora el piso del cuarto.",
   },
   {
-    nombre: "Alfombra fina",
+    nombre: "Alfombra Fina",
     tipo: "alfombra",
     icono: "🟫",
     costo: 18000,
@@ -150,7 +150,7 @@ const catalogo = [
   },
 
   {
-    nombre: "Sábanas limpias",
+    nombre: "Sábanas Limpias",
     tipo: "sabanas",
     icono: "🧺",
     costo: 3000,
@@ -158,7 +158,7 @@ const catalogo = [
     descripcion: "Necesarias para rentar.",
   },
   {
-    nombre: "Sábanas premium",
+    nombre: "Sábanas Premium",
     tipo: "sabanas",
     icono: "✨",
     costo: 12000,
@@ -175,7 +175,7 @@ const catalogo = [
     descripcion: "Seguridad básica del cuarto.",
   },
   {
-    nombre: "📶 WiFi básico",
+    nombre: "📶 WiFi Básico",
     tipo: "internet",
     icono: "📶",
     costo: 12000,
@@ -183,7 +183,7 @@ const catalogo = [
     descripcion: "Internet para huéspedes.",
   },
   {
-    nombre: "🚀 Fibra óptica",
+    nombre: "🚀 Fibra Óptica",
     tipo: "internet",
     icono: "🛰️",
     costo: 40000,
@@ -191,7 +191,7 @@ const catalogo = [
     descripcion: "Internet de alta velocidad.",
   },
   {
-    nombre: "❄️ Aire acondicionado",
+    nombre: "❄️ Aire Acondicionado",
     tipo: "clima",
     icono: "❄️",
     costo: 18000,
@@ -199,7 +199,7 @@ const catalogo = [
     descripcion: "Mejora la comodidad.",
   },
   {
-    nombre: "🧊 Clima inteligente",
+    nombre: "🧊 Clima Inteligente",
     tipo: "clima",
     icono: "🧊",
     costo: 50000,
@@ -207,7 +207,7 @@ const catalogo = [
     descripcion: "Sistema premium de climatización.",
   },
   {
-    nombre: "🖼️ Cuadro sencillo",
+    nombre: "🖼️ Cuadro Sencillo",
     tipo: "cuadro",
     icono: "🖼️",
     costo: 6000,
@@ -215,7 +215,7 @@ const catalogo = [
     descripcion: "Decoración básica.",
   },
   {
-    nombre: "🎨 Cuadro elegante",
+    nombre: "🎨 Cuadro Elegante",
     tipo: "cuadro",
     icono: "🎨",
     costo: 18000,
@@ -223,7 +223,7 @@ const catalogo = [
     descripcion: "Da estilo al cuarto.",
   },
   {
-    nombre: "👑 Arte premium",
+    nombre: "👑 Arte Premium",
     tipo: "cuadro",
     icono: "🖼️",
     costo: 50000,
@@ -233,7 +233,7 @@ const catalogo = [
   {
     nombre: "Elevador",
     tipo: "elevador",
-    icono: "🛗",
+    icono: "🔼",
     costo: 80000,
     lujo: 0,
     descripcion: "Permite construir más pisos.",
@@ -285,7 +285,7 @@ const empleados = [
     puesto: "👨‍💼 Gerente",
     cantidad: 1,
     sueldo: 400,
-    capacidad: "10 empleados",
+    capacidad: "10 Empleados",
     indicador: "1 / 10",
   },
 
@@ -293,7 +293,7 @@ const empleados = [
     puesto: "🧑‍💼 Subgerente",
     cantidad: 0,
     sueldo: 300,
-    capacidad: "7 empleados",
+    capacidad: "7 Empleados",
     indicador: "0 / 7",
   },
 
@@ -301,7 +301,7 @@ const empleados = [
     puesto: "🛎️ Botones",
     cantidad: 0,
     sueldo: 100,
-    capacidad: "20 habitaciones",
+    capacidad: "20 Cuartos",
     indicador: "0 / 20",
   },
 
@@ -309,7 +309,7 @@ const empleados = [
     puesto: "🧹 Limpieza",
     cantidad: 0,
     sueldo: 30,
-    capacidad: "6 habitaciones",
+    capacidad: "6 Cuartos",
     indicador: "0 / 6",
   },
 
@@ -317,7 +317,7 @@ const empleados = [
     puesto: "🔧 Mantenimiento",
     cantidad: 0,
     sueldo: 200,
-    capacidad: "20 habitaciones",
+    capacidad: "20 Cuartos",
     indicador: "0 / 20",
   },
 
@@ -325,7 +325,7 @@ const empleados = [
     puesto: "👩‍💼 Recepcionista",
     cantidad: 0,
     sueldo: 200,
-    capacidad: "15 habitaciones",
+    capacidad: "15 Cuartos",
     indicador: "0 / 15",
   },
 
@@ -333,7 +333,7 @@ const empleados = [
     puesto: "🧺 Lavandería",
     cantidad: 0,
     sueldo: 150,
-    capacidad: "15 habitaciones",
+    capacidad: "15 Cuartos",
     indicador: "0 / 15",
   },
 
@@ -341,7 +341,7 @@ const empleados = [
     puesto: "🛡️ Vigilante",
     cantidad: 0,
     sueldo: 150,
-    capacidad: "30 habitaciones",
+    capacidad: "30 Cuartos",
     indicador: "0 / 30",
   },
 ];
@@ -393,22 +393,94 @@ function actualizarPanelPrestamo() {
 function dibujarEmpleados() {
   const contenedor = document.getElementById("contenidoEmpleados");
   const totalNomina = document.getElementById("totalNomina");
+
   if (!contenedor) {
     return;
   }
+
   contenedor.innerHTML = "";
+
+  const habitaciones = cuartos.filter((c) => c.comprada).length;
+
+  const gerente = empleados.find((e) => e.puesto.includes("Gerente"));
+  const subgerente = empleados.find((e) => e.puesto.includes("Subgerente"));
+
+  const totalOperativos =
+    empleados.reduce((sum, e) => sum + e.cantidad, 0) -
+    (gerente ? gerente.cantidad : 0) -
+    (subgerente ? subgerente.cantidad : 0);
+
+  const capacidadGerencial =
+    (gerente ? gerente.cantidad * 10 : 0) +
+    (subgerente ? subgerente.cantidad * 7 : 0);
+
   empleados.forEach((emp, index) => {
     let totalPuesto = emp.cantidad * emp.sueldo;
     let indicador = emp.indicador;
+
+    if (emp.puesto.includes("Gerente") || emp.puesto.includes("Subgerente")) {
+      indicador =
+        totalOperativos > capacidadGerencial
+          ? `⚠️ ${totalOperativos} / ${capacidadGerencial}`
+          : `✅ ${totalOperativos} / ${capacidadGerencial}`;
+    }
+
     if (emp.puesto.includes("Limpieza")) {
       const capacidadIdeal = emp.cantidad * 6;
+
       totalPuesto = cuartosRentados20 * 30;
-      if (cuartosRentados20 > capacidadIdeal) {
-        indicador = `⚠️ ${cuartosRentados20} / ${capacidadIdeal}`;
-      } else {
-        indicador = `✅ ${cuartosRentados20} / ${capacidadIdeal}`;
-      }
+
+      indicador =
+        cuartosRentados20 > capacidadIdeal
+          ? `⚠️ ${cuartosRentados20} / ${capacidadIdeal}`
+          : `✅ ${cuartosRentados20} / ${capacidadIdeal}`;
     }
+
+    if (emp.puesto.includes("Botones")) {
+      const capacidadIdeal = emp.cantidad * 20;
+
+      indicador =
+        habitaciones > capacidadIdeal
+          ? `⚠️ ${habitaciones} / ${capacidadIdeal}`
+          : `✅ ${habitaciones} / ${capacidadIdeal}`;
+    }
+
+    if (emp.puesto.includes("Mantenimiento")) {
+      const capacidadIdeal = emp.cantidad * 20;
+
+      indicador =
+        habitaciones > capacidadIdeal
+          ? `⚠️ ${habitaciones} / ${capacidadIdeal}`
+          : `✅ ${habitaciones} / ${capacidadIdeal}`;
+    }
+
+    if (emp.puesto.includes("Recepcion")) {
+      const capacidadIdeal = emp.cantidad * 15;
+
+      indicador =
+        habitaciones > capacidadIdeal
+          ? `⚠️ ${habitaciones} / ${capacidadIdeal}`
+          : `✅ ${habitaciones} / ${capacidadIdeal}`;
+    }
+
+    if (emp.puesto.includes("Lavandería")) {
+      const capacidadIdeal = emp.cantidad * 15;
+
+      indicador =
+        habitaciones > capacidadIdeal
+          ? `⚠️ ${habitaciones} / ${capacidadIdeal}`
+          : `✅ ${habitaciones} / ${capacidadIdeal}`;
+    }
+
+    if (emp.puesto.includes("Vigilante")) {
+      const capacidadIdeal = emp.cantidad * 30;
+
+      indicador =
+        habitaciones > capacidadIdeal
+          ? `⚠️ ${habitaciones} / ${capacidadIdeal}`
+          : `✅ ${habitaciones} / ${capacidadIdeal}`;
+    }
+
     contenedor.innerHTML += `
       <div class="filaEmpleado">
         <div>${emp.puesto}</div>
@@ -418,36 +490,30 @@ function dibujarEmpleados() {
         <div>${emp.capacidad}</div>
         <div>${indicador}</div>
         <div>
-        <button onclick="contratarEmpleado(${index})">
-          +
-        </button>
+          <button onclick="contratarEmpleado(${index})">+</button>
         </div>
         <div>
-          <button onclick="despedirEmpleado(${index})">
-            -
-          </button>
+          <button onclick="despedirEmpleado(${index})">-</button>
         </div>
       </div>
     `;
   });
+
   contenedor.innerHTML += `
     <div class="filaEmpleado totalFila">
       <div><strong>TOTAL NÓMINA</strong></div>
       <div></div>
       <div></div>
-      <div>
-        <strong>
-          $${nominaDiaria().toLocaleString()}
-        </strong>
-      </div>
+      <div><strong>$${nominaDiaria().toLocaleString()}</strong></div>
       <div></div>
       <div></div>
       <div></div>
       <div></div>
     </div>
   `;
+
   if (totalNomina) {
-    totalNomina.textContent = nominaDiaria().toLocaleString() / 2;
+    totalNomina.textContent = nominaDiaria().toLocaleString();
   }
 }
 
@@ -1173,21 +1239,54 @@ function generarContenidoCuarto(cuarto) {
   return html;
 }
 
+let filtroCatalogo = "todos";
+
+function filtrarCatalogo(tipo) {
+  filtroCatalogo = tipo;
+
+  crearCatalogo();
+}
+
 function crearCatalogo() {
   catalogoDiv.innerHTML = "";
-  catalogo.forEach((item, index) => {
+
+  let itemsFiltrados = catalogo;
+
+  if (filtroCatalogo !== "todos") {
+    itemsFiltrados = catalogo.filter((item) => item.tipo === filtroCatalogo);
+  }
+
+  itemsFiltrados.forEach((item, index) => {
+    const indexReal = catalogo.indexOf(item);
+
     const div = document.createElement("div");
+
     div.classList.add("itemCatalogo");
 
     div.innerHTML = `
-      <div class="iconoCatalogo">${item.icono}</div>
-      <div>
-        <h3>${item.nombre}</h3>
-        <p>${item.descripcion}</p>
-        <p>💰 $${item.costo.toLocaleString()}</p>
+
+      <div class="iconoCatalogo">
+        ${item.icono}
       </div>
-      <button onclick="comprarCatalogo(${index})">Comprar</button>
+
+      <div>
+
+        <h3>${item.nombre}</h3>
+
+        <p>${item.descripcion}</p>
+
+        <p>
+          💰 $${item.costo.toLocaleString()}
+        </p>
+
+      </div>
+
+      <button onclick="comprarCatalogo(${indexReal})">
+        Comprar
+      </button>
+
     `;
+
     catalogoDiv.appendChild(div);
   });
 }
@@ -2108,6 +2207,11 @@ function agregarMensaje(texto) {
   div.classList.add("mensaje");
   div.textContent = texto;
   mensajes.prepend(div);
+  const textoBanda = document.getElementById("textoBanda");
+
+  if (textoBanda) {
+    textoBanda.textContent = texto;
+  }
 }
 
 function numero(min, max) {
