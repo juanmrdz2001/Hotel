@@ -2230,3 +2230,142 @@ btnPausar.addEventListener("click", pausarJuego);
 crearCatalogo();
 actualizarPantalla();
 agregarMensaje("🏨 Bienvenido a Imperio Hotelero.");
+
+let nombreJugador = localStorage.getItem("nombreJugador");
+
+if (!nombreJugador) {
+  nombreJugador = prompt("🏨 Nombre del propietario:");
+
+  localStorage.setItem("nombreJugador", nombreJugador);
+
+  setTimeout(() => {
+    guardarJugador(nombreJugador);
+  }, 1000);
+}
+
+// ← AQUÍ VA EL PASO 4
+
+const etiquetaJugador = document.getElementById("nombreJugadorLabel");
+
+if (etiquetaJugador) {
+  etiquetaJugador.textContent = nombreJugador;
+}
+
+async function guardarPartida() {
+  const partida = {
+    jugador: nombreJugador,
+    dinero,
+    dia,
+    hora,
+    reputacion,
+    valorHotel: valorHotel(),
+
+    cuartos,
+    inventario,
+    empleados,
+    materiales,
+    prestamo,
+
+    tieneElevador,
+    vidaElevador,
+    vidaFachada,
+    diasDesgasteFachada,
+
+    clientesRechazados,
+    cuartosRentados20,
+    pagosHoy,
+    nominaPagadaHoy,
+
+    fechaGuardado: new Date().toLocaleString(),
+  };
+
+  try {
+    await guardarPartidaFirebase(nombreJugador, partida);
+    await guardarRankingMensual();
+
+    agregarMensaje("💾 Partida guardada en Firebase.");
+    alert("💾 Partida Guardada");
+  } catch (error) {
+    console.error(error);
+    alert("❌ Error al guardar partida. Revisa la consola.");
+  }
+}
+
+async function cargarPartida() {
+  try {
+    const partida = await cargarPartidaFirebase(nombreJugador);
+
+    if (!partida) {
+      alert("❌ No existe partida guardada.");
+      return;
+    }
+
+    dinero = partida.dinero;
+    dia = partida.dia;
+    hora = partida.hora;
+    reputacion = partida.reputacion;
+
+    clientesRechazados = partida.clientesRechazados || 0;
+
+    tieneElevador = partida.tieneElevador || false;
+    vidaElevador = partida.vidaElevador || 100;
+
+    vidaFachada = partida.vidaFachada || 100;
+    diasDesgasteFachada = partida.diasDesgasteFachada || 0;
+
+    cuartosRentados20 = partida.cuartosRentados20 || 0;
+    pagosHoy = partida.pagosHoy || 0;
+    nominaPagadaHoy = partida.nominaPagadaHoy || false;
+
+    Object.assign(prestamo, partida.prestamo);
+
+    empleados.splice(0, empleados.length, ...partida.empleados);
+
+    materiales.splice(0, materiales.length, ...partida.materiales);
+
+    inventario = partida.inventario || [];
+
+    cuartos.splice(0, cuartos.length, ...partida.cuartos);
+
+    actualizarPantalla();
+
+    agregarMensaje("📂 Partida recuperada correctamente.");
+    alert("📂 Partida recuperada");
+  } catch (error) {
+    console.error(error);
+    alert("❌ Error al recuperar partida. Revisa consola.");
+  }
+}
+
+async function guardarRankingMensual() {
+  const datosRanking = {
+    jugador: nombreJugador,
+    valorHotel: valorHotel(),
+    dia: dia,
+    reputacion: reputacion,
+    fecha: new Date().toLocaleString(),
+  };
+
+  await guardarRankingMensualFirebase(nombreJugador, datosRanking);
+
+  agregarMensaje("🏆 Ranking mensual actualizado.");
+}
+
+async function mostrarRankingMensual() {
+  const ranking = await obtenerRankingMensualFirebase();
+
+  if (ranking.length === 0) {
+    alert("No hay jugadores en el ranking.");
+
+    return;
+  }
+
+  let texto = "🏆 RANKING MENSUAL\n\n";
+
+  ranking.slice(0, 10).forEach((j, i) => {
+    texto +=
+      `${i + 1}. ${j.jugador}\n` + `$${j.valorHotel.toLocaleString()}\n\n`;
+  });
+
+  alert(texto);
+}

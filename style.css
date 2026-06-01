@@ -1217,4 +1217,16 @@ header p{
   }
 }
 
+.usuarioActual{
+  position:absolute;
+  left:15px;
+  top:10px;
+
+  font-size:14px;
+  font-weight:bold;
+
+  color:#2c3e50;
+}
+
+
 

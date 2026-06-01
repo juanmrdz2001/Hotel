@@ -21,10 +21,20 @@
 
 <div class="encabezadoFijo">
   <header>
-    <h1>🏨 Imperio Hotelero</h1>
-    <p>Compra cuartos, compra muebles y arrástralos donde quieras</p>
-  </header>
 
+  <div class="usuarioActual">
+    👤 <span id="nombreJugadorLabel">Invitado</span>
+  </div>
+
+  <h1>🏨 Imperio Hotelero</h1>
+
+  <p>
+    Compra cuartos, compra muebles y arrástralos donde quieras
+  </p>
+
+</header>
+  
+  
   <section class="panel">
     <div>🏨 Valor Hotel:$<span id="valorHotel">0</span></div>
     <div>💰 Dinero: $<span id="dinero">100000</span></div>
@@ -727,6 +737,18 @@
           ⏸ Pausar
         </button>
 
+        <button onclick="guardarPartida()">
+          💾 Guardar Partida
+        </button>
+
+        <button onclick="mostrarRankingMensual()">
+          🏆 Ranking
+        </button>
+
+        <button onclick="cargarPartida()">
+          📂 Recuperar Partida
+        </button>
+
       </div>
 
       <div class="catalogoBox">
@@ -783,7 +805,7 @@
   </section>
 
 </div>
-
+<script type="module" src="firebase.js"></script>
 <script src="script.js"></script>
 <footer class="footerAutor">
 
