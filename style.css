@@ -1228,5 +1228,63 @@ header p{
   color:#2c3e50;
 }
 
+.modalRanking{
+
+  display:none;
+
+  position:fixed;
+
+  left:0;
+  top:0;
+
+  width:100%;
+  height:100%;
+
+  background:rgba(0,0,0,0.6);
+
+  z-index:9999;
+
+}
+
+.contenidoRanking{
+
+  background:white;
+
+  width:700px;
+
+  max-width:95%;
+
+  margin:50px auto;
+
+  padding:20px;
+
+  border-radius:10px;
+
+}
+
+#tablaRanking{
+
+  width:100%;
+
+  border-collapse:collapse;
+
+}
+
+#tablaRanking th,
+#tablaRanking td{
+
+  border:1px solid #ccc;
+
+  padding:8px;
+
+  text-align:center;
+
+}
+
+#tablaRanking th{
+
+  background:#f2f2f2;
+
+}
 
 

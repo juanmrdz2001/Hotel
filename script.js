@@ -2351,21 +2351,48 @@ async function guardarRankingMensual() {
   agregarMensaje("🏆 Ranking mensual actualizado.");
 }
 
-async function mostrarRankingMensual() {
-  const ranking = await obtenerRankingMensualFirebase();
+window.mostrarRankingMensual = async function () {
+  try {
+    const ranking = await obtenerRankingMensualFirebase();
 
-  if (ranking.length === 0) {
-    alert("No hay jugadores en el ranking.");
+    const tbody = document.querySelector("#tablaRanking tbody");
 
-    return;
+    tbody.innerHTML = "";
+
+    if (ranking.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="3">
+            No hay jugadores en el ranking.
+          </td>
+        </tr>
+      `;
+    } else {
+      ranking.forEach((j, i) => {
+        let lugar = i + 1;
+
+        if (i === 0) lugar = "🥇";
+        else if (i === 1) lugar = "🥈";
+        else if (i === 2) lugar = "🥉";
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${lugar}</td>
+            <td>${j.jugador}</td>
+            <td>$${j.valorHotel.toLocaleString()}</td>
+          </tr>
+        `;
+      });
+    }
+
+    document.getElementById("rankingModal").style.display = "block";
+  } catch (error) {
+    console.error(error);
+
+    alert("❌ Error al obtener el ranking.");
   }
+};
 
-  let texto = "🏆 RANKING MENSUAL\n\n";
-
-  ranking.slice(0, 10).forEach((j, i) => {
-    texto +=
-      `${i + 1}. ${j.jugador}\n` + `$${j.valorHotel.toLocaleString()}\n\n`;
-  });
-
-  alert(texto);
-}
+window.cerrarRanking = function () {
+  document.getElementById("rankingModal").style.display = "none";
+};

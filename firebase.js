@@ -90,22 +90,3 @@ window.obtenerRankingMensualFirebase = async function () {
 
   return ranking;
 };
-
-async function mostrarRankingMensual() {
-  const ranking = await obtenerRankingMensualFirebase();
-
-  if (ranking.length === 0) {
-    alert("No hay jugadores en el ranking.");
-
-    return;
-  }
-
-  let texto = "🏆 RANKING MENSUAL\n\n";
-
-  ranking.slice(0, 10).forEach((j, i) => {
-    texto +=
-      `${i + 1}. ${j.jugador}\n` + `$${j.valorHotel.toLocaleString()}\n\n`;
-  });
-
-  alert(texto);
-}
