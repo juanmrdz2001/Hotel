@@ -57,12 +57,76 @@ numerosCuartos.forEach((numero, index) => {
 });
 
 const tiposClientes = [
-  { nombre: "Turista", emoji: "🚶", pagaBase: 500 },
-  { nombre: "Ejecutivo", emoji: "👔", pagaBase: 900 },
-  { nombre: "Familia", emoji: "👨‍👩‍👧", pagaBase: 1400 },
-  { nombre: "VIP", emoji: "🕴️", pagaBase: 2500 },
-  { nombre: "Mochilero", emoji: "🎒", pagaBase: 400 },
+  {
+    nombre: "Mochilero",
+    emoji: "🎒",
+    estrellas: "⭐",
+    pagaBase: 400,
+  },
+
+  {
+    nombre: "Turista",
+    emoji: "🚶",
+    estrellas: "⭐⭐",
+    pagaBase: 500,
+  },
+
+  {
+    nombre: "Ejecutivo",
+    emoji: "👔",
+    estrellas: "⭐⭐⭐",
+    pagaBase: 900,
+  },
+
+  {
+    nombre: "Familia",
+    emoji: "👨‍👩‍👧",
+    estrellas: "⭐⭐⭐⭐",
+    pagaBase: 1400,
+  },
+
+  {
+    nombre: "VIP",
+    emoji: "🕴️",
+    estrellas: "⭐⭐⭐⭐⭐",
+    pagaBase: 2500,
+  },
 ];
+
+function estrellasHotel() {
+  if (reputacion >= 85) {
+    return "⭐⭐⭐⭐⭐";
+  }
+  if (reputacion >= 60) {
+    return "⭐⭐⭐⭐";
+  }
+  if (reputacion >= 40) {
+    return "⭐⭐⭐";
+  }
+  if (reputacion >= 20) {
+    return "⭐⭐";
+  }
+  return "⭐";
+}
+
+function clienteAceptaHotel(cliente) {
+  if (cliente.nombre === "Mochilero") {
+    return reputacion >= 0;
+  }
+  if (cliente.nombre === "Turista") {
+    return reputacion >= 20;
+  }
+  if (cliente.nombre === "Ejecutivo") {
+    return reputacion >= 40;
+  }
+  if (cliente.nombre === "Familia") {
+    return reputacion >= 60;
+  }
+  if (cliente.nombre === "VIP") {
+    return reputacion >= 85;
+  }
+  return true;
+}
 
 const catalogo = [
   {
@@ -784,7 +848,6 @@ function descontarMaterial(nombre, cantidad) {
 
 function promedioVidaTipo(tipo) {
   // CUARTOS
-
   if (tipo === "cuarto") {
     let total = 0;
     let cantidad = 0;
@@ -792,11 +855,9 @@ function promedioVidaTipo(tipo) {
     cuartos.forEach((cuarto) => {
       if (cuarto.comprada) {
         const vida = Number(cuarto.vida) || 0;
-
         const vidaMaxima = Number(cuarto.vidaMaxima) || 100;
 
         total += (vida / vidaMaxima) * 100;
-
         cantidad++;
       }
     });
@@ -809,17 +870,15 @@ function promedioVidaTipo(tipo) {
   }
 
   // ELEVADOR
-
   if (tipo === "elevador") {
     if (!tieneElevador) {
-      return 100;
+      return 0;
     }
 
     return Math.round((vidaElevador / vidaMaximaElevador) * 100);
   }
 
   // OBJETOS
-
   let total = 0;
   let cantidad = 0;
 
@@ -828,13 +887,12 @@ function promedioVidaTipo(tipo) {
 
     if (obj && obj.vida !== undefined && obj.vidaMaxima !== undefined) {
       total += (obj.vida / obj.vidaMaxima) * 100;
-
       cantidad++;
     }
   });
 
   if (cantidad === 0) {
-    return 100;
+    return 0;
   }
 
   return Math.round(total / cantidad);
@@ -993,7 +1051,7 @@ function actualizarPantalla() {
   diaSpan.textContent = dia;
   horaSpan.textContent = `${hora.toString().padStart(2, "0")}:00`;
   calcularReputacion();
-  reputacionSpan.textContent = reputacion;
+  reputacionSpan.textContent = `${reputacion} ${estrellasHotel()}`;
   ocupadasSpan.textContent = cuartos.filter((c) => c.ocupada).length;
   compradasSpan.textContent = cuartos.filter((c) => c.comprada).length;
 
@@ -1473,8 +1531,18 @@ function repararTipo(tipo) {
 }
 
 function comprarCuarto(costo) {
-  let cuartoDisponible = cuartos.find((c) => !c.comprada);
+  const cuartosComprados = cuartos.filter((c) => c.comprada).length;
+  if (cuartosComprados >= 10 && !tieneElevador) {
+    agregarMensaje(
+      "🛗 Para comprar el cuarto 11 necesitas instalar primero un elevador.",
+    );
 
+    alert(
+      "🛗 Para construir más de 10 cuartos debes comprar primero el elevador.",
+    );
+    return;
+  }
+  let cuartoDisponible = cuartos.find((c) => !c.comprada);
   if (!cuartoDisponible) {
     if (!tieneElevador) {
       agregarMensaje("❌ Necesitas comprar elevador para construir otro piso.");
@@ -1485,20 +1553,21 @@ function comprarCuarto(costo) {
     agregarMensaje("🏢 Se construyó un nuevo piso.");
   }
   if (dinero < costo) {
-    agregarMensaje("❌ No tienes suficiente dinero.");
+    agregarMensaje("❌ No tienes suficiente dinero para comprar este cuarto.");
     return;
   }
   dinero -= costo;
-
-  gtag("event", "comprar_cuarto", {
-    costo: costo,
-  });
+  if (typeof gtag === "function") {
+    gtag("event", "comprar_cuarto", {
+      costo: costo,
+      cuarto: cuartoDisponible.numero,
+    });
+  }
   cuartoDisponible.comprada = true;
   cuartoDisponible.costo = costo;
   agregarMensaje(
-    `🛏️ Compraste el cuarto ${cuartoDisponible.numero} por $${costo.toLocaleString()}.`,
+    `🚪 Compraste el cuarto ${cuartoDisponible.numero} por $${costo.toLocaleString()}.`,
   );
-
   actualizarPantalla();
 }
 
@@ -1665,11 +1734,13 @@ function supervisionEmpleadosCorrecta() {
 function calcularReputacion() {
   let reputacionTotal = 0;
 
+  const cuartosComprados = cuartos.filter((c) => c.comprada);
+
   // =====================================
   // 40% LUJO
   // =====================================
 
-  const cuartosComprados = cuartos.filter((c) => c.comprada);
+  const LUJO_MAXIMO_CUARTO = 193;
 
   let totalLujo = 0;
 
@@ -1677,37 +1748,46 @@ function calcularReputacion() {
     totalLujo += lujoCuarto(cuarto);
   });
 
-  const maximoLujo = cuartosComprados.length * 40;
+  const maximoLujoPosible = cuartosComprados.length * LUJO_MAXIMO_CUARTO;
 
-  if (maximoLujo > 0) {
-    reputacionTotal += (totalLujo / maximoLujo) * 40;
+  if (maximoLujoPosible > 0) {
+    reputacionTotal += (totalLujo / maximoLujoPosible) * 40;
   }
 
   // =====================================
-  // 25% MANTENIMIENTO
+  // 25% DESGASTE / MANTENIMIENTO
   // =====================================
 
-  reputacionTotal += promedioVidaTipo("cuarto") * 0.035;
+  let totalVida = 0;
+  let cantidadVida = 0;
 
-  reputacionTotal += promedioVidaTipo("cama") * 0.035;
+  cuartosComprados.forEach((cuarto) => {
+    totalVida += promedioVidaTipo("cuarto");
+    cantidadVida++;
 
-  reputacionTotal += promedioVidaTipo("tv") * 0.03;
+    for (let tipo in cuarto.objetos) {
+      const obj = cuarto.objetos[tipo];
 
-  reputacionTotal += promedioVidaTipo("lampara") * 0.005;
+      if (obj && obj.vida !== undefined && obj.vidaMaxima !== undefined) {
+        totalVida += (obj.vida / obj.vidaMaxima) * 100;
+        cantidadVida++;
+      }
+    }
+  });
 
-  reputacionTotal += promedioVidaTipo("alfombra") * 0.02;
+  if (tieneElevador) {
+    totalVida += (vidaElevador / vidaMaximaElevador) * 100;
+    cantidadVida++;
+  }
 
-  reputacionTotal += promedioVidaTipo("sabanas") * 0.02;
+  totalVida += vidaFachada;
+  cantidadVida++;
 
-  reputacionTotal += promedioVidaTipo("extinguidor") * 0.005;
+  if (cantidadVida > 0) {
+    const promedioDesgaste = totalVida / cantidadVida;
 
-  reputacionTotal += promedioVidaTipo("internet") * 0.02;
-
-  reputacionTotal += promedioVidaTipo("clima") * 0.02;
-
-  reputacionTotal += promedioVidaTipo("cuadro") * 0.005;
-
-  reputacionTotal += vidaFachada * 0.04;
+    reputacionTotal += (promedioDesgaste / 100) * 25;
+  }
 
   // =====================================
   // 25% EMPLEADOS
@@ -1716,29 +1796,18 @@ function calcularReputacion() {
   const habitaciones = cuartosComprados.length;
 
   const gerente = empleados.find((e) => e.puesto.includes("Gerente"));
-
   const subgerente = empleados.find((e) => e.puesto.includes("Subgerente"));
-
   const botones = empleados.find((e) => e.puesto.includes("Botones"));
-
   const limpieza = empleados.find((e) => e.puesto.includes("Limpieza"));
-
   const mantenimiento = empleados.find((e) =>
     e.puesto.includes("Mantenimiento"),
   );
-
   const recepcion = empleados.find((e) => e.puesto.includes("Recepcion"));
-
   const lavanderia = empleados.find((e) => e.puesto.includes("Lavandería"));
-
   const vigilancia = empleados.find((e) => e.puesto.includes("Vigilante"));
 
-  // CAPACIDAD GERENCIAL
-
   const totalOperativos =
-    empleados.reduce((sum, e) => {
-      return sum + e.cantidad;
-    }, 0) -
+    empleados.reduce((sum, e) => sum + e.cantidad, 0) -
     (gerente ? gerente.cantidad : 0) -
     (subgerente ? subgerente.cantidad : 0);
 
@@ -1747,8 +1816,6 @@ function calcularReputacion() {
     (subgerente ? subgerente.cantidad * 7 : 0);
 
   const supervisionCorrecta = capacidadGerencial >= totalOperativos;
-
-  // SOLO SI HAY SUPERVISIÓN CORRECTA
 
   if (supervisionCorrecta) {
     if (gerente && gerente.cantidad >= 1) {
@@ -1760,15 +1827,10 @@ function calcularReputacion() {
     }
 
     const limpiezaNecesaria = Math.ceil(cuartosRentados20 / 6);
-
     const botonesNecesarios = Math.ceil(habitaciones / 20);
-
     const mantenimientoNecesario = Math.ceil(habitaciones / 20);
-
     const recepcionNecesaria = Math.ceil(habitaciones / 15);
-
     const lavanderiaNecesaria = Math.ceil(habitaciones / 15);
-
     const vigilanciaNecesaria = Math.ceil(habitaciones / 30);
 
     if (botones && botones.cantidad >= botonesNecesarios) {
@@ -1801,9 +1863,9 @@ function calcularReputacion() {
   // =====================================
 
   materiales.forEach((mat) => {
-    if (mat.cantidad > 0) {
-      reputacionTotal += 1;
-    }
+    const porcentaje = mat.maximo > 0 ? mat.cantidad / mat.maximo : 0;
+
+    reputacionTotal += Math.max(0, Math.min(1, porcentaje));
   });
 
   // =====================================
@@ -1813,8 +1875,6 @@ function calcularReputacion() {
   const penalizacionRechazos = Math.min(clientesRechazados * 0.5, 4);
 
   reputacionTotal -= penalizacionRechazos;
-
-  // =====================================
 
   reputacion = Math.max(0, Math.min(100, Math.round(reputacionTotal)));
 }
@@ -2066,59 +2126,50 @@ function cerrarDiaHotel() {
 }
 
 function calcularClientes() {
-  let base = 0;
+  const pisos = Math.max(...cuartos.map((c) => Math.floor(c.numero / 100)));
 
-  if (hora >= 8 && hora <= 11) {
-    base = numero(1, 3);
-  } else if (hora >= 12 && hora <= 17) {
-    base = numero(2, 5);
-  } else if (hora >= 18 && hora <= 22) {
-    base = numero(3, 7);
-  } else {
-    base = numero(0, 2);
-  }
+  const clientesPorPiso = 20;
 
-  base += Math.floor(reputacion / 25);
+  const clientesDia = pisos * clientesPorPiso;
 
-  return base;
+  return Math.round(clientesDia / 16);
 }
 
 function recibirClientes() {
   const cantidad = calcularClientes();
-
   agregarMensaje(`🕒 ${hora}:00 llegaron ${cantidad} posibles huéspedes.`);
-
   for (let i = 0; i < cantidad; i++) {
     const cliente = tiposClientes[numero(0, tiposClientes.length - 1)];
-
+    if (!clienteAceptaHotel(cliente)) {
+      clientesRechazados++;
+      agregarMensaje(
+        `❌ ${cliente.emoji} ${cliente.nombre} ${cliente.estrellas} no aceptó la reputación del hotel.`,
+      );
+      continue;
+    }
     mostrarCliente(cliente);
-
     const cuarto = cuartos.find((c) => {
       if (c.rentadoHoy === undefined) {
         c.rentadoHoy = false;
       }
-
       return c.comprada && cuartoListo(c) && !c.ocupada && !c.rentadoHoy;
     });
-
     if (cuarto) {
       cuarto.ocupada = true;
       cuarto.rentadoHoy = true;
-
       const pago = precioCuarto(cuarto);
-
       dinero += pago;
       pagosHoy++;
       consumirMaterialesPorRenta();
-
       clientesRechazados++;
-
       agregarMensaje(
         `${cliente.emoji} ${cliente.nombre} rentó el cuarto ${cuarto.numero} y pagó $${pago.toLocaleString()}.`,
       );
     } else {
+      clientesRechazados++;
+
       agregarMensaje(
-        `❌ ${cliente.nombre} se fue porque no había cuarto listo y disponible.`,
+        `❌ ${cliente.emoji} ${cliente.nombre} ${cliente.estrellas} se fue porque no había cuarto listo y disponible.`,
       );
     }
   }
@@ -2176,7 +2227,7 @@ function mostrarCliente(cliente) {
     siguienteCarrilCliente = 0;
   }
 
-  div.textContent = `${cliente.emoji} ${cliente.nombre}`;
+  div.textContent = `${cliente.emoji} ${cliente.nombre} ${cliente.estrellas}`;
 
   entradaHotel.appendChild(div);
 
