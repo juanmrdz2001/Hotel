@@ -29,6 +29,23 @@ const costoFachada = 650000;
 let diasDesgasteFachada = 0;
 const cuartos = [];
 
+let rentasHoy = 0;
+let desgasteHoy = 0;
+let nominaHoy = 0;
+let materialesHoy = 0;
+let interesesHoy = 0;
+
+let historialResultados = [];
+
+function mostrarInstrucciones() {
+  document.getElementById("modalInstrucciones").style.display = "block";
+}
+
+function cerrarInstrucciones() {
+  document.getElementById("modalInstrucciones").style.display = "none";
+  localStorage.setItem("instruccionesVistas", "si");
+}
+
 const numerosCuartos = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110];
 
 numerosCuartos.forEach((numero, index) => {
@@ -643,6 +660,31 @@ function costoLimpiezaDiaria() {
   return cuartosQuePuedeLimpiar * 30;
 }
 
+function consumirMaterialesPorRenta() {
+  consumirMaterial("🧻 Papel de baño", 2);
+  consumirMaterial("🧼 Fabuloso", 0.1);
+  consumirMaterial("💧 Aguas", 2);
+  consumirMaterial("🧪 Ácido", 0.05);
+  consumirMaterial("🧴 Shampoo", 0.02);
+  consumirMaterial("🧴 Acondicionado", 0.02);
+}
+
+function consumirMaterial(nombre, cantidad) {
+  const material = materiales.find((m) => m.nombre.includes(nombre));
+
+  if (!material) return;
+
+  const cantidadReal = Math.min(material.cantidad, cantidad);
+
+  materialesHoy += cantidadReal * material.precio;
+
+  material.cantidad -= cantidadReal;
+
+  if (material.cantidad < 0) {
+    material.cantidad = 0;
+  }
+}
+
 function dibujarMateriales() {
   const contenedor = document.getElementById("contenidoMateriales");
 
@@ -825,21 +867,16 @@ function pedirMaterial(index) {
   actualizarPantalla();
 }
 
-function consumirMaterialesPorRenta() {
-  descontarMaterial("🧻 Papel de baño", 2);
-  descontarMaterial("🧼 Fabuloso", 0.1);
-  descontarMaterial("💧 Aguas", 2);
-  descontarMaterial("🧪 Ácido", 0.05);
-  descontarMaterial("🧴 Shampoo", 0.02);
-  descontarMaterial("🧴 Acondicionado", 0.02);
-}
-
 function descontarMaterial(nombre, cantidad) {
   const material = materiales.find((m) => m.nombre.includes(nombre));
 
   if (!material) return;
 
-  material.cantidad -= cantidad;
+  const cantidadReal = Math.min(material.cantidad, cantidad);
+
+  material.cantidad -= cantidadReal;
+
+  materialesHoy += cantidadReal * material.precio;
 
   if (material.cantidad < 0) {
     material.cantidad = 0;
@@ -1073,6 +1110,7 @@ function actualizarPantalla() {
   dibujarEmpleados();
   dibujarMateriales();
   actualizarPanelPrestamo();
+  dibujarHistorialResultados();
   verificarQuiebra();
 }
 
@@ -1398,6 +1436,32 @@ function comprarCatalogo(index) {
   actualizarPantalla();
 }
 
+function calcularDesgasteDelDia() {
+  let total = 0;
+
+  cuartos.forEach((cuarto) => {
+    if (cuarto.comprada) {
+      total += 150;
+    }
+
+    for (let tipo in cuarto.objetos) {
+      const obj = cuarto.objetos[tipo];
+
+      if (obj) {
+        total += Math.max(10, obj.lujo * 5);
+      }
+    }
+  });
+
+  if (tieneElevador) {
+    total += 500;
+  }
+
+  total += costoFachada / 365;
+
+  return Math.round(total);
+}
+
 function desgastarObjetosPorDia() {
   cuartos.forEach((cuarto) => {
     if (cuarto.comprada) {
@@ -1436,6 +1500,8 @@ function desgastarObjetosPorDia() {
       vidaElevador = 0;
     }
   }
+
+  desgasteHoy = calcularDesgasteDelDia();
 }
 
 function repararTipo(tipo) {
@@ -2062,12 +2128,17 @@ function avanzarHora() {
   if (hora === 6 && !nominaPagadaHoy) {
     const pagoNomina = nominaDiaria();
     dinero -= pagoNomina;
+    nominaHoy += pagoNomina;
 
     nominaPagadaHoy = true;
     agregarMensaje(
       `💵 Se pagó nómina diaria por $${pagoNomina.toLocaleString()}.`,
     );
   }
+  if (hora === 23) {
+    guardarResultadoDelDia();
+  }
+
   recibirClientes();
   actualizarPantalla();
 }
@@ -2123,6 +2194,82 @@ function cerrarDiaHotel() {
   if (dia % prestamo.frecuenciaDias === 0) {
     pagarCuotaPrestamo();
   }
+
+  if (hora === 23) {
+    guardarResultadoDelDia();
+  }
+}
+
+function guardarResultadoDelDia() {
+  interesesHoy = (prestamo.saldo * prestamo.interes) / prestamo.frecuenciaDias;
+
+  const resultado =
+    rentasHoy - desgasteHoy - nominaHoy - materialesHoy - interesesHoy;
+  historialResultados.push({
+    dia,
+    rentas: Math.round(rentasHoy),
+    desgaste: Math.round(desgasteHoy),
+    nomina: Math.round(nominaHoy),
+    materiales: Math.round(materialesHoy),
+    intereses: Math.round(interesesHoy),
+    resultado: Math.round(resultado),
+    reputacion: reputacion,
+  });
+
+  if (historialResultados.length > 10) {
+    historialResultados.shift();
+  }
+
+  rentasHoy = 0;
+  desgasteHoy = 0;
+  nominaHoy = 0;
+  materialesHoy = 0;
+  interesesHoy = 0;
+}
+
+function dibujarHistorialResultados() {
+  const contenedor = document.getElementById("historialResultados");
+
+  if (!contenedor) return;
+
+  contenedor.innerHTML = `
+    <div class="filaResultado encabezadoResultado">
+      <div>Día</div>
+      <div>Rentas</div>
+      <div>-Desg.</div>
+      <div>-Nom.</div>
+      <div>-Mat.</div>
+      <div>-Int.</div>
+      <div>Resultado</div>
+      <div>⭐Rep</div>
+    </div>
+  `;
+
+  historialResultados
+    .slice()
+    .reverse()
+    .forEach((r) => {
+      contenedor.innerHTML += `
+        <div class="filaResultado">
+          <div>${r.dia}</div>
+          <div>$${r.rentas.toLocaleString()}</div>
+          <div>$${r.desgaste.toLocaleString()}</div>
+          <div>$${r.nomina.toLocaleString()}</div>
+          <div>$${r.materiales.toLocaleString()}</div>
+          <div>$${r.intereses.toLocaleString()}</div>
+
+          <div class="${
+            r.resultado < 0 ? "resultadoNegativo" : "resultadoPositivo"
+          }">
+            $${r.resultado.toLocaleString()}
+          </div>
+
+          <div>
+            ${r.reputacion}
+          </div>
+        </div>
+      `;
+    });
 }
 
 function calcularClientes() {
@@ -2137,33 +2284,46 @@ function calcularClientes() {
 
 function recibirClientes() {
   const cantidad = calcularClientes();
+
   agregarMensaje(`🕒 ${hora}:00 llegaron ${cantidad} posibles huéspedes.`);
+
   for (let i = 0; i < cantidad; i++) {
     const cliente = tiposClientes[numero(0, tiposClientes.length - 1)];
+
     if (!clienteAceptaHotel(cliente)) {
       clientesRechazados++;
+
       agregarMensaje(
         `❌ ${cliente.emoji} ${cliente.nombre} ${cliente.estrellas} no aceptó la reputación del hotel.`,
       );
+
       continue;
     }
+
     mostrarCliente(cliente);
+
     const cuarto = cuartos.find((c) => {
       if (c.rentadoHoy === undefined) {
         c.rentadoHoy = false;
       }
+
       return c.comprada && cuartoListo(c) && !c.ocupada && !c.rentadoHoy;
     });
+
     if (cuarto) {
       cuarto.ocupada = true;
       cuarto.rentadoHoy = true;
+
       const pago = precioCuarto(cuarto);
+
       dinero += pago;
+      rentasHoy += pago;
       pagosHoy++;
+
       consumirMaterialesPorRenta();
-      clientesRechazados++;
+
       agregarMensaje(
-        `${cliente.emoji} ${cliente.nombre} rentó el cuarto ${cuarto.numero} y pagó $${pago.toLocaleString()}.`,
+        `${cliente.emoji} ${cliente.nombre} ${cliente.estrellas} rentó el cuarto ${cuarto.numero} y pagó $${pago.toLocaleString()}.`,
       );
     } else {
       clientesRechazados++;
@@ -2263,6 +2423,12 @@ function agregarMensaje(texto) {
   if (textoBanda) {
     textoBanda.textContent = texto;
   }
+}
+
+if (!localStorage.getItem("instruccionesVistas")) {
+  setTimeout(() => {
+    mostrarInstrucciones();
+  }, 800);
 }
 
 function numero(min, max) {

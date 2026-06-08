@@ -15,6 +15,17 @@
 
   gtag('config', 'G-S634GK8XC3');
 </script>
+<div id="modalInstrucciones" class="modalInstrucciones">
+  <div class="contenidoInstruccionesImagen">
+
+    <img src="Instrucciones.jpg" alt="Instrucciones del juego">
+
+    <button onclick="cerrarInstrucciones()">
+      Entendido, empezar a jugar
+    </button>
+
+  </div>
+</div>
 <body>
 
 <div class="contenedor">
@@ -699,6 +710,11 @@
 
 </div>
 
+<div class="panelResultados">
+  <h3>📊 Últimos 10 días</h3>
+  <div id="historialResultados"></div>
+</div>
+
     </section>
 
     <!-- PANEL DERECHO -->
@@ -708,6 +724,10 @@
       <div class="controles">
 
         <h2>Controles</h2>
+  
+        <button onclick="mostrarInstrucciones()">
+           ❓ Instrucciones
+        </button>
 
         <button id="btnIniciar">
           ▶ Iniciar
@@ -732,7 +752,6 @@
         <button onclick="cargarPartida()">
           📂 Recuperar Partida
         </button>
-
       </div>
 
       <div class="catalogoBox">
