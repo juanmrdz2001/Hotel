@@ -63,7 +63,7 @@ header h1{
 .mensajesBox{
   background:white;
   border-radius:18px;
-  padding:10px;
+  padding:4px;
   box-shadow:0 4px 12px rgba(0,0,0,0.15);
   margin-bottom:20px;
 }
@@ -192,9 +192,13 @@ header h1{
 
 .objeto-cama{
   position:absolute;
-  left:8px;
-  bottom:16px;
-  font-size:28px;
+  left:3px;
+  bottom:14px;
+  width:50px;
+  height:40px;
+  object-fit:contain;
+  background:transparent;
+  mix-blend-mode:multiply;
 }
 
 .objeto-tv{
@@ -225,8 +229,8 @@ header h1{
 
 .objeto-sabanas{
   position:absolute;
-  left:18px;
-  bottom:28px;
+  left:52px;
+  bottom:18px;
   font-size:16px;
   z-index:3;
 }
@@ -713,7 +717,7 @@ button:hover{
   gap:5px;
   padding:6px;
   border-bottom:1px solid #ddd;
-  font-size:12px;
+  font-size:16px;
 }
 
 .encabezadoEmpleado{
@@ -755,7 +759,7 @@ button:hover{
   align-items:center;
   padding:6px;
   border-bottom:1px solid #ddd;
-  font-size:12px;
+  font-size:16px;
 }
 
 .encabezadoMaterial{
@@ -785,7 +789,7 @@ button:hover{
 
 .textoBarraMaterial{
   color:white;
-  font-size:10px;
+  font-size:16px;
   font-weight:bold;
   display:flex;
   align-items:center;
@@ -872,7 +876,7 @@ header p{
 .datoPrestamo{
   margin:8px 0;
   font-weight:bold;
-  font-size:14px;
+  font-size:16px;
 }
 
 .gameOverOverlay{
@@ -984,7 +988,7 @@ header p{
 .filtrosCatalogo{
   display:flex;
   flex-wrap:wrap;
-  gap:5px;
+  gap:2px;
   margin-bottom:10px;
   justify-content:center;
 }
@@ -1010,7 +1014,7 @@ header p{
 .filtrosCatalogo{
   display:flex;
   flex-wrap:wrap;
-  gap:5px;
+  gap:3px;
   margin-bottom:10px;
 }
 
@@ -1189,5 +1193,57 @@ header p{
 .resultadoPositivo{
   color:green;
   font-weight:bold;
+}
+
+.objeto-cama{
+  position:absolute;
+  left:3px;
+  bottom:14px;
+  width:50px;
+  height:40px;
+  object-fit:contain;
+  background:transparent;
+  mix-blend-mode:multiply;
+}
+
+.plantaLuz{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  height:100%;
+  padding:4px;
+  text-align:center;
+}
+
+.tituloPlantaLuz{
+  font-size:12px;
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+.datosPlantaLuz{
+  font-size:15px;
+  font-weight:bold;
+}
+
+.iconoPlantaLuz{
+  width:20px;
+  height:20px;
+  vertical-align:middle;
+}
+
+.torretasEnergia{
+  font-size:14px;
+  min-height:16px;
+  animation: parpadeoTorretas 0.6s infinite alternate;
+}
+
+.alertaParpadeo{
+  animation: parpadeoTorretas 0.6s infinite alternate;
+}
+
+@keyframes parpadeoTorretas{
+  from{ opacity:0.25; }
+  to{ opacity:1; }
 }
 

@@ -34,8 +34,30 @@ let desgasteHoy = 0;
 let nominaHoy = 0;
 let materialesHoy = 0;
 let interesesHoy = 0;
+let diasSobrecarga = 0;
 
 let historialResultados = [];
+
+let plantasLuz = [
+  {
+    vida: 100,
+    vidaMaxima: 100,
+    costo: 160000,
+  },
+];
+
+const CAPACIDAD_POR_PLANTA = 100;
+
+const consumoEnergia = {
+  lampara: 5,
+  tv: 10,
+  internet: 8,
+  clima: 20,
+  elevador: 25,
+  lavanderia: 15,
+  cafeteria: 20,
+  alberca: 15,
+};
 
 function mostrarInstrucciones() {
   document.getElementById("modalInstrucciones").style.display = "block";
@@ -310,6 +332,14 @@ const catalogo = [
     costo: 50000,
     lujo: 25,
     descripcion: "Decoración VIP.",
+  },
+  {
+    nombre: "⚡ Planta de Luz",
+    tipo: "plantaLuz",
+    icono: "⚡",
+    costo: 160000,
+    lujo: 0,
+    descripcion: "Aumenta la capacidad eléctrica del hotel.",
   },
   {
     nombre: "Elevador",
@@ -1111,6 +1141,7 @@ function actualizarPantalla() {
   dibujarMateriales();
   actualizarPanelPrestamo();
   dibujarHistorialResultados();
+  actualizarPanelPlantaLuz();
   verificarQuiebra();
 }
 
@@ -1257,10 +1288,11 @@ function generarContenidoCuarto(cuarto) {
   // CAMA
   if (obj.cama) {
     html += `
-      <span class="objetoCuarto objeto-cama">
-        ${obj.cama.icono}
-      </span>
-    `;
+    <img
+      class="objetoCuarto objeto-cama"
+      src="${cuarto.ocupada ? "img/CamaOcupada2.png" : "img/CamaSola.png"}"
+    >
+  `;
   }
   // TV
   if (obj.tv) {
@@ -1416,6 +1448,31 @@ function comprarCatalogo(index) {
     actualizarPantalla();
     return;
   }
+  if (item.tipo === "plantaLuz") {
+    if (dinero < item.costo) {
+      agregarMensaje("❌ No alcanza para comprar una planta de luz.");
+      return;
+    }
+
+    dinero -= item.costo;
+
+    plantasLuz.push({
+      vida: 100,
+      vidaMaxima: 100,
+      costo: item.costo,
+    });
+
+    if (consumoElectricoHotel() <= capacidadElectricaHotel()) {
+      diasSobrecarga = 0;
+    }
+
+    agregarMensaje(
+      `⚡ Compraste una planta de luz. Capacidad actual: ${capacidadElectricaHotel()} unidades.`,
+    );
+
+    actualizarPantalla();
+    return;
+  }
 
   // COMPRAR OBJETOS PARA INVENTARIO
   dinero -= item.costo;
@@ -1459,6 +1516,15 @@ function calcularDesgasteDelDia() {
 
   total += costoFachada / 365;
 
+  if (typeof plantasLuz !== "undefined" && Array.isArray(plantasLuz)) {
+    plantasLuz.forEach((planta) => {
+      const costo = planta.costo || 160000;
+      const vidaMaxima = planta.vidaMaxima || 100;
+
+      total += costo / vidaMaxima;
+    });
+  }
+
   return Math.round(total);
 }
 
@@ -1499,6 +1565,16 @@ function desgastarObjetosPorDia() {
     if (vidaElevador < 0) {
       vidaElevador = 0;
     }
+  }
+
+  if (typeof plantasLuz !== "undefined" && Array.isArray(plantasLuz)) {
+    plantasLuz.forEach((planta) => {
+      planta.vida--;
+
+      if (planta.vida < 0) {
+        planta.vida = 0;
+      }
+    });
   }
 
   desgasteHoy = calcularDesgasteDelDia();
@@ -1695,6 +1771,11 @@ function valorHotel() {
   // MATERIALES
 
   total += valorMateriales();
+
+  // PLANTA DE LUZ
+  plantasLuz.forEach((planta) => {
+    total += planta.costo * (planta.vida / planta.vidaMaxima);
+  });
 
   // ELEVADOR
 
@@ -1933,6 +2014,15 @@ function calcularReputacion() {
 
     reputacionTotal += Math.max(0, Math.min(1, porcentaje));
   });
+  if (consumoElectricoHotel() > capacidadElectricaHotel()) {
+    reputacionTotal -= 5;
+  }
+  // PLANTA DE LUZ
+  reputacionTotal += (promedioVidaPlantasLuz() / 100) * 2;
+
+  const castigoEnergia = penalizacionPorSobrecarga();
+
+  reputacionTotal -= castigoEnergia;
 
   // =====================================
   // 4% RECHAZOS
@@ -2198,6 +2288,14 @@ function cerrarDiaHotel() {
   if (hora === 23) {
     guardarResultadoDelDia();
   }
+
+  if (consumoElectricoHotel() > capacidadElectricaHotel()) {
+    diasSobrecarga++;
+
+    agregarMensaje(`🚨 Día ${diasSobrecarga} con sobrecarga eléctrica.`);
+  } else {
+    diasSobrecarga = 0;
+  }
 }
 
 function guardarResultadoDelDia() {
@@ -2396,6 +2494,146 @@ function mostrarCliente(cliente) {
   }, 3500);
 }
 
+function capacidadElectricaHotel() {
+  return plantasLuz.length * CAPACIDAD_POR_PLANTA;
+}
+
+function consumoElectricoHotel() {
+  let consumo = 0;
+
+  cuartos.forEach((cuarto) => {
+    if (!cuarto.comprada) return;
+
+    if (cuarto.objetos.lampara) consumo += consumoEnergia.lampara;
+    if (cuarto.objetos.tv) consumo += consumoEnergia.tv;
+    if (cuarto.objetos.internet) consumo += consumoEnergia.internet;
+    if (cuarto.objetos.clima) consumo += consumoEnergia.clima;
+  });
+
+  if (tieneElevador) consumo += consumoEnergia.elevador;
+
+  consumo += consumoEnergia.lavanderia;
+  consumo += consumoEnergia.cafeteria;
+  consumo += consumoEnergia.alberca;
+
+  return consumo;
+}
+
+function promedioVidaPlantasLuz() {
+  if (!plantasLuz || plantasLuz.length === 0) return 100;
+
+  let total = 0;
+
+  plantasLuz.forEach((planta) => {
+    total += (planta.vida / planta.vidaMaxima) * 100;
+  });
+
+  return Math.round(total / plantasLuz.length);
+}
+
+function costoReparacionPlantasLuz() {
+  let total = 0;
+
+  plantasLuz.forEach((planta) => {
+    const desgaste = planta.vidaMaxima - planta.vida;
+    total += desgaste * 1600;
+  });
+
+  return Math.round(total);
+}
+
+function repararPlantasLuz() {
+  const costo = costoReparacionPlantasLuz();
+
+  if (costo <= 0) {
+    agregarMensaje("✅ Las plantas de luz ya están al 100%.");
+    return;
+  }
+
+  if (dinero < costo) {
+    agregarMensaje("❌ No alcanza para reparar las plantas de luz.");
+    return;
+  }
+
+  dinero -= costo;
+
+  plantasLuz.forEach((planta) => {
+    planta.vida = planta.vidaMaxima;
+  });
+
+  agregarMensaje(
+    `⚡ Reparaste las plantas de luz por $${costo.toLocaleString()}.`,
+  );
+
+  actualizarPantalla();
+}
+
+function obtenerTorretasSobrecarga() {
+  if (diasSobrecarga >= 10) return "🚨🚨🚨🚨🚨";
+  if (diasSobrecarga >= 8) return "🚨🚨🚨🚨";
+  if (diasSobrecarga >= 6) return "🚨🚨🚨";
+  if (diasSobrecarga >= 4) return "🚨🚨";
+  if (diasSobrecarga >= 2) return "🚨";
+
+  return "";
+}
+
+function penalizacionPorSobrecarga() {
+  if (diasSobrecarga >= 10) return 40;
+  if (diasSobrecarga >= 8) return 25;
+  if (diasSobrecarga >= 6) return 20;
+  if (diasSobrecarga >= 4) return 15;
+  if (diasSobrecarga >= 2) return 10;
+
+  return 0;
+}
+
+function actualizarPanelPlantaLuz() {
+  const num = document.getElementById("numPlantasLuz");
+  const usada = document.getElementById("energiaUsada");
+  const capacidad = document.getElementById("energiaCapacidad");
+  const torretas = document.getElementById("torretasEnergia");
+
+  const vidaIndicador = document.getElementById("vidaPlantasLuzIndicador");
+  const barraIndicador = document.getElementById("barraPlantasLuz");
+  const costoIndicador = document.getElementById("costoPlantasLuz");
+
+  const consumo = consumoElectricoHotel();
+  const cap = capacidadElectricaHotel();
+  const vida = promedioVidaPlantasLuz();
+  const costo = costoReparacionPlantasLuz();
+
+  if (num) num.textContent = plantasLuz.length;
+  if (usada) usada.textContent = consumo;
+  if (capacidad) capacidad.textContent = cap;
+
+  if (usada && capacidad) {
+    if (consumo > cap) {
+      usada.style.color = "red";
+      capacidad.style.color = "red";
+    } else {
+      usada.style.color = "black";
+      capacidad.style.color = "black";
+    }
+  }
+
+  if (torretas) {
+    torretas.textContent = obtenerTorretasSobrecarga();
+
+    if (torretas.textContent.trim() !== "") {
+      torretas.classList.add("alertaParpadeo");
+    } else {
+      torretas.classList.remove("alertaParpadeo");
+    }
+  }
+
+  if (vidaIndicador) vidaIndicador.textContent = vida + "%";
+  if (barraIndicador) barraIndicador.style.width = vida + "%";
+  if (costoIndicador) {
+    costoIndicador.textContent = "💰 $" + costo.toLocaleString();
+  }
+}
+
 function iniciarJuego() {
   if (juegoActivo) return;
 
@@ -2488,10 +2726,12 @@ async function guardarPartida() {
     vidaFachada,
     diasDesgasteFachada,
 
+    plantasLuz,
     clientesRechazados,
     cuartosRentados20,
     pagosHoy,
     nominaPagadaHoy,
+    diasSobrecarga,
 
     fechaGuardado: new Date().toLocaleString(),
   };
@@ -2543,7 +2783,15 @@ async function cargarPartida() {
     inventario = partida.inventario || [];
 
     cuartos.splice(0, cuartos.length, ...partida.cuartos);
+    plantasLuz = partida.plantasLuz || [
+      {
+        vida: 100,
+        vidaMaxima: 100,
+        costo: 160000,
+      },
+    ];
 
+    diasSobrecarga = partida.diasSobrecarga || 0;
     actualizarPantalla();
 
     agregarMensaje("📂 Partida recuperada correctamente.");

@@ -122,7 +122,26 @@
 
   <div class="zonaServicios">
 
-    <div class="servicio plantaLuz">⚡ Planta de luz</div>
+<div class="servicio plantaLuz" id="servicioPlantaLuz">
+
+  <div class="tituloPlantaLuz">
+    ⚡ PLANTA LUZ ⚡
+  </div>
+
+  <div class="datosPlantaLuz">
+
+    <img src="img/Planta.png" class="iconoPlantaLuz">
+    <span id="numPlantasLuz">1</span>
+    &nbsp;&nbsp;
+    🔋 <span id="energiaUsada">50</span>/<span id="energiaCapacidad">100</span>
+  </div>
+
+  <div id="torretasEnergia" class="torretasEnergia">
+  </div>
+
+</div>
+
+
     <div class="servicio lavanderia">🧺 Lavandería</div>
     <div class="servicio mantenimiento">🔧 Mantenimiento</div>
     <div class="servicio recepcion">🛎️ Recepción</div>
@@ -597,6 +616,30 @@
 
 </div>
 
+<div class="indicador">
+  <div class="indicadorTitulo">
+    <div class="tituloIzquierda">
+      <span>⚡ Plantas de luz</span>
+    </div>
+
+    <div class="zonaDerechaIndicador">
+      <span id="vidaPlantasLuzIndicador">100%</span>
+
+      <button class="btnReparar" onclick="repararPlantasLuz()">
+        Reparar
+      </button>
+    </div>
+  </div>
+
+  <div class="barraExterior">
+    <div class="barraInterior" id="barraPlantasLuz" style="width:100%"></div>
+  </div>
+
+  <div class="costoReparacion" id="costoPlantasLuz">
+    💰 $0
+  </div>
+</div>
+
 <!-- ELEVADOR -->
 
 <div class="indicador">
@@ -711,7 +754,7 @@
 </div>
 
 <div class="panelResultados">
-  <h3>📊 Últimos 10 días</h3>
+  <h3>📊 Estado Financiero De Los Últimos 10 días</h3>
   <div id="historialResultados"></div>
 </div>
 
@@ -781,6 +824,8 @@
   <button onclick="filtrarCatalogo('clima')">❄️</button>
 
   <button onclick="filtrarCatalogo('cuadro')">🖼️</button>
+
+  <button onclick="filtrarCatalogo('plantaLuz')">⚡</button>
 
   <button onclick="filtrarCatalogo('elevador')">🏢</button>
 
