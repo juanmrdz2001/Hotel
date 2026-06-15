@@ -46,6 +46,16 @@ let plantasLuz = [
   },
 ];
 
+let lavadoras = [
+  {
+    vida: 100,
+    vidaMaxima: 100,
+    costo: 40000,
+  },
+];
+
+let pendientesLavanderia = 0;
+
 const CAPACIDAD_POR_PLANTA = 100;
 
 const consumoEnergia = {
@@ -234,7 +244,6 @@ const catalogo = [
     lujo: 15,
     descripcion: "Da elegancia al cuarto.",
   },
-
   {
     nombre: "Alfombra Básica",
     tipo: "alfombra",
@@ -251,7 +260,6 @@ const catalogo = [
     lujo: 22,
     descripcion: "Sube el nivel del cuarto.",
   },
-
   {
     nombre: "Sábanas Limpias",
     tipo: "sabanas",
@@ -340,6 +348,14 @@ const catalogo = [
     costo: 160000,
     lujo: 0,
     descripcion: "Aumenta la capacidad eléctrica del hotel.",
+  },
+  {
+    nombre: "Lavadora",
+    tipo: "lavadora",
+    icono: '<img src="img/Lavadora.png" class="iconoCatalogoImg">',
+    costo: 40000,
+    consumo: 15,
+    descripcion: "Aumenta la capacidad de la Lavandería",
   },
   {
     nombre: "Elevador",
@@ -1142,6 +1158,7 @@ function actualizarPantalla() {
   actualizarPanelPrestamo();
   dibujarHistorialResultados();
   actualizarPanelPlantaLuz();
+  actualizarPanelLavanderia();
   verificarQuiebra();
 }
 
@@ -1198,6 +1215,25 @@ function actualizarIndicadoresMantenimiento() {
 
   if (costoFachadaSpan) {
     costoFachadaSpan.textContent = `💰 $${Math.round(costoActualFachada).toLocaleString()}`;
+  }
+
+  const vidaLavadoras = promedioVidaLavadoras();
+  const costoLavadoras = costoReparacionLavadoras();
+
+  const vidaLavadorasSpan = document.getElementById("vidaLavadorasIndicador");
+  const barraLavadoras = document.getElementById("barraLavadoras");
+  const costoLavadorasSpan = document.getElementById("costoLavadoras");
+
+  if (vidaLavadorasSpan) {
+    vidaLavadorasSpan.textContent = vidaLavadoras + "%";
+  }
+
+  if (barraLavadoras) {
+    barraLavadoras.style.width = vidaLavadoras + "%";
+  }
+
+  if (costoLavadorasSpan) {
+    costoLavadorasSpan.textContent = "💰 $" + costoLavadoras.toLocaleString();
   }
 }
 
@@ -1465,11 +1501,24 @@ function comprarCatalogo(index) {
     if (consumoElectricoHotel() <= capacidadElectricaHotel()) {
       diasSobrecarga = 0;
     }
-
     agregarMensaje(
       `⚡ Compraste una planta de luz. Capacidad actual: ${capacidadElectricaHotel()} unidades.`,
     );
 
+    actualizarPantalla();
+    return;
+  }
+
+  if (item.tipo === "lavadora") {
+    dinero -= item.costo;
+
+    lavadoras.push({
+      vida: 100,
+      vidaMaxima: 100,
+      costo: item.costo,
+    });
+
+    agregarMensaje("🧺 Compraste una lavadora.");
     actualizarPantalla();
     return;
   }
@@ -1525,6 +1574,11 @@ function calcularDesgasteDelDia() {
     });
   }
 
+  // DESGASTE LAVADORAS
+  lavadoras.forEach((lavadora) => {
+    total += lavadora.costo / lavadora.vidaMaxima;
+  });
+
   return Math.round(total);
 }
 
@@ -1576,6 +1630,14 @@ function desgastarObjetosPorDia() {
       }
     });
   }
+
+  lavadoras.forEach((lavadora) => {
+    lavadora.vida--;
+
+    if (lavadora.vida < 0) {
+      lavadora.vida = 0;
+    }
+  });
 
   desgasteHoy = calcularDesgasteDelDia();
 }
@@ -1782,6 +1844,11 @@ function valorHotel() {
   if (tieneElevador) {
     total += 80000 * ((vidaElevador || 100) / 100);
   }
+
+  // LAVADORAS
+  lavadoras.forEach((lavadora) => {
+    total += lavadora.costo * (lavadora.vida / lavadora.vidaMaxima);
+  });
 
   // FACHADA
 
@@ -2024,6 +2091,13 @@ function calcularReputacion() {
 
   reputacionTotal -= castigoEnergia;
 
+  // LAVANDERIA
+  const pendientes = pendientesLavanderia;
+
+  if (pendientes > 0) {
+    reputacionTotal -= Math.min(20, Math.ceil(pendientes / 2));
+  }
+
   // =====================================
   // 4% RECHAZOS
   // =====================================
@@ -2229,6 +2303,10 @@ function avanzarHora() {
     guardarResultadoDelDia();
   }
 
+  if (hora === 23) {
+    procesarLavanderia();
+  }
+
   recibirClientes();
   actualizarPantalla();
 }
@@ -2296,6 +2374,7 @@ function cerrarDiaHotel() {
   } else {
     diasSobrecarga = 0;
   }
+  procesarLavanderiaDiaria();
 }
 
 function guardarResultadoDelDia() {
@@ -2512,7 +2591,7 @@ function consumoElectricoHotel() {
 
   if (tieneElevador) consumo += consumoEnergia.elevador;
 
-  consumo += consumoEnergia.lavanderia;
+  consumo += lavadoras.length * 15;
   consumo += consumoEnergia.cafeteria;
   consumo += consumoEnergia.alberca;
 
@@ -2634,6 +2713,180 @@ function actualizarPanelPlantaLuz() {
   }
 }
 
+function obtenerDetalleConsumoEnergia() {
+  const detalle = [];
+
+  function agregar(cantidad, descripcion, consumo) {
+    if (cantidad <= 0) return;
+
+    detalle.push({
+      cantidad,
+      descripcion,
+      consumo,
+      total: cantidad * consumo,
+    });
+  }
+
+  const lamparas = cuartos.filter(
+    (c) => c.comprada && c.objetos.lampara,
+  ).length;
+  const tvs = cuartos.filter((c) => c.comprada && c.objetos.tv).length;
+  const internets = cuartos.filter(
+    (c) => c.comprada && c.objetos.internet,
+  ).length;
+  const climas = cuartos.filter((c) => c.comprada && c.objetos.clima).length;
+
+  agregar(lamparas, "Lámparas", consumoEnergia.lampara);
+  agregar(tvs, "Televisiones", consumoEnergia.tv);
+  agregar(internets, "Internet / WiFi", consumoEnergia.internet);
+  agregar(climas, "Aires acondicionados", consumoEnergia.clima);
+
+  if (tieneElevador) {
+    agregar(1, "Elevador", consumoEnergia.elevador);
+  }
+
+  agregar(1, "Lavandería", consumoEnergia.lavanderia);
+  agregar(1, "Cafetería", consumoEnergia.cafeteria);
+  agregar(1, "Alberca", consumoEnergia.alberca);
+
+  return detalle;
+}
+
+function mostrarDetalleEnergia() {
+  const tbody = document.getElementById("detalleConsumoEnergia");
+  const modal = document.getElementById("modalEnergia");
+
+  if (!tbody || !modal) return;
+
+  const detalle = obtenerDetalleConsumoEnergia();
+
+  tbody.innerHTML = "";
+
+  let totalGeneral = 0;
+
+  detalle.forEach((item) => {
+    totalGeneral += item.total;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${item.cantidad}</td>
+        <td>${item.descripcion}</td>
+        <td>${item.consumo}</td>
+        <td>${item.total}</td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML += `
+    <tr>
+      <td colspan="3"><strong>TOTAL</strong></td>
+      <td><strong>${totalGeneral}</strong></td>
+    </tr>
+  `;
+
+  modal.style.display = "block";
+}
+
+function cerrarDetalleEnergia() {
+  document.getElementById("modalEnergia").style.display = "none";
+}
+
+function capacidadLavanderia() {
+  return lavadoras.length * 20;
+}
+
+function actualizarPanelLavanderia() {
+  document.getElementById("numLavadoras").textContent = lavadoras.length;
+
+  document.getElementById("cuartosLavanderia").textContent = cuartos.filter(
+    (c) => c.ocupada,
+  ).length;
+
+  document.getElementById("capacidadLavanderia").textContent =
+    capacidadLavanderia();
+
+  const pendientes = document.getElementById("pendientesLavanderia");
+
+  pendientes.textContent = pendientesLavanderia;
+
+  pendientes.style.color = pendientesLavanderia > 0 ? "red" : "black";
+}
+
+function cuartosOcupados() {
+  return cuartos.filter((c) => c.comprada && c.ocupada).length;
+}
+
+function procesarLavanderiaDiaria() {
+  const rentadosHoy = pagosHoy;
+  pendientesLavanderia += rentadosHoy;
+  const capacidad = capacidadLavanderia();
+  const lavados = Math.min(pendientesLavanderia, capacidad);
+  pendientesLavanderia -= lavados;
+  if (pendientesLavanderia > 0) {
+    agregarMensaje(
+      `🧺 Lavandería saturada. Quedan ${pendientesLavanderia} pendientes.`,
+    );
+  } else {
+    agregarMensaje("🧺 Lavandería procesó toda la ropa del día.");
+  }
+}
+
+function procesarLavanderia() {
+  const ocupados = cuartos.filter((c) => c.ocupada).length;
+  pendientesLavanderia += ocupados;
+  pendientesLavanderia -= capacidadLavanderia();
+  if (pendientesLavanderia < 0) {
+    pendientesLavanderia = 0;
+  }
+}
+
+function promedioVidaLavadoras() {
+  if (!lavadoras || lavadoras.length === 0) return 100;
+
+  let total = 0;
+
+  lavadoras.forEach((lavadora) => {
+    total += (lavadora.vida / lavadora.vidaMaxima) * 100;
+  });
+
+  return Math.round(total / lavadoras.length);
+}
+
+function costoReparacionLavadoras() {
+  let total = 0;
+
+  lavadoras.forEach((lavadora) => {
+    const desgaste = lavadora.vidaMaxima - lavadora.vida;
+    total += desgaste * 400;
+  });
+
+  return Math.round(total);
+}
+
+function repararLavadoras() {
+  const costo = costoReparacionLavadoras();
+
+  if (costo <= 0) {
+    agregarMensaje("✅ Las lavadoras ya están al 100%.");
+    return;
+  }
+
+  if (dinero < costo) {
+    agregarMensaje("❌ No alcanza para reparar las lavadoras.");
+    return;
+  }
+
+  dinero -= costo;
+
+  lavadoras.forEach((lavadora) => {
+    lavadora.vida = lavadora.vidaMaxima;
+  });
+
+  agregarMensaje(`🧺 Reparaste las lavadoras por $${costo.toLocaleString()}.`);
+
+  actualizarPantalla();
+}
+
 function iniciarJuego() {
   if (juegoActivo) return;
 
@@ -2732,6 +2985,8 @@ async function guardarPartida() {
     pagosHoy,
     nominaPagadaHoy,
     diasSobrecarga,
+    lavadoras,
+    pendientesLavanderia,
 
     fechaGuardado: new Date().toLocaleString(),
   };
@@ -2792,6 +3047,20 @@ async function cargarPartida() {
     ];
 
     diasSobrecarga = partida.diasSobrecarga || 0;
+    lavadoras.splice(
+      0,
+      lavadoras.length,
+      ...(partida.lavadoras || [
+        {
+          vida: 100,
+          vidaMaxima: 100,
+          costo: 40000,
+        },
+      ]),
+    );
+
+    pendientesLavanderia = partida.pendientesLavanderia || 0;
+
     actualizarPantalla();
 
     agregarMensaje("📂 Partida recuperada correctamente.");
