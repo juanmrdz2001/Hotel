@@ -304,7 +304,8 @@ const catalogo = [
   {
     nombre: "❄️ Aire Acondicionado",
     tipo: "clima",
-    icono: "❄️",
+    icono: '<img src="img/Clima.png" class="iconoCatalogoImg">',
+    imagen: "img/Clima.png",
     costo: 18000,
     lujo: 12,
     descripcion: "Mejora la comodidad.",
@@ -312,7 +313,8 @@ const catalogo = [
   {
     nombre: "🧊 Clima Inteligente",
     tipo: "clima",
-    icono: "🧊",
+    icono: '<img src="img/Clima2.png" class="iconoCatalogoImg">',
+    imagen: "img/Clima2.png",
     costo: 50000,
     lujo: 30,
     descripcion: "Sistema premium de climatización.",
@@ -1381,10 +1383,11 @@ function generarContenidoCuarto(cuarto) {
   // CLIMA
   if (obj.clima) {
     html += `
-      <span class="objetoCuarto objeto-clima">
-        ${obj.clima.icono}
-      </span>
-    `;
+    <img
+      src="${obj.clima.imagen || "img/Clima.png"}"
+      class="objetoCuarto objeto-clima"
+      alt="Clima">
+  `;
   }
   // CUADRO
   if (obj.cuadro) {
@@ -1531,6 +1534,7 @@ function comprarCatalogo(index) {
     nombre: item.nombre,
     tipo: item.tipo,
     icono: item.icono,
+    imagen: item.imagen,
     lujo: item.lujo,
     costo: item.costo,
     vida: vidaUtilPorTipo[item.tipo] || 100,
