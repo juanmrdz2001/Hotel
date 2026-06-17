@@ -246,23 +246,23 @@ header h1{
 
 .objeto-sabanas{
   position:absolute;
-  left:52px;
-  bottom:20px;
+  left:54px;
+  bottom:27px;
   font-size:16px;
   z-index:3;
 }
 
 .objeto-extinguidor{
   position:absolute;
-  right:6px;
-  bottom:18px;
+  right:0px;
+  bottom: 40px;
   font-size:16px;
 }
 
 .objeto-internet{
   position:absolute;
-  top:6px;
-  left:35%;
+  top:85px;
+  right:2px;
   transform:translateX(-50%);
   font-size:14px;
 }
@@ -322,8 +322,9 @@ header h1{
   grid-column:1 / 4;
   grid-row:2;
   display:grid;
-  grid-template-columns:1fr 1.3fr 1.3fr 0.8fr 120px 3fr 1.4fr;
+  grid-template-columns:1.7fr 1.6fr 0.6fr 0.6fr 120px 3fr 1.4fr;
   gap:4px;
+  min-width:600px;
 }
 
 .ladoHotel{
@@ -1064,10 +1065,6 @@ header p{
   min-width:600px;
 }
 
-.zonaServicios{
-  min-width:600px;
-}
-
 .bandaMensajes{
   position:sticky;
   top:110px; /* ajusta según la altura de tu encabezado */
@@ -1290,6 +1287,14 @@ header p{
   position:relative;
   width:100%;
   height:100%;
+  background:
+  linear-gradient(
+    to bottom,
+    #f8f7f4 0%,
+    #c4c4c1 70%,
+    #9b9997 70%,
+    #5e5d5d 100%
+  );
   display:flex;
   flex-direction:column;
   justify-content:space-between;
@@ -1362,6 +1367,14 @@ header p{
 .lavanderia{
   width:100%;
   height:100%;
+  background:
+  linear-gradient(
+    to bottom,
+    #f8f7f4 0%,
+    #ebf7f4 70%,
+    #bfe6df 70%,
+    #0e97e7 100%
+  );
   display:flex;
   flex-direction:column;
   justify-content:space-between;
@@ -1410,3 +1423,50 @@ header p{
   height:40px;
   object-fit:contain;
 }
+
+.alberca{
+    width:255px;
+    height:80px;
+    background-image:url("img/Alberca.png");
+    background-size:95% 85%;
+    background-repeat:no-repeat;
+    background-position:center;
+    border-radius:10px;
+    border:4px solid #2149ce;
+}
+
+.cafeteria{
+    width:560px;
+    height:80px;
+    background-image:url("img/Cafeteria.png");
+    background-size:98% 88%;
+    background-repeat:no-repeat;
+    background-position:center;
+    border-radius:10px;
+    border:2px solid #703005;
+}
+
+
+.recepcion{
+    width:330px;
+    height:80px;
+    background-image:url("img/Recepcion.png");
+    background-size:98% 88%;
+    background-repeat:no-repeat;
+    background-position:center;
+    border-radius:10px;
+    border:2px solid #703005;
+}
+
+
+.mantenimiento{
+    width:145px;
+    height:80px;
+    background-image:url("img/Mantenimiento.png");
+    background-size:98% 88%;
+    background-repeat:no-repeat;
+    background-position:center;
+    border-radius:10px;
+    border:2px solid #703005;
+}
+
