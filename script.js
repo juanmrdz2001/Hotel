@@ -2378,7 +2378,7 @@ function cerrarDiaHotel() {
   } else {
     diasSobrecarga = 0;
   }
-  //procesarLavanderiaDiaria();
+  procesarLavanderiaDiaria();
 }
 
 function guardarResultadoDelDia() {
@@ -2837,19 +2837,11 @@ function procesarLavanderiaDiaria() {
 
 function procesarLavanderia() {
   const ocupados = cuartos.filter((c) => c.ocupada).length;
-  const capacidad = capacidadLavanderia();
-
-  pendientesLavanderia += ocupados - capacidad;
-
+  pendientesLavanderia += ocupados;
+  pendientesLavanderia -= capacidadLavanderia();
   if (pendientesLavanderia < 0) {
     pendientesLavanderia = 0;
   }
-
-  agregarMensaje(
-    `🧺 Lavandería: ${ocupados}/${capacidad}. Pendientes acumulados: ${pendientesLavanderia}.`,
-  );
-
-  actualizarPanelLavanderia();
 }
 
 function promedioVidaLavadoras() {
@@ -2973,7 +2965,9 @@ if (etiquetaJugador) {
 
 function limpiarUndefined(obj) {
   return JSON.parse(
-    JSON.stringify(obj, (key, value) => (value === undefined ? null : value)),
+    JSON.stringify(obj, (key, value) =>
+      value === undefined ? null : value
+    )
   );
 }
 
@@ -3012,8 +3006,7 @@ async function guardarPartida() {
   try {
     const partidaLimpia = limpiarUndefined(partida);
 
-    await setDoc(doc(db, "partidas", nombreJugador), partidaLimpia);
-
+    await guardarPartidaFirebase(nombreJugador, partidaLimpia);
     await guardarRankingMensual();
 
     agregarMensaje("💾 Partida guardada en Firebase.");
