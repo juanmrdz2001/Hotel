@@ -2565,43 +2565,27 @@ function mostrarCliente(cliente) {
   const div = document.createElement("div");
 
   div.classList.add("cliente");
-
   // TODOS CAMINAN ABAJO
-
   div.style.top = "125px";
-
   // ¿SE HOSPEDA O SIGUE?
-
   if (cliente.seHospeda) {
     div.classList.add("clienteHospeda");
   } else {
     div.classList.add("clientePasa");
   }
-
   div.innerHTML = `
-
     <img
       src="${cliente.imagen}"
       class="imgCliente">
-
     <div class="textoCliente">
-
       ${cliente.nombre}
-
       <br>
-
       <span class="estrellasCliente">
-
       ${cliente.estrellas}
-
       </span>
-
     </div>
-
   `;
-
   entradaHotel.appendChild(div);
-
   setTimeout(() => {
     div.remove();
   }, 5000);
