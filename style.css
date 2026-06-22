@@ -29,7 +29,6 @@ header h1{
   font-size:40px;
 }
 
-
 .panel{
   display:grid;
   grid-template-columns:repeat(6, 1fr);
@@ -55,7 +54,6 @@ header h1{
   align-items:start;
 }
 
-.hotelBox,
 .controles,
 .catalogoBox,
 .inventarioBox,
@@ -314,7 +312,7 @@ header h1{
   grid-template-rows:1fr 75px;
   column-gap:8px;
   row-gap:4px;
-  padding:3px;
+  padding:2px;
   align-items:stretch;
 }
 
@@ -356,38 +354,90 @@ header h1{
   border-color:#0277bd;
 }
 
-.entrada{
-  background:#e3f2fd;
-  border-radius:12px;
-  padding:10px;
-  min-height:190px;
-  overflow:hidden;
+.entradaSuperior{
+  width:100%;
 }
 
 #entradaHotel{
   position:relative;
-  height:150px;
+  width:100%;
+  height:220px;
+
+  background-image:url("img/Fachada.png");
+  background-size:cover;
+  background-position:center bottom;
+  background-repeat:no-repeat;
+
+  overflow:hidden;
+  border-radius:12px;
+  border:3px solid #8a5a2b;
+}
+
+.zonaInferiorColumnas{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  align-items:start;
+}
+
+.columnaIzquierdaInferior,
+.columnaDerechaInferior{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
 
 .cliente{
   position:absolute;
-  left:-260px;
-  font-size:24px;
-  white-space:nowrap;
-  animation-name:entrar;
-  animation-duration:3s;
-  animation-timing-function:linear;
-  animation-fill-mode:forwards;
+  left:-60px;
+  z-index:80;
+
+  display:flex;
+  align-items:center;
+  gap:4px;
+
+  animation:moverCliente 4s linear forwards;
 }
 
-@keyframes entrar{
+.imgCliente{
+  width:96px;
+  height:96px;
+  object-fit:contain;
+
+  animation:pasitosCliente .35s infinite alternate ease-in-out;
+}
+
+.textoCliente{
+  background:rgba(255,255,255,.85);
+  border-radius:6px;
+  padding:1px 5px;
+
+  font-size:12px;
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+.estrellasCliente{
+  font-size:12px;
+}
+
+@keyframes moverCliente{
   from{
-    left:-260px;
-    opacity:0;
+    left:-60px;
   }
+
   to{
-    left:80%;
-    opacity:1;
+    left:120%;
+  }
+}
+
+@keyframes pasitosCliente{
+  from{
+    transform:translateY(0);
+  }
+
+  to{
+    transform:translateY(-2px);
   }
 }
 
@@ -617,11 +667,13 @@ button:hover{
 }
 
 .zonaInferior{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:20px;
+  display:flex;
+  flex-direction:column;
+  gap: 4px;
+  width:100%;
+  margin-top:4px;
 }
+
 .mantenimientoPanel{
   background:#f5f5f5;
   border-radius:12px;
@@ -1057,8 +1109,11 @@ header p{
 }
 
 .hotelBox{
-  min-width:0;
-  overflow-x:auto;
+  background:white;
+  border-radius:18px;
+  padding:2px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+  margin-bottom:5px;
 }
 
 .hotelVisual{

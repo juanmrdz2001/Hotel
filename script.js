@@ -109,6 +109,8 @@ const tiposClientes = [
   {
     nombre: "Mochilero",
     emoji: "🎒",
+    icono: '<img src="img/Mochilero.png" class="iconoCatalogoImg">',
+    imagen: "img/Mochilero.png",
     estrellas: "⭐",
     pagaBase: 400,
   },
@@ -116,6 +118,8 @@ const tiposClientes = [
   {
     nombre: "Turista",
     emoji: "🚶",
+    icono: '<img src="img/Turista.png" class="iconoCatalogoImg">',
+    imagen: "img/Turista.png",
     estrellas: "⭐⭐",
     pagaBase: 500,
   },
@@ -123,6 +127,8 @@ const tiposClientes = [
   {
     nombre: "Ejecutivo",
     emoji: "👔",
+    icono: '<img src="img/Ejecutivo.png" class="iconoCatalogoImg">',
+    imagen: "img/Ejecutivo.png",
     estrellas: "⭐⭐⭐",
     pagaBase: 900,
   },
@@ -130,6 +136,8 @@ const tiposClientes = [
   {
     nombre: "Familia",
     emoji: "👨‍👩‍👧",
+    icono: '<img src="img/Familia.png" class="iconoCatalogoImg">',
+    imagen: "img/Familia.png",
     estrellas: "⭐⭐⭐⭐",
     pagaBase: 1400,
   },
@@ -137,6 +145,8 @@ const tiposClientes = [
   {
     nombre: "VIP",
     emoji: "🕴️",
+    icono: '<img src="img/VIP.png" class="iconoCatalogoImg">',
+    imagen: "img/VIP.png",
     estrellas: "⭐⭐⭐⭐⭐",
     pagaBase: 2500,
   },
@@ -2475,7 +2485,7 @@ function recibirClientes() {
       clientesRechazados++;
 
       agregarMensaje(
-        `❌ ${cliente.emoji} ${cliente.nombre} ${cliente.estrellas} no aceptó la reputación del hotel.`,
+        `❌ ${cliente.imagen} ${cliente.nombre} ${cliente.estrellas} no aceptó la reputación del hotel.`,
       );
 
       continue;
@@ -2504,13 +2514,13 @@ function recibirClientes() {
       consumirMaterialesPorRenta();
 
       agregarMensaje(
-        `${cliente.emoji} ${cliente.nombre} ${cliente.estrellas} rentó el cuarto ${cuarto.numero} y pagó $${pago.toLocaleString()}.`,
+        `${cliente.imagen} ${cliente.nombre} ${cliente.estrellas} rentó el cuarto ${cuarto.numero} y pagó $${pago.toLocaleString()}.`,
       );
     } else {
       clientesRechazados++;
 
       agregarMensaje(
-        `❌ ${cliente.emoji} ${cliente.nombre} ${cliente.estrellas} se fue porque no había cuarto listo y disponible.`,
+        `❌ ${cliente.imagen} ${cliente.nombre} ${cliente.estrellas} se fue porque no había cuarto listo y disponible.`,
       );
     }
   }
@@ -2556,25 +2566,48 @@ function liberarHabitaciones() {
 
 function mostrarCliente(cliente) {
   const div = document.createElement("div");
+
   div.classList.add("cliente");
 
-  const carriles = [130, 105, 80, 55, 30, 5];
+  // TODOS CAMINAN ABAJO
 
-  div.style.top = carriles[siguienteCarrilCliente] + "px";
+  div.style.top = "125px";
 
-  siguienteCarrilCliente++;
+  // ¿SE HOSPEDA O SIGUE?
 
-  if (siguienteCarrilCliente >= carriles.length) {
-    siguienteCarrilCliente = 0;
+  if (cliente.seHospeda) {
+    div.classList.add("clienteHospeda");
+  } else {
+    div.classList.add("clientePasa");
   }
 
-  div.textContent = `${cliente.emoji} ${cliente.nombre} ${cliente.estrellas}`;
+  div.innerHTML = `
+
+    <img
+      src="${cliente.imagen}"
+      class="imgCliente">
+
+    <div class="textoCliente">
+
+      ${cliente.nombre}
+
+      <br>
+
+      <span class="estrellasCliente">
+
+      ${cliente.estrellas}
+
+      </span>
+
+    </div>
+
+  `;
 
   entradaHotel.appendChild(div);
 
   setTimeout(() => {
     div.remove();
-  }, 3500);
+  }, 5000);
 }
 
 function capacidadElectricaHotel() {
@@ -2965,9 +2998,7 @@ if (etiquetaJugador) {
 
 function limpiarUndefined(obj) {
   return JSON.parse(
-    JSON.stringify(obj, (key, value) =>
-      value === undefined ? null : value
-    )
+    JSON.stringify(obj, (key, value) => (value === undefined ? null : value)),
   );
 }
 

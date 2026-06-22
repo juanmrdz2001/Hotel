@@ -223,72 +223,90 @@
 </div> 
 
       <!-- ENTRADA -->
-
 <div class="zonaInferior">
 
-  <!-- ENTRADA -->
+  <!-- ENTRADA DEL HOTEL COMPLETA -->
 
-  <div class="entrada">
+  <div class="entradaSuperior">
 
-    <h3>Entrada del Hotel</h3>
-
-    <div id="entradaHotel"></div>
-  <div class="panelEmpleados">
-
-  <h3>👨‍💼 Empleados</h3>
-  <h5 class="advertencias">(A los Empleados se les paga a las 6:00)</h1>
-  <div class="tablaEmpleados">
-    
-    <div class="filaEmpleado encabezadoEmpleado">
-
-    <div>Puesto</div>
-    <div>Cantidad</div>
-    <div>Sueldo</div>
-    <div>Total</div>
-    <div>Capacidad</div>
-    <div>Indicador</div>
-    <div>+</div>
-    <div>-</div>
-      
-    </div>
-
-    <div id="contenidoEmpleados"></div>
+       <div id="entradaHotel"></div>
 
   </div>
-  </div>
 
-  <div class="panelMateriales">
 
-  <h3>📦 Almacén de Materiales</h3>
+  <!-- DOS COLUMNAS ABAJO -->
 
-  <div class="tablaMateriales">
+  <div class="zonaInferiorColumnas">
 
-    <div class="filaMaterial encabezadoMaterial">
+    <!-- COLUMNA IZQUIERDA -->
 
-      <div>Material</div>
-      <div>Cantidad</div>
-      <div>Quedan</div>
-      <div>Precio</div>
-      <div>Valor</div>
-      <div>Indicador</div>
-      <div>Botón</div>
+    <div class="columnaIzquierdaInferior">
+
+      <div class="panelEmpleados">
+
+        <h3>👨‍💼 Empleados</h3>
+
+        <h5 class="advertencias">
+          (A los Empleados se les paga a las 6:00)
+        </h5>
+
+        <div class="tablaEmpleados">
+
+          <div class="filaEmpleado encabezadoEmpleado">
+            <div>Puesto</div>
+            <div>Cantidad</div>
+            <div>Sueldo</div>
+            <div>Total</div>
+            <div>Capacidad</div>
+            <div>Indicador</div>
+            <div>+</div>
+            <div>-</div>
+          </div>
+
+          <div id="contenidoEmpleados"></div>
+
+        </div>
+
+      </div>
+
+
+      <div class="panelMateriales">
+
+        <h3>📦 Almacén de Materiales</h3>
+
+        <div class="tablaMateriales">
+
+          <div class="filaMaterial encabezadoMaterial">
+            <div>Material</div>
+            <div>Cantidad</div>
+            <div>Quedan</div>
+            <div>Precio</div>
+            <div>Valor</div>
+            <div>Indicador</div>
+            <div>Botón</div>
+          </div>
+
+          <div id="contenidoMateriales"></div>
+
+        </div>
+
+      </div>
 
     </div>
 
-    <div id="contenidoMateriales"></div>
+    <!-- COLUMNA DERECHA -->
 
-</div>
-</div>
-</div>
-  
-  <!-- MANTENIMIENTO -->
+    <div class="columnaDerechaInferior">
 
-  <div class="mantenimientoPanel">
+      <div class="mantenimientoPanel">
 
-    <h3>🔧 Indicadores</h3>
-    <h5 class="advertencias">(Muestran El Desgaste De Los Muebles)</h5>
+        <h3>🔧 Indicadores</h3>
 
-<div id="indicadoresMantenimiento">
+        <h5 class="advertencias">
+          (Muestran El Desgaste De Los Muebles)
+        </h5>
+
+        <div id="indicadoresMantenimiento">
 
   <!-- CUARTOS -->
 
@@ -821,35 +839,47 @@
 
   </div>
 
-</div>
+        </div>
 
-<div class="panelPrestamo">
+      </div>
 
-  <h3>🏦 Préstamo Bancario</h3>
 
-  <div class="datoPrestamo">
-    💰 Saldo insoluto:
-    $<span id="saldoPrestamo">700000</span>
-  </div>
+      <div class="panelPrestamo">
 
-  <div class="datoPrestamo">
-    📅 Siguiente pago:
-    Día <span id="diaPagoPrestamo">10</span>
-  </div>
+        <h3>🏦 Préstamo Bancario</h3>
 
-  <div class="datoPrestamo">
-    💵 Monto siguiente pago:
-    $<span id="montoPagoPrestamo">34000</span>
-  </div>
+        <div class="datoPrestamo">
+          💰 Saldo insoluto:
+          $<span id="saldoPrestamo">700000</span>
+        </div>
 
-</div>
+        <div class="datoPrestamo">
+          📅 Siguiente pago:
+          Día <span id="diaPagoPrestamo">10</span>
+        </div>
 
-<div class="panelResultados">
-  <h3>📊 Estado Financiero De Los Últimos 10 días</h3>
-  <div id="historialResultados"></div>
-</div>
+        <div class="datoPrestamo">
+          💵 Monto siguiente pago:
+          $<span id="montoPagoPrestamo">34000</span>
+        </div>
 
-    </section>
+      </div>
+
+
+      <div class="panelResultados">
+
+        <h3>📊 Estado Financiero De Los Últimos 10 días</h3>
+
+        <div id="historialResultados"></div>
+
+      </div>
+
+    </div>
+
+    </div>
+    </div>
+    
+</section>
 
     <!-- PANEL DERECHO -->
 
