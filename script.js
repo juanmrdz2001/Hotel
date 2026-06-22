@@ -2475,52 +2475,49 @@ function calcularClientes() {
 
 function recibirClientes() {
   const cantidad = calcularClientes();
-
   agregarMensaje(`🕒 ${hora}:00 llegaron ${cantidad} posibles huéspedes.`);
-
   for (let i = 0; i < cantidad; i++) {
     const cliente = tiposClientes[numero(0, tiposClientes.length - 1)];
-
     if (!clienteAceptaHotel(cliente)) {
       clientesRechazados++;
-
       agregarMensaje(
-        `❌ ${cliente.imagen} ${cliente.nombre} ${cliente.estrellas} no aceptó la reputación del hotel.`,
+        `❌ ${cliente.nombre}
+        ${cliente.estrellas}
+        no aceptó la reputación del hotel.`,
       );
-
       continue;
     }
-
-    mostrarCliente(cliente);
-
     const cuarto = cuartos.find((c) => {
       if (c.rentadoHoy === undefined) {
         c.rentadoHoy = false;
       }
-
       return c.comprada && cuartoListo(c) && !c.ocupada && !c.rentadoHoy;
     });
-
+    cliente.seHospeda = !!cuarto;
+    mostrarCliente(cliente);
     if (cuarto) {
       cuarto.ocupada = true;
       cuarto.rentadoHoy = true;
-
       const pago = precioCuarto(cuarto);
-
       dinero += pago;
       rentasHoy += pago;
       pagosHoy++;
-
       consumirMaterialesPorRenta();
-
       agregarMensaje(
-        `${cliente.imagen} ${cliente.nombre} ${cliente.estrellas} rentó el cuarto ${cuarto.numero} y pagó $${pago.toLocaleString()}.`,
+        `🏨 ${cliente.nombre}
+        ${cliente.estrellas}
+        rentó el cuarto
+        ${cuarto.numero}
+        y pagó
+        $${pago.toLocaleString()}.`,
       );
     } else {
       clientesRechazados++;
-
       agregarMensaje(
-        `❌ ${cliente.imagen} ${cliente.nombre} ${cliente.estrellas} se fue porque no había cuarto listo y disponible.`,
+        `❌ ${cliente.nombre}
+        ${cliente.estrellas}
+        se fue porque no había
+        cuarto disponible.`,
       );
     }
   }

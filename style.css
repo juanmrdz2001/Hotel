@@ -388,15 +388,22 @@ header h1{
 }
 
 .cliente{
-  position:absolute;
-  left:-60px;
-  z-index:80;
+   position:absolute;
+   left:-60px;
+   z-index:80;
+   display:flex;
+   align-items:center;
+   gap:4px;
+}
 
-  display:flex;
-  align-items:center;
-  gap:4px;
+.clientePasa{
+   animation:
+   moverCliente 5s linear forwards;
+}
 
-  animation:moverCliente 4s linear forwards;
+.clienteHospeda{
+   animation:
+   entrarHotel 3.5s linear forwards;
 }
 
 .imgCliente{
@@ -422,13 +429,19 @@ header h1{
 }
 
 @keyframes moverCliente{
-  from{
-    left:-60px;
-  }
 
-  to{
-    left:120%;
-  }
+   from{
+
+      left:-60px;
+
+   }
+
+   to{
+
+      left:110%;
+
+   }
+
 }
 
 @keyframes pasitosCliente{
@@ -439,6 +452,22 @@ header h1{
   to{
     transform:translateY(-2px);
   }
+}
+
+@keyframes entrarHotel{
+   0%{
+      left:-60px;
+      opacity:1;
+   }
+   80%{
+      left:44%;
+      opacity:1;
+   }
+   100%{
+      left:47%;
+      opacity:0;
+      transform:scale(.7);
+   }
 }
 
 button{
