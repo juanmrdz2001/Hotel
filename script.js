@@ -38,6 +38,11 @@ let diasSobrecarga = 0;
 
 let historialResultados = [];
 
+let contingenciasHoy = 0;
+let eventoHoy = "";
+let ultimoDiaEventoRevisado = 0;
+let alertaPausoJuego = false;
+
 let plantasLuz = [
   {
     vida: 100,
@@ -2321,6 +2326,10 @@ function avanzarHora() {
     procesarLavanderia();
   }
 
+  if (hora === 12) {
+    revisarContingencias();
+  }
+
   recibirClientes();
   actualizarPantalla();
 }
@@ -2395,7 +2404,13 @@ function guardarResultadoDelDia() {
   interesesHoy = (prestamo.saldo * prestamo.interes) / prestamo.frecuenciaDias;
 
   const resultado =
-    rentasHoy - desgasteHoy - nominaHoy - materialesHoy - interesesHoy;
+    rentasHoy -
+    desgasteHoy -
+    nominaHoy -
+    materialesHoy -
+    interesesHoy -
+    contingenciasHoy;
+
   historialResultados.push({
     dia,
     rentas: Math.round(rentasHoy),
@@ -2403,8 +2418,10 @@ function guardarResultadoDelDia() {
     nomina: Math.round(nominaHoy),
     materiales: Math.round(materialesHoy),
     intereses: Math.round(interesesHoy),
+    contingencias: Math.round(contingenciasHoy),
     resultado: Math.round(resultado),
     reputacion: reputacion,
+    evento: eventoHoy || "-",
   });
 
   if (historialResultados.length > 10) {
@@ -2416,6 +2433,8 @@ function guardarResultadoDelDia() {
   nominaHoy = 0;
   materialesHoy = 0;
   interesesHoy = 0;
+  contingenciasHoy = 0;
+  eventoHoy = "";
 }
 
 function dibujarHistorialResultados() {
@@ -2431,6 +2450,7 @@ function dibujarHistorialResultados() {
       <div>-Nom.</div>
       <div>-Mat.</div>
       <div>-Int.</div>
+      <div>-Cont.</div>
       <div>Resultado</div>
       <div>⭐Rep</div>
     </div>
@@ -2448,6 +2468,7 @@ function dibujarHistorialResultados() {
           <div>$${r.nomina.toLocaleString()}</div>
           <div>$${r.materiales.toLocaleString()}</div>
           <div>$${r.intereses.toLocaleString()}</div>
+          <div>$${(r.contingencias || 0).toLocaleString()}</div>
 
           <div class="${
             r.resultado < 0 ? "resultadoNegativo" : "resultadoPositivo"
@@ -3156,3 +3177,192 @@ window.mostrarRankingMensual = async function () {
 window.cerrarRanking = function () {
   document.getElementById("rankingModal").style.display = "none";
 };
+
+function mostrarAlertaEvento(titulo, mensaje, imagen) {
+  const modal = document.getElementById("alertaEvento");
+  const tituloEvento = document.getElementById("tituloEvento");
+  const mensajeEvento = document.getElementById("mensajeEvento");
+  const imagenEvento = document.getElementById("imagenEvento");
+
+  if (!modal || !tituloEvento || !mensajeEvento || !imagenEvento) {
+    agregarMensaje(`${titulo} ${mensaje}`);
+    return;
+  }
+
+  alertaPausoJuego = juegoActivo;
+
+  if (intervalo) {
+    clearInterval(intervalo);
+    intervalo = null;
+  }
+
+  tituloEvento.innerHTML = titulo;
+  mensajeEvento.innerHTML = mensaje;
+
+  if (imagen) {
+    imagenEvento.src = imagen;
+    imagenEvento.style.display = "block";
+  } else {
+    imagenEvento.style.display = "none";
+  }
+
+  modal.classList.remove("oculto");
+}
+
+function cerrarAlertaEvento() {
+  const modal = document.getElementById("alertaEvento");
+
+  if (modal) {
+    modal.classList.add("oculto");
+  }
+
+  if (alertaPausoJuego && juegoActivo && !intervalo) {
+    intervalo = setInterval(() => {
+      avanzarHora();
+    }, 3000);
+  }
+
+  alertaPausoJuego = false;
+}
+
+function revisarNoticiasEspeciales() {
+  if (dia === 21) {
+    mostrarAlertaEvento(
+      "📰 NOTICIAS DEL DÍA",
+      `
+      La ciudad continúa creciendo.<br><br>
+      Las autoridades advierten sobre posibles robos y manifestaciones.<br><br>
+      A partir de hoy podrían presentarse contingencias.
+      `,
+      "",
+    );
+    return true;
+  }
+
+  if (dia === 51) {
+    mostrarAlertaEvento(
+      "📰 NOTICIAS DEL DÍA",
+      `
+      Las altas temperaturas han aumentado el riesgo de incendios.<br><br>
+      Se recomienda mantener extinguidores suficientes y en buen estado.
+      `,
+      "",
+    );
+    return true;
+  }
+
+  if (dia === 101) {
+    mostrarAlertaEvento(
+      "📰 NOTICIAS DEL DÍA",
+      `
+      Comenzó la temporada de lluvias.<br><br>
+      Las autoridades alertan sobre posibles inundaciones en la ciudad.
+      `,
+      "",
+    );
+    return true;
+  }
+
+  return false;
+}
+
+function aplicarContingencia(evento) {
+  dinero -= evento.perdidaDinero;
+  contingenciasHoy += evento.perdidaDinero;
+
+  reputacion -= evento.perdidaReputacion;
+
+  if (reputacion < 0) {
+    reputacion = 0;
+  }
+
+  eventoHoy = evento.nombre;
+
+  agregarMensaje(
+    `🚨 ${evento.nombre}: -$${evento.perdidaDinero.toLocaleString()} y -${evento.perdidaReputacion} reputación.`,
+  );
+
+  mostrarAlertaEvento(
+    `🚨 ${evento.nombre}`,
+    `
+    ${evento.mensaje}<br><br>
+    💰 Pérdida: -$${evento.perdidaDinero.toLocaleString()}<br>
+    ⭐ Reputación: -${evento.perdidaReputacion}
+    `,
+    evento.imagen,
+  );
+
+  actualizarPantalla();
+}
+
+function revisarContingencias() {
+  if (dia <= 20) {
+    return;
+  }
+
+  if (ultimoDiaEventoRevisado === dia) {
+    return;
+  }
+
+  ultimoDiaEventoRevisado = dia;
+
+  if (revisarNoticiasEspeciales()) {
+    return;
+  }
+
+  const eventos = [];
+
+  if (dia >= 21) {
+    eventos.push({
+      nombre: "🚓 Robo",
+      imagen: "img/Robo.png",
+      probabilidad: 8,
+      perdidaDinero: 15000,
+      perdidaReputacion: 3,
+      mensaje: "Un robo afectó la operación del hotel.",
+    });
+
+    eventos.push({
+      nombre: "✊ Manifestación",
+      imagen: "img/Manifestaciones.png",
+      probabilidad: 8,
+      perdidaDinero: 5000,
+      perdidaReputacion: 4,
+      mensaje: "Una manifestación bloqueó parcialmente la entrada del hotel.",
+    });
+  }
+
+  if (dia >= 51) {
+    eventos.push({
+      nombre: "🔥 Incendio",
+      imagen: "img/Incendio.png",
+      probabilidad: 4,
+      perdidaDinero: 25000,
+      perdidaReputacion: 8,
+      mensaje: "Un incendio causó daños en parte del hotel.",
+    });
+  }
+
+  if (dia >= 101) {
+    eventos.push({
+      nombre: "🌊 Inundación",
+      imagen: "img/Inundacion.png",
+      probabilidad: 4,
+      perdidaDinero: 20000,
+      perdidaReputacion: 5,
+      mensaje: "Las lluvias provocaron una inundación en la planta baja.",
+    });
+  }
+
+  const suerte = numero(1, 1000);
+  let acumulado = 0;
+
+  for (const evento of eventos) {
+    acumulado += evento.probabilidad;
+
+    if (suerte <= acumulado) {
+      aplicarContingencia(evento);
+      return;
+    }
+  }
+}
