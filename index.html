@@ -307,6 +307,10 @@
 
         <h3>🔧 Indicadores</h3>
 
+        <button class="btnCambiarVista" onclick="cambiarVistaIndicadores()">
+        ⬢ Ver Hexágonos
+        </button>
+
         <h5 class="advertencias">
           (Muestran El Desgaste De Los Muebles)
         </h5>
@@ -799,17 +803,16 @@
   </div>
 
 </div>
-</div>
 <!-- FACHADA -->
 
 <div class="indicador">
 
   <div class="indicadorTitulo">
-
+     
     <div class="tituloIzquierda">
       <span>🏨 Fachada</span>
     </div>
-
+    
     <div class="zonaDerechaIndicador">
 
       <span id="vidaFachada">
@@ -818,15 +821,13 @@
 
       <button class="btnReparar"
         onclick="repararFachada()">
-
         Reparar
-
       </button>
 
     </div>
 
   </div>
-
+  
   <div class="barraExterior">
 
     <div class="barraInterior"
@@ -834,17 +835,18 @@
       style="width:100%">
 
     </div>
-
+    
   </div>
-
+  
   <div class="costoReparacion"
     id="costoFachada">
 
     💰 $650,000
 
   </div>
-
-        </div>
+ 
+</div>
+  
 
       </div>
 
@@ -1052,6 +1054,13 @@
     </button>
   </div>
 </div>
+
+<audio id="sonidoGrillo" src="audio/Grillo.mp3"></audio>
+
+<button onclick="probarGrillo()">
+  Probar Grillo
+</button>
+
 
 <script type="module" src="firebase.js"></script>
 <script src="script.js"></script>

@@ -1618,3 +1618,122 @@ header p{
   font-size:16px;
 }
 
+.btnCambiarVista{
+  width:auto;
+  padding:8px 14px;
+  margin:5px auto 10px auto;
+  display:block;
+  border-radius:10px;
+  background:#2905f1;
+  color:white;
+  font-weight:bold;
+}
+.contenedorHexagonos{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:10px;
+  justify-items:center;
+}
+
+.hexMantenimiento{
+  width:170px;
+  height:190px;
+  position:relative;
+
+  clip-path:polygon(
+    50% 0%,
+    100% 25%,
+    100% 75%,
+    50% 100%,
+    0% 75%,
+    0% 25%
+  );
+
+  background:#08ee4d;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.hexMantenimiento::before{
+  content:"";
+  position:absolute;
+  inset:15px;
+
+  clip-path:polygon(
+    50% 0%,
+    100% 25%,
+    100% 75%,
+    50% 100%,
+    0% 75%,
+    0% 25%
+  );
+
+  background:rgb(252, 251, 251);
+  border:4px solid rgb(253, 251, 251);
+}
+
+.contenidoHex{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  font-weight:bold;
+  color:black;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+}
+
+.nombreHex{
+  font-size:20px;
+  font-style:italic;
+  line-height: 1;
+}
+
+.porcentajeHex{
+  font-size:16px;
+  line-height: 1;
+  margin:0;
+}
+
+.costoHex{
+  font-size:16px;
+  font-style:italic;
+  color: #b52b27;
+  line-height: 1;
+  cursor:pointer;
+}
+
+.hexVerde{
+  background:#09f750;
+}
+
+.hexAmarillo{
+  background:#c4ee0a;
+}
+
+.hexNaranja{
+  background:#eef104;
+}
+
+.hexRojo{
+  background:#e90909;
+}
+
+.btnHex{
+  width:96px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:none;
+  border-radius:8px;
+  background:#1976d2;
+  color:white;
+  font-size:20px;
+  font-weight:bold;
+  cursor:pointer;
+}

@@ -35,6 +35,8 @@ let nominaHoy = 0;
 let materialesHoy = 0;
 let interesesHoy = 0;
 let diasSobrecarga = 0;
+let vistaHexagonal = false;
+let htmlIndicadoresBarras = "";
 
 let historialResultados = [];
 
@@ -1179,31 +1181,79 @@ function actualizarPantalla() {
   verificarQuiebra();
 }
 
+function cambiarVistaIndicadores() {
+  const contenedor = document.getElementById("indicadoresMantenimiento");
+  const boton = document.querySelector(".btnCambiarVista");
+
+  if (!contenedor) {
+    return;
+  }
+
+  if (!htmlIndicadoresBarras) {
+    htmlIndicadoresBarras = contenedor.innerHTML;
+  }
+
+  vistaHexagonal = !vistaHexagonal;
+
+  if (vistaHexagonal) {
+    if (boton) {
+      boton.textContent = "📊 Ver Barras";
+    }
+
+    dibujarIndicadoresHexagonales();
+  } else {
+    if (boton) {
+      boton.textContent = "⬢ Ver Hexágonos";
+    }
+
+    contenedor.innerHTML = htmlIndicadoresBarras;
+    actualizarIndicadoresMantenimiento();
+  }
+}
+
 function actualizarIndicadoresMantenimiento() {
+  const contenedor = document.getElementById("indicadoresMantenimiento");
+
+  if (vistaHexagonal) {
+    dibujarIndicadoresHexagonales();
+    return;
+  }
+
+  if (!contenedor) {
+    return;
+  }
+
   actualizarIndicador("cuarto", "vidaCuartos", "barraCuartos", "costoCuartos");
   actualizarIndicador("cama", "vidaCamas", "barraCamas", "costoCamas");
   actualizarIndicador("tv", "vidaTv", "barraTv", "costoTv");
+
   actualizarIndicador(
     "lampara",
     "vidaLamparas",
     "barraLamparas",
     "costoLamparas",
   );
+
   actualizarIndicador("sabanas", "vidaSabanas", "barraSabanas", "costoSabanas");
+
   actualizarIndicador(
     "internet",
     "vidaInternet",
     "barraInternet",
     "costoInternet",
   );
+
   actualizarIndicador("clima", "vidaClima", "barraClima", "costoClima");
+
   actualizarIndicador(
     "extinguidor",
     "vidaExtinguidor",
     "barraExtinguidor",
     "costoExtinguidor",
   );
+
   actualizarIndicador("cuadro", "vidaCuadro", "barraCuadro", "costoCuadro");
+
   actualizarIndicador(
     "elevador",
     "vidaElevador",
@@ -1221,14 +1271,9 @@ function actualizarIndicadoresMantenimiento() {
 
   if (barraFachada) {
     barraFachada.style.width = `${vidaFachada}%`;
-    barraFachada.style.background = "";
   }
 
-  const desgastePorDia = costoFachada / 365;
-
-  const diasDesgastados = (100 - vidaFachada) / (100 / 365);
-
-  const costoActualFachada = desgastePorDia * diasDesgastados;
+  const costoActualFachada = diasDesgasteFachada * (costoFachada / 365);
 
   if (costoFachadaSpan) {
     costoFachadaSpan.textContent = `💰 $${Math.round(costoActualFachada).toLocaleString()}`;
@@ -1252,6 +1297,114 @@ function actualizarIndicadoresMantenimiento() {
   if (costoLavadorasSpan) {
     costoLavadorasSpan.textContent = "💰 $" + costoLavadoras.toLocaleString();
   }
+}
+
+function obtenerDatoIndicadorHex(tipo) {
+  if (tipo === "lavadora") {
+    return {
+      vida: promedioVidaLavadoras(),
+      costo: costoReparacionLavadoras(),
+    };
+  }
+
+  if (tipo === "plantaLuz") {
+    return {
+      vida: promedioVidaPlantasLuz(),
+      costo: costoReparacionPlantasLuz(),
+    };
+  }
+
+  if (tipo === "fachada") {
+    const costoActualFachada = diasDesgasteFachada * (costoFachada / 365);
+
+    return {
+      vida: Math.round(vidaFachada),
+      costo: Math.round(costoActualFachada),
+    };
+  }
+
+  return {
+    vida: promedioVidaTipo(tipo),
+    costo: costoReparacionTipo(tipo),
+  };
+}
+
+function dibujarIndicadoresHexagonales() {
+  const contenedor = document.getElementById("indicadoresMantenimiento");
+
+  if (!contenedor) {
+    return;
+  }
+
+  const datos = [
+    { nombre: "Cuarto", tipo: "cuarto", reparar: "repararTipo('cuarto')" },
+    { nombre: "Camas", tipo: "cama", reparar: "repararTipo('cama')" },
+    { nombre: "TVs", tipo: "tv", reparar: "repararTipo('tv')" },
+    { nombre: "Lámparas", tipo: "lampara", reparar: "repararTipo('lampara')" },
+    { nombre: "Sábanas", tipo: "sabanas", reparar: "repararTipo('sabanas')" },
+    { nombre: "Internet", tipo: "internet", reparar: "repararTipo('internet')" },
+    { nombre: "Clima", tipo: "clima", reparar: "repararTipo('clima')" },
+    { nombre: "Extinguidor", tipo: "extinguidor", reparar: "repararTipo('extinguidor')" },
+    { nombre: "Cuadros", tipo: "cuadro", reparar: "repararTipo('cuadro')" },
+    { nombre: "Lavadoras", tipo: "lavadora", reparar: "repararLavadoras()" },
+    { nombre: "Planta Luz", tipo: "plantaLuz", reparar: "repararPlantasLuz()" },
+    { nombre: "Elevador", tipo: "elevador", reparar: "repararTipo('elevador')" },
+    { nombre: "Fachada", tipo: "fachada", reparar: "repararFachada()" },
+  ];
+
+  contenedor.innerHTML = `
+    <div class="contenedorHexagonos"></div>
+  `;
+
+  const hexBox = contenedor.querySelector(".contenedorHexagonos");
+
+  datos.forEach((d) => {
+    const info = obtenerDatoIndicadorHex(d.tipo);
+    const vida = info.vida;
+    const costo = info.costo;
+
+    hexBox.innerHTML += `
+      <div class="hexMantenimiento ${claseHex(vida)}">
+
+        <div class="contenidoHex">
+
+          <div class="nombreHex">
+            ${d.nombre}
+          </div>
+
+          <div class="porcentajeHex">
+            ${vida}%
+          </div>
+
+          <button class="btnHex" onclick="${d.reparar}">
+            Reparar
+          </button>
+
+          <div class="costoHex">
+            $${costo.toLocaleString()}
+          </div>
+
+        </div>
+
+      </div>
+    `;
+  });
+}
+
+function claseHex(vida) {
+  if (vida >= 85) {
+    return "hexVerde";
+  }
+
+  if (vida >= 65) {
+    return "hexAmarillo";
+  }
+
+  if (vida >= 40) {
+    return "hexNaranja";
+  }
+
+  return "hexRojo";
 }
 
 function dibujarHotel() {
@@ -2296,34 +2449,41 @@ function mostrarDetalleCuarto() {
 
 function avanzarHora() {
   hora++;
+
   if (hora === 20) {
     cuartosRentados20 = cuartos.filter((c) => c.ocupada).length;
     agregarMensaje(
-      `🧾 A las 20:00 había ${cuartosRentados20} cuartos rentados para limpieza.`,
+      `🧾 A las 20:00 había ${cuartosRentados20} cuartos rentados para limpieza.`
     );
   }
+
+  if (hora === 23) {
+    guardarResultadoDelDia();
+    procesarLavanderia();
+    
+  }
+
   if (hora >= 24) {
     hora = 0;
     dia++;
     nominaPagadaHoy = false;
+    
+    reproducirGrillo();
     cerrarDiaHotel();
+    actualizarPantalla();
+    return;
   }
+
   if (hora === 6 && !nominaPagadaHoy) {
     const pagoNomina = nominaDiaria();
+
     dinero -= pagoNomina;
     nominaHoy += pagoNomina;
-
     nominaPagadaHoy = true;
-    agregarMensaje(
-      `💵 Se pagó nómina diaria por $${pagoNomina.toLocaleString()}.`,
-    );
-  }
-  if (hora === 23) {
-    guardarResultadoDelDia();
-  }
 
-  if (hora === 23) {
-    procesarLavanderia();
+    agregarMensaje(
+      `💵 Se pagó nómina diaria por $${pagoNomina.toLocaleString()}.`
+    );
   }
 
   if (hora === 12) {
@@ -2332,6 +2492,12 @@ function avanzarHora() {
 
   recibirClientes();
   actualizarPantalla();
+}
+
+function reproducirGrillo() {
+
+  const sonido = document.getElementById("sonidoGrillo");
+  sonido.play();
 }
 
 function salidaTempranaHuespedes() {
@@ -2496,51 +2662,73 @@ function calcularClientes() {
 
 function recibirClientes() {
   const cantidad = calcularClientes();
+
   agregarMensaje(`🕒 ${hora}:00 llegaron ${cantidad} posibles huéspedes.`);
+
   for (let i = 0; i < cantidad; i++) {
-    const cliente = tiposClientes[numero(0, tiposClientes.length - 1)];
-    if (!clienteAceptaHotel(cliente)) {
-      clientesRechazados++;
-      agregarMensaje(
-        `❌ ${cliente.nombre}
-        ${cliente.estrellas}
-        no aceptó la reputación del hotel.`,
-      );
-      continue;
-    }
-    const cuarto = cuartos.find((c) => {
-      if (c.rentadoHoy === undefined) {
-        c.rentadoHoy = false;
+    setTimeout(() => {
+      const cliente = {
+        ...tiposClientes[numero(0, tiposClientes.length - 1)]
+      };
+
+      if (!clienteAceptaHotel(cliente)) {
+        clientesRechazados++;
+
+        agregarMensaje(
+          `❌ ${cliente.nombre}
+          ${cliente.estrellas}
+          no aceptó la reputación del hotel.`
+        );
+
+        actualizarPantalla();
+        return;
       }
-      return c.comprada && cuartoListo(c) && !c.ocupada && !c.rentadoHoy;
-    });
-    cliente.seHospeda = !!cuarto;
-    mostrarCliente(cliente);
-    if (cuarto) {
-      cuarto.ocupada = true;
-      cuarto.rentadoHoy = true;
-      const pago = precioCuarto(cuarto);
-      dinero += pago;
-      rentasHoy += pago;
-      pagosHoy++;
-      consumirMaterialesPorRenta();
-      agregarMensaje(
-        `🏨 ${cliente.nombre}
-        ${cliente.estrellas}
-        rentó el cuarto
-        ${cuarto.numero}
-        y pagó
-        $${pago.toLocaleString()}.`,
-      );
-    } else {
-      clientesRechazados++;
-      agregarMensaje(
-        `❌ ${cliente.nombre}
-        ${cliente.estrellas}
-        se fue porque no había
-        cuarto disponible.`,
-      );
-    }
+
+      const cuarto = cuartos.find((c) => {
+        if (c.rentadoHoy === undefined) {
+          c.rentadoHoy = false;
+        }
+
+        return c.comprada && cuartoListo(c) && !c.ocupada && !c.rentadoHoy;
+      });
+
+      cliente.seHospeda = !!cuarto;
+
+      mostrarCliente(cliente);
+
+      if (cuarto) {
+        cuarto.ocupada = true;
+        cuarto.rentadoHoy = true;
+
+        const pago = precioCuarto(cuarto);
+
+        dinero += pago;
+        rentasHoy += pago;
+        pagosHoy++;
+
+        consumirMaterialesPorRenta();
+
+        agregarMensaje(
+          `🏨 ${cliente.nombre}
+          ${cliente.estrellas}
+          rentó el cuarto
+          ${cuarto.numero}
+          y pagó
+          $${pago.toLocaleString()}.`
+        );
+      } else {
+        clientesRechazados++;
+
+        agregarMensaje(
+          `❌ ${cliente.nombre}
+          ${cliente.estrellas}
+          se fue porque no había
+          cuarto disponible.`
+        );
+      }
+
+      actualizarPantalla();
+    }, i * 250);
   }
 }
 
@@ -2927,7 +3115,14 @@ function repararLavadoras() {
 }
 
 function iniciarJuego() {
-  if (juegoActivo) return;
+  if (juegoActivo) {
+    return;
+  }
+
+  if (intervalo) {
+    clearInterval(intervalo);
+    intervalo = null;
+  }
 
   juegoActivo = true;
   agregarMensaje("▶ Juego iniciado.");
@@ -2939,7 +3134,12 @@ function iniciarJuego() {
 
 function pausarJuego() {
   juegoActivo = false;
-  clearInterval(intervalo);
+
+  if (intervalo) {
+    clearInterval(intervalo);
+    intervalo = null;
+  }
+
   agregarMensaje("⏸ Juego pausado.");
 }
 
