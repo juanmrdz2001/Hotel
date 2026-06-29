@@ -10,6 +10,23 @@ let juegoActivo = false;
 let intervalo = null;
 let juegoTerminado = false;
 
+let aguaActual = 100000;
+const aguaMaxima = 100000;
+const consumoAguaPorRenta = 100;
+let ultimoDiaFantasma = 0;
+const costoPipaAgua = 5000;
+const litrosPipaAgua = 10000;
+
+//================= GAS =================
+
+let gasActual = 2000;
+const gasMaximo = 2000;
+const consumoGasPorRenta = 4;
+const litrosPipaGas = 1000;
+const costoPipaGas = 5000;
+const costoLitroGas = 5;
+let costoGasConsumido = 0;
+
 let prestamo = {
   saldo: 700000,
   capitalOriginal: 700000,
@@ -104,13 +121,49 @@ numerosCuartos.forEach((numero, index) => {
       lampara: null,
       alfombra: null,
       sabanas: null,
-      extinguidor: null,
+      extintor: null,
       internet: null,
       clima: null,
       cuadro: null,
     },
   });
 });
+
+const imagenesClientes = {
+  Mochilero: ["img/Mochilero1.png", "img/Mochilero2.png", "img/Mochilero3.png"],
+
+  Turista: ["img/Turista1.png", "img/Turista2.png", "img/Turista3.png"],
+
+  Ejecutivo: ["img/Ejecutivo1.png", "img/Ejecutivo2.png", "img/Ejecutivo3.png"],
+
+  Familia: ["img/Familia1.png", "img/Familia2.png", "img/Familia3.png"],
+
+  VIP: ["img/VIP1.png", "img/VIP2.png", "img/VIP3.png"],
+};
+
+const indiceImagenCliente = {
+  Mochilero: 0,
+  Turista: 0,
+  Ejecutivo: 0,
+  Familia: 0,
+  VIP: 0,
+};
+
+function obtenerImagenCliente(nombreCliente) {
+  const lista = imagenesClientes[nombreCliente];
+
+  if (!lista || lista.length === 0) {
+    return "img/Mochilero1.png";
+  }
+
+  const indice = indiceImagenCliente[nombreCliente];
+
+  const imagen = lista[indice];
+
+  indiceImagenCliente[nombreCliente] = (indice + 1) % lista.length;
+
+  return imagen;
+}
 
 const tiposClientes = [
   {
@@ -295,8 +348,8 @@ const catalogo = [
   },
 
   {
-    nombre: "Extinguidor",
-    tipo: "extinguidor",
+    nombre: "Extintor",
+    tipo: "extintor",
     icono: "🧯",
     costo: 3500,
     lujo: 3,
@@ -410,7 +463,7 @@ const vidaUtilPorTipo = {
   cama: 100,
   tv: 80,
   lampara: 60,
-  extinguidor: 40,
+  extintor: 40,
   elevador: 100,
   cuadro: 200,
   internet: 100,
@@ -725,6 +778,100 @@ function costoLimpiezaDiaria() {
   return cuartosQuePuedeLimpiar * 30;
 }
 
+function consumirAguaPorRenta() {
+  const litrosUsados = Math.min(aguaActual, consumoAguaPorRenta);
+
+  aguaActual -= litrosUsados;
+
+  if (aguaActual < 0) {
+    aguaActual = 0;
+  }
+
+  // $0.50 por litro usado
+  materialesHoy += litrosUsados * 0.5;
+}
+
+function comprarPipaAgua() {
+  if (aguaActual >= aguaMaxima) {
+    agregarMensaje("💧 El tanque de agua ya está lleno.");
+    return;
+  }
+
+  if (dinero < costoPipaAgua) {
+    agregarMensaje("❌ No alcanza para comprar la pipa de agua.");
+    return;
+  }
+
+  dinero -= costoPipaAgua;
+
+  aguaActual += litrosPipaAgua;
+
+  if (aguaActual > aguaMaxima) {
+    aguaActual = aguaMaxima;
+  }
+
+  agregarMensaje(
+    `💧 Compraste una pipa de agua por $${costoPipaAgua.toLocaleString()}.`,
+  );
+
+  actualizarPantalla();
+}
+
+function actualizarPanelAgua() {
+  const existencia = document.getElementById("existenciaAgua");
+  const capacidad = document.getElementById("capacidadAgua");
+  const nivel = document.getElementById("nivelAgua");
+
+  if (existencia) {
+    existencia.textContent = aguaActual.toLocaleString();
+  }
+
+  if (capacidad) {
+    capacidad.textContent = aguaMaxima.toLocaleString();
+  }
+
+  if (nivel) {
+    const porcentaje = (aguaActual / aguaMaxima) * 100;
+    nivel.style.height = porcentaje + "%";
+  }
+}
+
+function comprarPipaGas() {
+  if (gasActual >= gasMaximo) {
+    agregarMensaje("🔥 El tanque de gas está lleno.");
+
+    return;
+  }
+
+  if (dinero < costoPipaGas) {
+    agregarMensaje("❌ No hay dinero para comprar gas.");
+
+    return;
+  }
+
+  dinero -= costoPipaGas;
+
+  gasActual += litrosPipaGas;
+
+  if (gasActual > gasMaximo) gasActual = gasMaximo;
+
+  agregarMensaje("🔥 Llegó una pipa de gas.");
+
+  actualizarPantalla();
+}
+
+function actualizarPanelGas() {
+  document.getElementById("existenciaGas").innerHTML =
+    gasActual.toLocaleString();
+
+  document.getElementById("capacidadGas").innerHTML =
+    gasMaximo.toLocaleString();
+
+  const porcentaje = (gasActual / gasMaximo) * 100;
+
+  document.getElementById("nivelGas").style.height = porcentaje + "%";
+}
+
 function consumirMaterialesPorRenta() {
   consumirMaterial("🧻 Papel de baño", 2);
   consumirMaterial("🧼 Fabuloso", 0.1);
@@ -940,8 +1087,6 @@ function descontarMaterial(nombre, cantidad) {
   const cantidadReal = Math.min(material.cantidad, cantidad);
 
   material.cantidad -= cantidadReal;
-
-  materialesHoy += cantidadReal * material.precio;
 
   if (material.cantidad < 0) {
     material.cantidad = 0;
@@ -1178,6 +1323,8 @@ function actualizarPantalla() {
   dibujarHistorialResultados();
   actualizarPanelPlantaLuz();
   actualizarPanelLavanderia();
+  actualizarPanelAgua();
+  actualizarPanelGas();
   verificarQuiebra();
 }
 
@@ -1246,10 +1393,10 @@ function actualizarIndicadoresMantenimiento() {
   actualizarIndicador("clima", "vidaClima", "barraClima", "costoClima");
 
   actualizarIndicador(
-    "extinguidor",
-    "vidaExtinguidor",
-    "barraExtinguidor",
-    "costoExtinguidor",
+    "extintor",
+    "vidaExtintor",
+    "barraExtintor",
+    "costoExtintor",
   );
 
   actualizarIndicador("cuadro", "vidaCuadro", "barraCuadro", "costoCuadro");
@@ -1342,13 +1489,25 @@ function dibujarIndicadoresHexagonales() {
     { nombre: "TVs", tipo: "tv", reparar: "repararTipo('tv')" },
     { nombre: "Lámparas", tipo: "lampara", reparar: "repararTipo('lampara')" },
     { nombre: "Sábanas", tipo: "sabanas", reparar: "repararTipo('sabanas')" },
-    { nombre: "Internet", tipo: "internet", reparar: "repararTipo('internet')" },
+    {
+      nombre: "Internet",
+      tipo: "internet",
+      reparar: "repararTipo('internet')",
+    },
     { nombre: "Clima", tipo: "clima", reparar: "repararTipo('clima')" },
-    { nombre: "Extinguidor", tipo: "extinguidor", reparar: "repararTipo('extinguidor')" },
+    {
+      nombre: "Extintor",
+      tipo: "extintor",
+      reparar: "repararTipo('Extintor')",
+    },
     { nombre: "Cuadros", tipo: "cuadro", reparar: "repararTipo('cuadro')" },
     { nombre: "Lavadoras", tipo: "lavadora", reparar: "repararLavadoras()" },
     { nombre: "Planta Luz", tipo: "plantaLuz", reparar: "repararPlantasLuz()" },
-    { nombre: "Elevador", tipo: "elevador", reparar: "repararTipo('elevador')" },
+    {
+      nombre: "Elevador",
+      tipo: "elevador",
+      reparar: "repararTipo('elevador')",
+    },
     { nombre: "Fachada", tipo: "fachada", reparar: "repararFachada()" },
   ];
 
@@ -1532,11 +1691,11 @@ function generarContenidoCuarto(cuarto) {
       </span>
     `;
   }
-  // EXTINGUIDOR
-  if (obj.extinguidor) {
+  // Extintor
+  if (obj.extintor) {
     html += `
-      <span class="objetoCuarto objeto-extinguidor">
-        ${obj.extinguidor.icono}
+      <span class="objetoCuarto objeto-extintor">
+        ${obj.extintor.icono}
       </span>
     `;
   }
@@ -2059,7 +2218,7 @@ function crearNuevoPiso() {
         lampara: null,
         alfombra: null,
         sabanas: null,
-        extinguidor: null,
+        extintor: null,
         internet: null,
         clima: null,
         cuadro: null,
@@ -2439,7 +2598,7 @@ function mostrarDetalleCuarto() {
     ${filaObjeto("💡 Lámpara", "lampara")}
     ${filaObjeto("🟥 Alfombra", "alfombra")}
     ${filaObjeto("🧺 Sábanas", "sabanas")}
-    ${filaObjeto("🧯 Extinguidor", "extinguidor")}
+    ${filaObjeto("🧯 Extintor", "extintor")}
     ${filaObjeto("📶 Internet", "internet")}
     ${filaObjeto("❄️ Clima", "clima")}
     ${filaObjeto("🖼️ Cuadro", "cuadro")}
@@ -2447,31 +2606,104 @@ function mostrarDetalleCuarto() {
   `;
 }
 
+function reproducirFantasma() {
+  const sonido = document.getElementById("sonidoFantasma");
+
+  if (!sonido) {
+    console.log("No se encontró sonidoFantasma");
+    return;
+  }
+
+  sonido.volume = 0.5;
+  sonido.currentTime = 0;
+
+  sonido.play().catch((error) => {
+    console.log("No se pudo reproducir el fantasma:", error);
+  });
+}
+
+function mostrarFantasma() {
+  const hotel = document.querySelector(".hotelVisual");
+
+  if (!hotel) {
+    return;
+  }
+
+  const fantasma = document.createElement("img");
+
+  fantasma.src = "img/Fantasma.png";
+  fantasma.classList.add("fantasmaHotel");
+
+  hotel.appendChild(fantasma);
+
+  reproducirFantasma();
+
+  reputacion = Math.max(0, reputacion - 10);
+
+  agregarMensaje("👻 Un fantasma recorrió los cuartos. Reputación -10.");
+
+  setTimeout(() => {
+    fantasma.remove();
+  }, 8000);
+
+  actualizarPantalla();
+}
+
+function probarFantasma() {
+  agregarMensaje("👻 Prueba de fantasma.");
+
+  mostrarFantasma();
+}
+
+function revisarFantasma() {
+  if (dia < 30) {
+    return;
+  }
+
+  if (ultimoDiaFantasma === dia) {
+    return;
+  }
+
+  ultimoDiaFantasma = dia;
+
+  const suerte = numero(1, 100);
+
+  if (suerte === 1) {
+    mostrarFantasma();
+  }
+}
+
+function consumirGasPorRenta() {
+  const litrosUsados = Math.min(gasActual, consumoGasPorRenta);
+
+  gasActual -= litrosUsados;
+
+  if (gasActual < 0) {
+    gasActual = 0;
+  }
+
+  const costoGas = litrosUsados * costoLitroGas;
+
+  costoGasConsumido += costoGas;
+  materialesHoy += costoGas;
+}
+
+function consumirGas(litros) {
+  if (existenciaGas >= litros) {
+    existenciaGas -= litros;
+
+    let costoPorLitroGas = precioGas / capacidadGas;
+    costoGasConsumido += litros * costoPorLitroGas;
+  }
+
+  actualizarPantalla();
+}
+
 function avanzarHora() {
   hora++;
 
-  if (hora === 20) {
-    cuartosRentados20 = cuartos.filter((c) => c.ocupada).length;
-    agregarMensaje(
-      `🧾 A las 20:00 había ${cuartosRentados20} cuartos rentados para limpieza.`
-    );
-  }
-
-  if (hora === 23) {
-    guardarResultadoDelDia();
-    procesarLavanderia();
-    
-  }
-
-  if (hora >= 24) {
-    hora = 0;
-    dia++;
-    nominaPagadaHoy = false;
-    
-    reproducirGrillo();
-    cerrarDiaHotel();
-    actualizarPantalla();
-    return;
+  if (hora === 3) {
+    revisarFantasma();
   }
 
   if (hora === 6 && !nominaPagadaHoy) {
@@ -2482,7 +2714,7 @@ function avanzarHora() {
     nominaPagadaHoy = true;
 
     agregarMensaje(
-      `💵 Se pagó nómina diaria por $${pagoNomina.toLocaleString()}.`
+      `💵 Se pagó nómina diaria por $${pagoNomina.toLocaleString()}.`,
     );
   }
 
@@ -2490,12 +2722,34 @@ function avanzarHora() {
     revisarContingencias();
   }
 
+  if (hora === 20) {
+    cuartosRentados20 = cuartos.filter((c) => c.ocupada).length;
+    agregarMensaje(
+      `🧾 A las 20:00 había ${cuartosRentados20} cuartos rentados para limpieza.`,
+    );
+  }
+
+  if (hora === 23) {
+    guardarResultadoDelDia();
+    procesarLavanderia();
+  }
+
+  if (hora >= 24) {
+    hora = 0;
+    dia++;
+    nominaPagadaHoy = false;
+
+    reproducirGrillo();
+    cerrarDiaHotel();
+    actualizarPantalla();
+    return;
+  }
+
   recibirClientes();
   actualizarPantalla();
 }
 
 function reproducirGrillo() {
-
   const sonido = document.getElementById("sonidoGrillo");
   sonido.play();
 }
@@ -2550,10 +2804,6 @@ function cerrarDiaHotel() {
   // COBRO DE PRÉSTAMO AL INICIAR DÍA 10, 20, 30...
   if (dia % prestamo.frecuenciaDias === 0) {
     pagarCuotaPrestamo();
-  }
-
-  if (hora === 23) {
-    guardarResultadoDelDia();
   }
 
   if (consumoElectricoHotel() > capacidadElectricaHotel()) {
@@ -2668,8 +2918,10 @@ function recibirClientes() {
   for (let i = 0; i < cantidad; i++) {
     setTimeout(() => {
       const cliente = {
-        ...tiposClientes[numero(0, tiposClientes.length - 1)]
+        ...tiposClientes[numero(0, tiposClientes.length - 1)],
       };
+
+      cliente.imagen = obtenerImagenCliente(cliente.nombre);
 
       if (!clienteAceptaHotel(cliente)) {
         clientesRechazados++;
@@ -2677,7 +2929,7 @@ function recibirClientes() {
         agregarMensaje(
           `❌ ${cliente.nombre}
           ${cliente.estrellas}
-          no aceptó la reputación del hotel.`
+          no aceptó la reputación del hotel.`,
         );
 
         actualizarPantalla();
@@ -2707,6 +2959,8 @@ function recibirClientes() {
         pagosHoy++;
 
         consumirMaterialesPorRenta();
+        consumirAguaPorRenta();
+        consumirGasPorRenta();
 
         agregarMensaje(
           `🏨 ${cliente.nombre}
@@ -2714,7 +2968,7 @@ function recibirClientes() {
           rentó el cuarto
           ${cuarto.numero}
           y pagó
-          $${pago.toLocaleString()}.`
+          $${pago.toLocaleString()}.`,
         );
       } else {
         clientesRechazados++;
@@ -2723,7 +2977,7 @@ function recibirClientes() {
           `❌ ${cliente.nombre}
           ${cliente.estrellas}
           se fue porque no había
-          cuarto disponible.`
+          cuarto disponible.`,
         );
       }
 
@@ -3444,7 +3698,7 @@ function revisarNoticiasEspeciales() {
       "📰 NOTICIAS DEL DÍA",
       `
       Las altas temperaturas han aumentado el riesgo de incendios.<br><br>
-      Se recomienda mantener extinguidores suficientes y en buen estado.
+      Se recomienda mantener Extintores suficientes y en buen estado.
       `,
       "",
     );

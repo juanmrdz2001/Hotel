@@ -297,7 +297,75 @@
 
       </div>
 
+<div class="panelAguaGas">
+
+  <div class="panelAgua">
+
+    <h3>💧 Tanque de Agua</h3>
+
+    <div class="aguaContenido">
+
+      <div class="tanqueAgua">
+        <div id="nivelAgua" class="nivelAgua"></div>
+      </div>
+
+      <div class="datosAgua">
+        <p>
+          Capacidad:
+          <strong><span id="capacidadAgua">100000</span> lts</strong>
+        </p>
+
+        <p>
+          Existencia:
+          <strong><span id="existenciaAgua">100000</span> lts</strong>
+        </p>
+
+        <button onclick="comprarPipaAgua()">
+          💧 Pipa de Agua<br>
+          $5,000 / 10,000 lts
+        </button>
+         <h5 class="advertencias">(Cada Cuarto Utiliza 100 Lts)</h5>      
+      </div>
+
     </div>
+
+  </div>
+
+
+  <div class="panelGas">
+
+    <h3>🔥 Tanque de Gas</h3>
+
+    <div class="gasContenido">
+
+      <div class="tanqueGas">
+        <div id="nivelGas" class="nivelGas"></div>
+      </div>
+
+      <div class="datosGas">
+        <p>
+          Capacidad:
+          <strong><span id="capacidadGas">2000</span> lts</strong>
+        </p>
+
+        <p>
+          Existencia:
+          <strong><span id="existenciaGas">2000</span> lts</strong>
+        </p>
+
+        <button onclick="comprarPipaGas()">
+          🔥 Pipa de Gas<br>
+          $5,000 / 1,000 lts
+        </button>
+        <h5 class="advertencias">(Cada Cuarto Utiliza 4 Lts)</h5>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+</div>
 
     <!-- COLUMNA DERECHA -->
 
@@ -618,24 +686,24 @@
 
 </div>
 
-<!-- EXTINGUIDOR -->
+<!-- Extintor -->
 
 <div class="indicador">
 
   <div class="indicadorTitulo">
 
     <div class="tituloIzquierda">
-      <span>🧯 Extinguidor</span>
+      <span>🧯 Extintor</span>
     </div>
 
     <div class="zonaDerechaIndicador">
 
-      <span id="vidaExtinguidor">
+      <span id="vidaExtintor">
         100%
       </span>
 
       <button class="btnReparar"
-        onclick="repararTipo('extinguidor')">
+        onclick="repararTipo('extintor')">
 
         Reparar
 
@@ -648,7 +716,7 @@
   <div class="barraExterior">
 
     <div class="barraInterior"
-      id="barraExtinguidor"
+      id="barraExtintor"
       style="width:100%">
 
     </div>
@@ -656,7 +724,7 @@
   </div>
 
   <div class="costoReparacion"
-    id="costoExtinguidor">
+    id="costoExtintor">
 
     💰 $0
 
@@ -945,7 +1013,7 @@
 
   <button onclick="filtrarCatalogo('sabanas')">🧺</button>
 
-  <button onclick="filtrarCatalogo('extinguidor')">🧯</button>
+  <button onclick="filtrarCatalogo('extintor')">🧯</button>
 
   <button onclick="filtrarCatalogo('internet')">📶</button>
 
@@ -1055,10 +1123,11 @@
   </div>
 </div>
 
+<audio id="sonidoFantasma" src="audio/Fantasma.mp3" preload="auto"></audio>
 <audio id="sonidoGrillo" src="audio/Grillo.mp3"></audio>
 
-<button onclick="probarGrillo()">
-  Probar Grillo
+<button onclick="probarFantasma()">
+    👻 Probar Fantasma
 </button>
 
 

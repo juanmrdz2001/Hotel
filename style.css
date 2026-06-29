@@ -263,7 +263,7 @@ header h1{
   z-index:3;
 }
 
-.objeto-extinguidor{
+.objeto-extintor{
   position:absolute;
   right:0px;
   bottom: 40px;
@@ -1237,7 +1237,7 @@ header p{
 }
 
 .advertencias{
-   font-size:12px;
+   font-size:14px;
    text-align: center;
    padding:2px;
 }
@@ -1621,7 +1621,7 @@ header p{
 .btnCambiarVista{
   width:auto;
   padding:8px 14px;
-  margin:5px auto 10px auto;
+  margin:5px auto 6px auto;
   display:block;
   border-radius:10px;
   background:#2905f1;
@@ -1736,4 +1736,166 @@ header p{
   font-size:20px;
   font-weight:bold;
   cursor:pointer;
+}
+
+.panelAguaGas{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:30px;
+    margin-top:12px;
+    background:white;
+    border:3px solid #444;
+    border-radius:12px;
+    padding:15px;
+}
+.panelAgua{
+    width:50%;
+}
+
+.panelGas{
+    width:50%;
+    border-left:3px solid #bbb;
+    padding-left:20px;
+}
+
+.panelAgua h3{
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.aguaContenido{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:25px;
+}
+
+.tanqueAgua{
+  width:130px;
+  height:150px;
+  border:4px solid #111;
+  border-radius:50% / 12%;
+  position:relative;
+  overflow:hidden;
+  background:white;
+}
+
+.tanqueAgua::before{
+  content:"";
+  position:absolute;
+  top:-4px;
+  left:-4px;
+  width:130px;
+  height:28px;
+  border:4px solid #111;
+  border-radius:50%;
+  background:white;
+  z-index:3;
+}
+
+.nivelAgua{
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:#00a9e8;
+  transition:.4s;
+}
+
+.datosAgua{
+  font-size:15px;
+  font-weight:bold;
+}
+
+.datosAgua button{
+  background:#03a9f4;
+  border-radius:14px;
+  padding:10px;
+}
+
+.nivelGas{
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#FFD500;
+    transition:.5s;
+}
+
+.panelGas h3{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.gasContenido{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:25px;
+}
+
+.datosGas{
+    font-size:15px;
+    font-weight:bold;
+}
+
+.datosGas button{
+    background:#FFD500;
+    color:#000;
+    border:3px solid #111;
+    border-radius:14px;
+    padding:10px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.datosGas button:hover{
+    background:#FFC400;
+}
+
+.tanqueGas{
+    width:180px;
+    height:100px;
+    border:5px solid #111;
+    border-radius:50px;
+    position:relative;
+    overflow:hidden;
+    background:white;
+}
+
+.tanqueGas::before{
+    content:"";
+    position:absolute;
+    left:-5px;
+    top:-5px;
+    width:180px;
+    height:25px;
+    border:5px solid #111;
+    border-radius:50%;
+    background:white;
+    z-index:3;
+}
+
+.fantasmaHotel{
+  position:absolute;
+  left:-80px;
+  top:120px;
+  width:70px;
+  height:70px;
+  object-fit:contain;
+  z-index:9999;
+  pointer-events:none;
+  opacity:.85;
+  animation:fantasmaRecorre 8s linear forwards;
+}
+
+@keyframes fantasmaRecorre{
+  0%{ left:-80px; top:320px; }
+  25%{ top:820px; }
+  50%{ top:540px; }
+  75%{ top:820px; }
+  100%{ left:105%; top:320px; }
 }
