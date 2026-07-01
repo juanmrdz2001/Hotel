@@ -1948,3 +1948,9 @@ header p{
     font-style:italic;
     padding: 0;
 }
+
+.itemSeleccionadoMovil {
+  outline: 3px solid #00aaff;
+  background: #e6f7ff;
+  transform: scale(1.05);
+}

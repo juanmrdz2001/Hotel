@@ -456,6 +456,7 @@ const catalogo = [
   },
 ];
 
+let itemSeleccionadoMovil = null;
 let inventario = [];
 
 const dineroSpan = document.getElementById("dinero");
@@ -1641,25 +1642,87 @@ function dibujarHotel() {
 function crearDivCuarto(cuarto) {
   const div = document.createElement("div");
   div.classList.add("cuarto");
+
   if (!cuarto.comprada) {
     div.classList.add("bloqueado");
     div.innerHTML = "🔒";
   } else {
     div.classList.add("comprado");
+
     if (cuarto.ocupada) {
       div.classList.add("ocupado");
     }
+
     div.innerHTML = generarContenidoCuarto(cuarto);
+
     div.addEventListener("dragover", permitirSoltar);
+
     div.addEventListener("drop", (e) => {
       soltarEnCuarto(e, cuarto.id);
     });
   }
+
   div.addEventListener("click", () => {
+    if (itemSeleccionadoMovil && cuarto.comprada) {
+      soltarItemSeleccionadoEnCuarto(cuarto.id);
+      return;
+    }
+
     cuartoSeleccionado = cuarto.id;
     mostrarDetalleCuarto();
   });
+
   return div;
+}
+
+function soltarItemSeleccionadoEnCuarto(cuartoId) {
+  if (!itemSeleccionadoMovil) return;
+
+  const itemId = itemSeleccionadoMovil.id;
+  const item = inventario.find((i) => String(i.id) === String(itemId));
+  const cuarto = cuartos.find((c) => c.id === cuartoId);
+
+  if (!item || !cuarto || !cuarto.comprada) {
+    itemSeleccionadoMovil = null;
+    actualizarPantalla();
+    return;
+  }
+
+  const objetoActual = cuarto.objetos[item.tipo];
+
+  if (objetoActual) {
+    if (item.lujo > objetoActual.lujo) {
+      cuarto.objetos[item.tipo] = item;
+      inventario = inventario.filter((i) => String(i.id) !== String(itemId));
+
+      reputacion += 2;
+      if (reputacion > 100) reputacion = 100;
+
+      agregarMensaje(
+        `⬆️ Mejoraste ${item.tipo} del cuarto ${cuarto.numero}: ${objetoActual.nombre} → ${item.nombre}.`
+      );
+
+      itemSeleccionadoMovil = null;
+      actualizarPantalla();
+      return;
+    } else {
+      agregarMensaje(`❌ El cuarto ${cuarto.numero} ya tiene un objeto igual o mejor.`);
+      itemSeleccionadoMovil = null;
+      actualizarPantalla();
+      return;
+    }
+  }
+
+  cuarto.objetos[item.tipo] = item;
+  inventario = inventario.filter((i) => String(i.id) !== String(itemId));
+
+  reputacion += 1;
+  if (reputacion > 100) reputacion = 100;
+
+  agregarMensaje(`🧰 Pusiste ${item.nombre} en el cuarto ${cuarto.numero}.`);
+
+  itemSeleccionadoMovil = null;
+  actualizarPantalla();
 }
 
 function generarContenidoCuarto(cuarto) {
@@ -2282,12 +2345,27 @@ function dibujarInventario() {
     div.draggable = true;
     div.dataset.id = item.id;
 
+    if (
+      itemSeleccionadoMovil &&
+      String(itemSeleccionadoMovil.id) === String(item.id)
+    ) {
+      div.classList.add("itemSeleccionadoMovil");
+    }
+
     div.innerHTML = `
       ${item.icono}
       <small>${item.nombre}</small>
     `;
 
+    // Computadora
     div.addEventListener("dragstart", arrastrarItem);
+
+    // Celular / toque
+    div.addEventListener("click", () => {
+      itemSeleccionadoMovil = item;
+      agregarMensaje(`📱 Seleccionaste ${item.nombre}. Ahora toca un cuarto.`);
+      actualizarPantalla();
+    });
 
     inventarioDiv.appendChild(div);
   });
