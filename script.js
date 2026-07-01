@@ -3926,6 +3926,15 @@ window.mostrarRankingMensual = async function () {
   }
 };
 
+window.cerrarRanking = function () {
+  const modal = document.getElementById("rankingModal");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+};
+
+
 function mostrarAlertaEvento(titulo, mensaje, imagen) {
   const modal = document.getElementById("alertaEvento");
   const tituloEvento = document.getElementById("tituloEvento");
