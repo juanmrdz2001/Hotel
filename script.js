@@ -41,11 +41,6 @@ const drenajePorRenta = 80;
 const costoServicioDrenaje = 1200;
 let costoDrenajeHoy = 0;
 
-//================Clima ===================
-const clima = climaSaltillo[dia - 1];
-
-temperaturaMinima = clima.minima;
-temperaturaMaxima = clima.maxima;
 
 let prestamo = {
   saldo: 700000,
@@ -2353,6 +2348,47 @@ function soltarTouchItem(e) {
   soltarItemEnCuartoPorId(itemTouchId, cuartoId);
 
   itemTouchId = null;
+}
+
+function soltarItemEnCuartoPorId(itemId, cuartoId) {
+  const item = inventario.find((i) => String(i.id) === String(itemId));
+  const cuarto = cuartos.find((c) => c.id === cuartoId);
+
+  if (!item || !cuarto || !cuarto.comprada) {
+    return;
+  }
+
+  const objetoActual = cuarto.objetos[item.tipo];
+
+  if (objetoActual) {
+    if (item.lujo > objetoActual.lujo) {
+      cuarto.objetos[item.tipo] = item;
+      inventario = inventario.filter((i) => String(i.id) !== String(itemId));
+
+      reputacion += 2;
+      if (reputacion > 100) reputacion = 100;
+
+      agregarMensaje(
+        `⬆️ Mejoraste ${item.tipo} del cuarto ${cuarto.numero}: ${objetoActual.nombre} → ${item.nombre}.`
+      );
+
+      actualizarPantalla();
+      return;
+    } else {
+      agregarMensaje(`❌ El cuarto ${cuarto.numero} ya tiene un objeto igual o mejor.`);
+      return;
+    }
+  }
+
+  cuarto.objetos[item.tipo] = item;
+  inventario = inventario.filter((i) => String(i.id) !== String(itemId));
+
+  reputacion += 1;
+  if (reputacion > 100) reputacion = 100;
+
+  agregarMensaje(`🧰 Pusiste ${item.nombre} en el cuarto ${cuarto.numero}.`);
+
+  actualizarPantalla();
 }
 
 function arrastrarItem(e) {
