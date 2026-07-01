@@ -49,15 +49,23 @@
   Compra cuartos, compra muebles y arrástralos donde quieras
 </p> 
 </header>
-  
-  
+    
   <section class="panel">
     <div>🏨 Valor Hotel:$<span id="valorHotel">0</span></div>
     <div>💰 Dinero: $<span id="dinero">100000</span></div>
     <div>📅 Día: <span id="dia">1</span></div>
     <div>🕒 Hora: <span id="hora">08:00</span></div>
     <div>Reputación: <span id="reputacion">50</span></div>
-    <div>🛏️ Ocupación: <span id="ocupadas">0</span>/<span id="compradas">0</span></div>
+    <div>
+    🛏️ Ocupación:
+    <span id="ocupacion">0/2</span>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    🌤️ Clima:
+    <span id="clima">☀️ Soleado 5° / 16°C</span>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    📈 Demanda:
+    <span id="demanda">+28%</span>
+    </div>
   </section>
 </div>
 <div class="bandaMensajes">
@@ -1179,9 +1187,10 @@
     👻 Probar Fantasma
 </button>
 
-
-<script type="module" src="firebase.js"></script>
+<script src="climaSaltillo.js"></script>
+<script src="demanda.js"></script>
 <script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
 <footer class="footerAutor">
 
   © 2026 CP Juan Manuel Rodriguez Elizondo  

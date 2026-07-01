@@ -41,6 +41,12 @@ const drenajePorRenta = 80;
 const costoServicioDrenaje = 1200;
 let costoDrenajeHoy = 0;
 
+//================Clima ===================
+const clima = climaSaltillo[dia - 1];
+
+temperaturaMinima = clima.minima;
+temperaturaMaxima = clima.maxima;
+
 let prestamo = {
   saldo: 700000,
   capitalOriginal: 700000,
@@ -1326,6 +1332,14 @@ function actualizarPantalla() {
     }
   }
 
+  const climaHoy = obtenerClimaDelDia();
+
+document.getElementById("clima").textContent =
+    `${iconoClima(climaHoy)} ${climaHoy.estado} ${climaHoy.minima}° / ${climaHoy.maxima}°C`;
+
+document.getElementById("demanda").textContent =
+    `📈 +${Math.round((obtenerFactorDemanda() - 1) * 100)}%`;
+
   valorHotelSpan.textContent = valorHotel().toLocaleString();
 
   dibujarHotel();
@@ -1342,6 +1356,27 @@ function actualizarPantalla() {
   actualizarPanelGas();
   actualizarPanelBasuraDrenaje();
   verificarQuiebra();
+}
+
+function iconoClima(clima) {
+
+    if (clima.lluvia) return "🌧️";
+
+    switch (clima.estado) {
+
+        case "Soleado":
+            return "☀️";
+
+        case "Parcialmente nublado":
+            return "⛅";
+
+        case "Nublado":
+            return "☁️";
+
+        default:
+            return "🌤️";
+    }
+
 }
 
 function cambiarVistaIndicadores() {
@@ -1615,25 +1650,34 @@ function dibujarHotel() {
 
 function crearDivCuarto(cuarto) {
   const div = document.createElement("div");
+
   div.classList.add("cuarto");
+  div.dataset.id = cuarto.id;
+
   if (!cuarto.comprada) {
     div.classList.add("bloqueado");
     div.innerHTML = "🔒";
   } else {
     div.classList.add("comprado");
+
     if (cuarto.ocupada) {
       div.classList.add("ocupado");
     }
+
     div.innerHTML = generarContenidoCuarto(cuarto);
+
     div.addEventListener("dragover", permitirSoltar);
+
     div.addEventListener("drop", (e) => {
       soltarEnCuarto(e, cuarto.id);
     });
   }
+
   div.addEventListener("click", () => {
     cuartoSeleccionado = cuarto.id;
     mostrarDetalleCuarto();
   });
+
   return div;
 }
 
@@ -2262,10 +2306,53 @@ function dibujarInventario() {
       <small>${item.nombre}</small>
     `;
 
+    // Computadora
     div.addEventListener("dragstart", arrastrarItem);
+
+    // Celular
+    div.addEventListener("touchstart", iniciarTouchItem, { passive: false });
+    div.addEventListener("touchend", soltarTouchItem, { passive: false });
 
     inventarioDiv.appendChild(div);
   });
+}
+
+let itemTouchId = null;
+
+function iniciarTouchItem(e) {
+  e.preventDefault();
+  itemTouchId = e.currentTarget.dataset.id;
+}
+
+function soltarTouchItem(e) {
+  e.preventDefault();
+
+  if (!itemTouchId) return;
+
+  const touch = e.changedTouches[0];
+
+  const elementoDebajo = document.elementFromPoint(
+    touch.clientX,
+    touch.clientY
+  );
+
+  if (!elementoDebajo) {
+    itemTouchId = null;
+    return;
+  }
+
+  const cuartoDiv = elementoDebajo.closest(".cuarto");
+
+  if (!cuartoDiv) {
+    itemTouchId = null;
+    return;
+  }
+
+  const cuartoId = Number(cuartoDiv.dataset.id);
+
+  soltarItemEnCuartoPorId(itemTouchId, cuartoId);
+
+  itemTouchId = null;
 }
 
 function arrastrarItem(e) {
@@ -3022,14 +3109,83 @@ function dibujarHistorialResultados() {
     });
 }
 
+function obtenerFactorDemanda() {
+  const clima = obtenerClimaDelDia();
+
+  let demanda = 1;
+
+  switch (clima.mes) {
+    case 1: demanda = 0.80; break;
+    case 2: demanda = 0.90; break;
+    case 3: demanda = 1.00; break;
+    case 4: demanda = 1.10; break;
+    case 5: demanda = 1.15; break;
+    case 6: demanda = 1.20; break;
+    case 7: demanda = 1.45; break;
+    case 8: demanda = 1.35; break;
+    case 9: demanda = 0.95; break;
+    case 10: demanda = 1.05; break;
+    case 11: demanda = 1.10; break;
+    case 12: demanda = 1.50; break;
+    default: demanda = 1;
+  }
+
+  // Clima agradable
+  if (clima.maxima >= 22 && clima.maxima <= 29 && !clima.lluvia) {
+    demanda *= 1.10;
+  }
+
+  // Calor fuerte
+  if (clima.maxima >= 33 && clima.maxima <= 34) {
+    demanda *= 0.95;
+  } else if (clima.maxima > 34) {
+    demanda *= 0.90;
+  }
+
+  // Frío
+  if (clima.minima >= 10 && clima.minima <= 14) {
+    demanda *= 0.95;
+  } else if (clima.minima >= 5 && clima.minima <= 9) {
+    demanda *= 0.90;
+  } else if (clima.minima >= 0 && clima.minima <= 4) {
+    demanda *= 0.80;
+  } else if (clima.minima < 0) {
+    demanda *= 0.70;
+  }
+
+  // Lluvia
+  if (clima.lluvia) {
+    demanda *= 0.90;
+  }
+
+  return demanda;
+}
+
+function obtenerClimaDelDia() {
+    return climaSaltillo[(dia - 1) % climaSaltillo.length];
+}
+
 function calcularClientes() {
-  const pisos = Math.max(...cuartos.map((c) => Math.floor(c.numero / 100)));
 
-  const clientesPorPiso = 20;
+    const pisos = Math.max(
+        ...cuartos.map(c => Math.floor(c.numero / 100))
+    );
 
-  const clientesDia = pisos * clientesPorPiso;
+    const clientesPorPiso = 20;
 
-  return Math.round(clientesDia / 16);
+    let clientesDia = pisos * clientesPorPiso;
+
+    // Aplicar demanda
+    clientesDia *= obtenerFactorDemanda();
+
+    // Clientes que llegan por hora
+    let clientes = clientesDia / 16;
+
+    // Variación aleatoria del ±10%
+    clientes *= numero(90, 110) / 100;
+
+    return Math.max(1, Math.round(clientes));
+
 }
 
 function sonarAmbulancia() {
