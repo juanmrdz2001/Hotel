@@ -40,7 +40,9 @@ const drenajeMaximo = 8000;
 const drenajePorRenta = 80;
 const costoServicioDrenaje = 1200;
 let costoDrenajeHoy = 0;
-
+//================Clima ===================
+let temperaturaMinima = 0;
+let temperaturaMaxima = 0;
 
 let prestamo = {
   saldo: 700000,
@@ -460,8 +462,7 @@ const dineroSpan = document.getElementById("dinero");
 const diaSpan = document.getElementById("dia");
 const horaSpan = document.getElementById("hora");
 const reputacionSpan = document.getElementById("reputacion");
-const ocupadasSpan = document.getElementById("ocupadas");
-const compradasSpan = document.getElementById("compradas");
+const ocupacionSpan = document.getElementById("ocupacion");
 
 const ladoIzquierdo = document.getElementById("ladoIzquierdo");
 const ladoDerecho = document.getElementById("ladoDerecho");
@@ -1315,8 +1316,10 @@ function actualizarPantalla() {
   horaSpan.textContent = `${hora.toString().padStart(2, "0")}:00`;
   calcularReputacion();
   reputacionSpan.textContent = `${reputacion} ${estrellasHotel()}`;
-  ocupadasSpan.textContent = cuartos.filter((c) => c.ocupada).length;
-  compradasSpan.textContent = cuartos.filter((c) => c.comprada).length;
+  const ocupadas = cuartos.filter(c => c.ocupada).length;
+const compradas = cuartos.filter(c => c.comprada).length;
+
+ocupacionSpan.textContent = `${ocupadas}/${compradas}`;
 
   const centroHotel = document.getElementById("centroHotel");
   if (centroHotel) {
@@ -1326,14 +1329,6 @@ function actualizarPantalla() {
       centroHotel.classList.remove("elevadorComprado");
     }
   }
-
-  const climaHoy = obtenerClimaDelDia();
-
-document.getElementById("clima").textContent =
-    `${iconoClima(climaHoy)} ${climaHoy.estado} ${climaHoy.minima}° / ${climaHoy.maxima}°C`;
-
-document.getElementById("demanda").textContent =
-    `📈 +${Math.round((obtenerFactorDemanda() - 1) * 100)}%`;
 
   valorHotelSpan.textContent = valorHotel().toLocaleString();
 
@@ -1645,34 +1640,25 @@ function dibujarHotel() {
 
 function crearDivCuarto(cuarto) {
   const div = document.createElement("div");
-
   div.classList.add("cuarto");
-  div.dataset.id = cuarto.id;
-
   if (!cuarto.comprada) {
     div.classList.add("bloqueado");
     div.innerHTML = "🔒";
   } else {
     div.classList.add("comprado");
-
     if (cuarto.ocupada) {
       div.classList.add("ocupado");
     }
-
     div.innerHTML = generarContenidoCuarto(cuarto);
-
     div.addEventListener("dragover", permitirSoltar);
-
     div.addEventListener("drop", (e) => {
       soltarEnCuarto(e, cuarto.id);
     });
   }
-
   div.addEventListener("click", () => {
     cuartoSeleccionado = cuarto.id;
     mostrarDetalleCuarto();
   });
-
   return div;
 }
 
@@ -2301,94 +2287,10 @@ function dibujarInventario() {
       <small>${item.nombre}</small>
     `;
 
-    // Computadora
     div.addEventListener("dragstart", arrastrarItem);
-
-    // Celular
-    div.addEventListener("touchstart", iniciarTouchItem, { passive: false });
-    div.addEventListener("touchend", soltarTouchItem, { passive: false });
 
     inventarioDiv.appendChild(div);
   });
-}
-
-let itemTouchId = null;
-
-function iniciarTouchItem(e) {
-  e.preventDefault();
-  itemTouchId = e.currentTarget.dataset.id;
-}
-
-function soltarTouchItem(e) {
-  e.preventDefault();
-
-  if (!itemTouchId) return;
-
-  const touch = e.changedTouches[0];
-
-  const elementoDebajo = document.elementFromPoint(
-    touch.clientX,
-    touch.clientY
-  );
-
-  if (!elementoDebajo) {
-    itemTouchId = null;
-    return;
-  }
-
-  const cuartoDiv = elementoDebajo.closest(".cuarto");
-
-  if (!cuartoDiv) {
-    itemTouchId = null;
-    return;
-  }
-
-  const cuartoId = Number(cuartoDiv.dataset.id);
-
-  soltarItemEnCuartoPorId(itemTouchId, cuartoId);
-
-  itemTouchId = null;
-}
-
-function soltarItemEnCuartoPorId(itemId, cuartoId) {
-  const item = inventario.find((i) => String(i.id) === String(itemId));
-  const cuarto = cuartos.find((c) => c.id === cuartoId);
-
-  if (!item || !cuarto || !cuarto.comprada) {
-    return;
-  }
-
-  const objetoActual = cuarto.objetos[item.tipo];
-
-  if (objetoActual) {
-    if (item.lujo > objetoActual.lujo) {
-      cuarto.objetos[item.tipo] = item;
-      inventario = inventario.filter((i) => String(i.id) !== String(itemId));
-
-      reputacion += 2;
-      if (reputacion > 100) reputacion = 100;
-
-      agregarMensaje(
-        `⬆️ Mejoraste ${item.tipo} del cuarto ${cuarto.numero}: ${objetoActual.nombre} → ${item.nombre}.`
-      );
-
-      actualizarPantalla();
-      return;
-    } else {
-      agregarMensaje(`❌ El cuarto ${cuarto.numero} ya tiene un objeto igual o mejor.`);
-      return;
-    }
-  }
-
-  cuarto.objetos[item.tipo] = item;
-  inventario = inventario.filter((i) => String(i.id) !== String(itemId));
-
-  reputacion += 1;
-  if (reputacion > 100) reputacion = 100;
-
-  agregarMensaje(`🧰 Pusiste ${item.nombre} en el cuarto ${cuarto.numero}.`);
-
-  actualizarPantalla();
 }
 
 function arrastrarItem(e) {
@@ -3202,26 +3104,13 @@ function obtenerClimaDelDia() {
 }
 
 function calcularClientes() {
+  const pisos = Math.max(...cuartos.map((c) => Math.floor(c.numero / 100)));
 
-    const pisos = Math.max(
-        ...cuartos.map(c => Math.floor(c.numero / 100))
-    );
+  const clientesPorPiso = 20;
 
-    const clientesPorPiso = 20;
+  const clientesDia = pisos * clientesPorPiso;
 
-    let clientesDia = pisos * clientesPorPiso;
-
-    // Aplicar demanda
-    clientesDia *= obtenerFactorDemanda();
-
-    // Clientes que llegan por hora
-    let clientes = clientesDia / 16;
-
-    // Variación aleatoria del ±10%
-    clientes *= numero(90, 110) / 100;
-
-    return Math.max(1, Math.round(clientes));
-
+  return Math.round(clientesDia / 16);
 }
 
 function sonarAmbulancia() {
