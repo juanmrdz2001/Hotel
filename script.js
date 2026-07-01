@@ -27,6 +27,20 @@ const costoPipaGas = 5000;
 const costoLitroGas = 5;
 let costoGasConsumido = 0;
 
+//================= BASURA =================
+let basuraActual = 0;
+const basuraMaxima = 500;
+const basuraPorRenta = 3;
+const costoRecoleccionBasura = 800;
+let costoBasuraHoy = 0;
+
+//================= DRENAJE =================
+let drenajeActual = 0;
+const drenajeMaximo = 8000;
+const drenajePorRenta = 80;
+const costoServicioDrenaje = 1200;
+let costoDrenajeHoy = 0;
+
 let prestamo = {
   saldo: 700000,
   capitalOriginal: 700000,
@@ -1249,6 +1263,7 @@ function verificarQuiebra() {
 
   juegoTerminado = true;
 
+  sonarAlerta();
   pausarJuego();
 
   const overlay = document.createElement("div");
@@ -1325,6 +1340,7 @@ function actualizarPantalla() {
   actualizarPanelLavanderia();
   actualizarPanelAgua();
   actualizarPanelGas();
+  actualizarPanelBasuraDrenaje();
   verificarQuiebra();
 }
 
@@ -2699,6 +2715,112 @@ function consumirGas(litros) {
   actualizarPantalla();
 }
 
+function generarBasuraPorRenta() {
+  basuraActual += basuraPorRenta;
+
+  if (basuraActual > basuraMaxima) {
+    basuraActual = basuraMaxima;
+  }
+
+  actualizarPanelBasuraDrenaje();
+}
+
+function usarDrenajePorRenta() {
+  if (drenajeActual + drenajePorRenta > drenajeMaximo) {
+    drenajeActual = drenajeMaximo;
+    actualizarPanelBasuraDrenaje();
+    return false;
+  }
+
+  drenajeActual += drenajePorRenta;
+
+  actualizarPanelBasuraDrenaje();
+
+  return true;
+}
+
+function recolectarBasura() {
+  if (basuraActual <= 0) {
+    agregarMensaje("🗑️ No hay basura para recolectar.");
+    return;
+  }
+
+  if (dinero < costoRecoleccionBasura) {
+    agregarMensaje("❌ No hay dinero.");
+    return;
+  }
+
+  dinero -= costoRecoleccionBasura;
+
+  // ESTE ES EL GASTO DEL DÍA
+  materialesHoy += costoRecoleccionBasura;
+
+  basuraActual = 0;
+
+  agregarMensaje("🗑️ Se recolectó la basura.");
+
+  actualizarPantalla();
+}
+
+function limpiarDrenaje() {
+  if (drenajeActual <= 0) {
+    agregarMensaje("🚽 El drenaje está limpio.");
+    return;
+  }
+
+  if (dinero < costoServicioDrenaje) {
+    agregarMensaje("❌ No hay dinero.");
+    return;
+  }
+
+  dinero -= costoServicioDrenaje;
+
+  // ESTE ES EL GASTO DEL DÍA
+  materialesHoy += costoServicioDrenaje;
+
+  drenajeActual = 0;
+
+  agregarMensaje("🚽 Se limpió el drenaje.");
+
+  actualizarPantalla();
+}
+
+function actualizarPanelBasuraDrenaje() {
+  const existenciaBasura = document.getElementById("existenciaBasura");
+  const capacidadBasura = document.getElementById("capacidadBasura");
+  const nivelBasura = document.getElementById("nivelBasura");
+
+  const existenciaDrenaje = document.getElementById("existenciaDrenaje");
+  const capacidadDrenaje = document.getElementById("capacidadDrenaje");
+  const nivelDrenaje = document.getElementById("nivelDrenaje");
+
+  if (existenciaBasura) {
+    existenciaBasura.textContent = basuraActual.toLocaleString();
+  }
+
+  if (capacidadBasura) {
+    capacidadBasura.textContent = basuraMaxima.toLocaleString();
+  }
+
+  if (nivelBasura) {
+    const porcentajeBasura = (basuraActual / basuraMaxima) * 100;
+    nivelBasura.style.width = porcentajeBasura + "%";
+  }
+
+  if (existenciaDrenaje) {
+    existenciaDrenaje.textContent = drenajeActual.toLocaleString();
+  }
+
+  if (capacidadDrenaje) {
+    capacidadDrenaje.textContent = drenajeMaximo.toLocaleString();
+  }
+
+  if (nivelDrenaje) {
+    const porcentajeDrenaje = (drenajeActual / drenajeMaximo) * 100;
+    nivelDrenaje.style.width = porcentajeDrenaje + "%";
+  }
+}
+
 function avanzarHora() {
   hora++;
 
@@ -2910,6 +3032,26 @@ function calcularClientes() {
   return Math.round(clientesDia / 16);
 }
 
+function sonarAmbulancia() {
+  const audio = document.getElementById("sonidoAmbulancia");
+
+  if (!audio) return;
+
+  audio.pause();
+  audio.currentTime = 0;
+
+  audio.play().catch(() => {});
+}
+
+function sonarAlerta() {
+  const audio = document.getElementById("sonidoAlerta");
+
+  if (!audio) return;
+
+  audio.currentTime = 0;
+  audio.play();
+}
+
 function recibirClientes() {
   const cantidad = calcularClientes();
 
@@ -2932,6 +3074,51 @@ function recibirClientes() {
           no aceptó la reputación del hotel.`,
         );
 
+        actualizarPantalla();
+        return;
+      }
+
+      // RESTRICCIONES DE SERVICIOS
+      if (aguaActual < consumoAguaPorRenta) {
+        clientesRechazados++;
+        cliente.seHospeda = false;
+        mostrarCliente(cliente);
+
+        sonarAlerta();
+        agregarMensaje("💧 No se pudo rentar: no hay suficiente agua.");
+        actualizarPantalla();
+        return;
+      }
+
+      if (gasActual < consumoGasPorRenta) {
+        clientesRechazados++;
+        cliente.seHospeda = false;
+        mostrarCliente(cliente);
+
+        sonarAlerta();
+        agregarMensaje("🔥 No se pudo rentar: no hay suficiente gas.");
+        actualizarPantalla();
+        return;
+      }
+
+      if (basuraActual >= basuraMaxima) {
+        clientesRechazados++;
+        cliente.seHospeda = false;
+        mostrarCliente(cliente);
+
+        sonarAlerta();
+        agregarMensaje("🗑️ No se pudo rentar: la basura está llena.");
+        actualizarPantalla();
+        return;
+      }
+
+      if (drenajeActual >= drenajeMaximo) {
+        clientesRechazados++;
+        cliente.seHospeda = false;
+        mostrarCliente(cliente);
+
+        sonarAlerta();
+        agregarMensaje("🚽 No se pudo rentar: el drenaje está lleno.");
         actualizarPantalla();
         return;
       }
@@ -2961,6 +3148,8 @@ function recibirClientes() {
         consumirMaterialesPorRenta();
         consumirAguaPorRenta();
         consumirGasPorRenta();
+        generarBasuraPorRenta();
+        usarDrenajePorRenta();
 
         agregarMensaje(
           `🏨 ${cliente.nombre}
@@ -3461,6 +3650,10 @@ function limpiarUndefined(obj) {
 async function guardarPartida() {
   const partida = {
     jugador: nombreJugador,
+
+    mesPartida: new Date().getMonth(),
+    anioPartida: new Date().getFullYear(),
+
     dinero,
     dia,
     hora,
@@ -3479,13 +3672,30 @@ async function guardarPartida() {
     diasDesgasteFachada,
 
     plantasLuz,
+    lavadoras,
+
     clientesRechazados,
     cuartosRentados20,
     pagosHoy,
     nominaPagadaHoy,
     diasSobrecarga,
-    lavadoras,
     pendientesLavanderia,
+
+    rentasHoy,
+    desgasteHoy,
+    nominaHoy,
+    materialesHoy,
+    interesesHoy,
+    contingenciasHoy,
+    eventoHoy,
+    historialResultados,
+
+    aguaActual,
+    gasActual,
+    costoGasConsumido,
+
+    basuraActual,
+    drenajeActual,
 
     fechaGuardado: new Date().toLocaleString(),
   };
@@ -3513,33 +3723,114 @@ async function cargarPartida() {
       return;
     }
 
-    dinero = partida.dinero;
-    dia = partida.dia;
-    hora = partida.hora;
-    reputacion = partida.reputacion;
+    // ==========================================
+    // VALIDAR QUE LA PARTIDA SEA DEL MES ACTUAL
+    // ==========================================
+    const hoy = new Date();
 
-    clientesRechazados = partida.clientesRechazados || 0;
+    if (
+      partida.mesPartida !== hoy.getMonth() ||
+      partida.anioPartida !== hoy.getFullYear()
+    ) {
+      alert(
+        "🏆 ¡Comenzó un nuevo mes!\n\n" +
+          "La partida guardada pertenece al mes anterior.\n\n" +
+          "Todos los jugadores comienzan desde cero para competir nuevamente.",
+      );
 
-    tieneElevador = partida.tieneElevador || false;
-    vidaElevador = partida.vidaElevador || 100;
+      agregarMensaje(
+        "🏆 Nuevo mes. La partida anterior ya no puede recuperarse.",
+      );
 
-    vidaFachada = partida.vidaFachada || 100;
-    diasDesgasteFachada = partida.diasDesgasteFachada || 0;
+      return;
+    }
 
-    cuartosRentados20 = partida.cuartosRentados20 || 0;
-    pagosHoy = partida.pagosHoy || 0;
-    nominaPagadaHoy = partida.nominaPagadaHoy || false;
+    // ==========================================
+    // DATOS GENERALES
+    // ==========================================
+    dinero = partida.dinero ?? dinero;
+    dia = partida.dia ?? dia;
+    hora = partida.hora ?? hora;
+    reputacion = partida.reputacion ?? reputacion;
 
-    Object.assign(prestamo, partida.prestamo);
+    clientesRechazados = partida.clientesRechazados ?? 0;
 
-    empleados.splice(0, empleados.length, ...partida.empleados);
+    // ==========================================
+    // HOTEL
+    // ==========================================
+    tieneElevador = partida.tieneElevador ?? false;
+    vidaElevador = partida.vidaElevador ?? 100;
 
-    materiales.splice(0, materiales.length, ...partida.materiales);
+    vidaFachada = partida.vidaFachada ?? 100;
+    diasDesgasteFachada = partida.diasDesgasteFachada ?? 0;
 
-    inventario = partida.inventario || [];
+    cuartosRentados20 = partida.cuartosRentados20 ?? 0;
+    pagosHoy = partida.pagosHoy ?? 0;
+    nominaPagadaHoy = partida.nominaPagadaHoy ?? false;
 
-    cuartos.splice(0, cuartos.length, ...partida.cuartos);
-    plantasLuz = partida.plantasLuz || [
+    diasSobrecarga = partida.diasSobrecarga ?? 0;
+    pendientesLavanderia = partida.pendientesLavanderia ?? 0;
+
+    // ==========================================
+    // ESTADO FINANCIERO
+    // ==========================================
+    rentasHoy = partida.rentasHoy ?? 0;
+    desgasteHoy = partida.desgasteHoy ?? 0;
+    nominaHoy = partida.nominaHoy ?? 0;
+    materialesHoy = partida.materialesHoy ?? 0;
+    interesesHoy = partida.interesesHoy ?? 0;
+    contingenciasHoy = partida.contingenciasHoy ?? 0;
+
+    eventoHoy = partida.eventoHoy ?? "";
+    historialResultados = partida.historialResultados ?? [];
+
+    // ==========================================
+    // AGUA, GAS, BASURA Y DRENAJE
+    // ==========================================
+    aguaActual = partida.aguaActual ?? aguaActual;
+    gasActual = partida.gasActual ?? gasActual;
+    costoGasConsumido = partida.costoGasConsumido ?? 0;
+
+    basuraActual = partida.basuraActual ?? 0;
+    drenajeActual = partida.drenajeActual ?? 0;
+
+    // ==========================================
+    // PRÉSTAMO
+    // ==========================================
+    if (partida.prestamo) {
+      Object.assign(prestamo, partida.prestamo);
+    }
+
+    // ==========================================
+    // EMPLEADOS
+    // ==========================================
+    if (partida.empleados) {
+      empleados.splice(0, empleados.length, ...partida.empleados);
+    }
+
+    // ==========================================
+    // MATERIALES
+    // ==========================================
+    if (partida.materiales) {
+      materiales.splice(0, materiales.length, ...partida.materiales);
+    }
+
+    // ==========================================
+    // INVENTARIO
+    // ==========================================
+    inventario = partida.inventario ?? [];
+
+    // ==========================================
+    // CUARTOS
+    // ==========================================
+    if (partida.cuartos) {
+      cuartos.splice(0, cuartos.length, ...partida.cuartos);
+    }
+
+    // ==========================================
+    // PLANTAS DE LUZ
+    // ==========================================
+    plantasLuz = partida.plantasLuz ?? [
       {
         vida: 100,
         vidaMaxima: 100,
@@ -3547,11 +3838,13 @@ async function cargarPartida() {
       },
     ];
 
-    diasSobrecarga = partida.diasSobrecarga || 0;
+    // ==========================================
+    // LAVADORAS
+    // ==========================================
     lavadoras.splice(
       0,
       lavadoras.length,
-      ...(partida.lavadoras || [
+      ...(partida.lavadoras ?? [
         {
           vida: 100,
           vidaMaxima: 100,
@@ -3560,15 +3853,13 @@ async function cargarPartida() {
       ]),
     );
 
-    pendientesLavanderia = partida.pendientesLavanderia || 0;
-
     actualizarPantalla();
 
     agregarMensaje("📂 Partida recuperada correctamente.");
     alert("📂 Partida recuperada");
   } catch (error) {
     console.error(error);
-    alert("❌ Error al recuperar partida. Revisa consola.");
+    alert("❌ Error al recuperar partida. Revisa la consola.");
   }
 }
 
@@ -3586,19 +3877,27 @@ async function guardarRankingMensual() {
   agregarMensaje("🏆 Ranking mensual actualizado.");
 }
 
+function claveMesActual() {
+  const hoy = new Date();
+  const anio = hoy.getFullYear();
+  const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+
+  return `${anio}-${mes}`;
+}
+
 window.mostrarRankingMensual = async function () {
   try {
-    const ranking = await obtenerRankingMensualFirebase();
+    const mesActual = claveMesActual();
+    const ranking = await obtenerRankingMensualFirebase(mesActual);
 
     const tbody = document.querySelector("#tablaRanking tbody");
-
     tbody.innerHTML = "";
 
     if (ranking.length === 0) {
       tbody.innerHTML = `
         <tr>
           <td colspan="3">
-            No hay jugadores en el ranking.
+            No hay jugadores en el ranking de ${mesActual}.
           </td>
         </tr>
       `;
@@ -3623,13 +3922,8 @@ window.mostrarRankingMensual = async function () {
     document.getElementById("rankingModal").style.display = "block";
   } catch (error) {
     console.error(error);
-
     alert("❌ Error al obtener el ranking.");
   }
-};
-
-window.cerrarRanking = function () {
-  document.getElementById("rankingModal").style.display = "none";
 };
 
 function mostrarAlertaEvento(titulo, mensaje, imagen) {
@@ -3732,6 +4026,7 @@ function aplicarContingencia(evento) {
 
   eventoHoy = evento.nombre;
 
+  sonarAmbulancia();
   agregarMensaje(
     `🚨 ${evento.nombre}: -$${evento.perdidaDinero.toLocaleString()} y -${evento.perdidaReputacion} reputación.`,
   );
