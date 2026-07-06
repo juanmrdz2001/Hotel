@@ -1954,3 +1954,23 @@ header p{
   background: #e6f7ff;
   transform: scale(1.05);
 }
+
+.principal{
+  display:grid;
+  grid-template-columns:260px minmax(600px, 1fr) 280px;
+  gap:10px;
+  align-items:start;
+}
+
+.columnaIzquierdaPC,
+.columnaCentroPC,
+.columnaDerechaPC{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+#hotelMovil,
+#zonaPanelMovil{
+  display:none !important;
+}

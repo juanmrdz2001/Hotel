@@ -1317,10 +1317,10 @@ function actualizarPantalla() {
   horaSpan.textContent = `${hora.toString().padStart(2, "0")}:00`;
   calcularReputacion();
   reputacionSpan.textContent = `${reputacion} ${estrellasHotel()}`;
-  const ocupadas = cuartos.filter(c => c.ocupada).length;
-const compradas = cuartos.filter(c => c.comprada).length;
+  const ocupadas = cuartos.filter((c) => c.ocupada).length;
+  const compradas = cuartos.filter((c) => c.comprada).length;
 
-ocupacionSpan.textContent = `${ocupadas}/${compradas}`;
+  ocupacionSpan.textContent = `${ocupadas}/${compradas}`;
 
   const centroHotel = document.getElementById("centroHotel");
   if (centroHotel) {
@@ -1334,6 +1334,7 @@ ocupacionSpan.textContent = `${ocupadas}/${compradas}`;
   valorHotelSpan.textContent = valorHotel().toLocaleString();
 
   dibujarHotel();
+  dibujarHotelMovil();
   dibujarInventario();
   mostrarDetalleCuarto();
   actualizarIndicadoresMantenimiento();
@@ -1347,27 +1348,29 @@ ocupacionSpan.textContent = `${ocupadas}/${compradas}`;
   actualizarPanelGas();
   actualizarPanelBasuraDrenaje();
   verificarQuiebra();
+
+  if (window.innerWidth <= 900 && !window.seccionMovilActual) {
+    window.seccionMovilActual = "hotel";
+    mostrarSeccionMovil("hotel");
+  }
 }
 
 function iconoClima(clima) {
+  if (clima.lluvia) return "🌧️";
 
-    if (clima.lluvia) return "🌧️";
+  switch (clima.estado) {
+    case "Soleado":
+      return "☀️";
 
-    switch (clima.estado) {
+    case "Parcialmente nublado":
+      return "⛅";
 
-        case "Soleado":
-            return "☀️";
+    case "Nublado":
+      return "☁️";
 
-        case "Parcialmente nublado":
-            return "⛅";
-
-        case "Nublado":
-            return "☁️";
-
-        default:
-            return "🌤️";
-    }
-
+    default:
+      return "🌤️";
+  }
 }
 
 function cambiarVistaIndicadores() {
@@ -1639,6 +1642,167 @@ function dibujarHotel() {
   });
 }
 
+function dibujarHotelMovil() {
+  const contenedor = document.getElementById("hotelMovil");
+  if (!contenedor) return;
+
+  contenedor.innerHTML = "";
+
+  const pisos = [...new Set(cuartos.map((c) => Math.floor(c.numero / 100)))];
+  pisos.sort((a, b) => b - a);
+
+  pisos.forEach((piso) => {
+    const cuartosDelPiso = cuartos.filter(
+      (c) => Math.floor(c.numero / 100) === piso,
+    );
+
+    let html = `
+      <div class="filaPisoMovil">
+        <div class="elevadorMovil">🛗</div>
+        <div class="cuartosScrollMovil">
+    `;
+
+    cuartosDelPiso.forEach((cuarto) => {
+      html += `
+        <div 
+          class="cuartoMovil ${cuarto.comprada ? "comprado" : "bloqueado"}"
+          onclick="tocarCuartoMovil(${cuarto.id})"
+        >
+          <span class="numeroCuartoMovil">
+            ${cuarto.comprada ? cuarto.numero : "🔒"}
+          </span>
+
+          <div class="iconosCuartoMovil">
+            ${cuarto.comprada ? generarIconosCuartoMovil(cuarto) : ""}
+          </div>
+
+          <span class="precioCuartoMovil">
+            ${cuarto.comprada ? "$" + precioCuarto(cuarto) : ""}
+          </span>
+        </div>
+      `;
+    });
+
+    html += `
+        </div>
+      </div>
+    `;
+
+    contenedor.innerHTML += html;
+  });
+
+  contenedor.innerHTML += `
+    <div class="filaPisoMovil filaServiciosMovil">
+      <div class="elevadorMovil">🏨</div>
+
+      <div class="cuartosScrollMovil">
+
+        <div class="servicioMovil plantaMovil">
+          <strong>⚡ Planta</strong>
+          <span>${plantasLuz.length}</span>
+          <small>${consumoElectricoHotel()} / ${capacidadElectricaHotel()}</small>
+        </div>
+
+        <div class="servicioMovil lavanderiaMovil">
+          <strong>🧺 Lavandería</strong>
+          <span>${lavadoras.length}</span>
+          <small>Pendientes: ${pendientesLavanderia}</small>
+        </div>
+
+        <div class="servicioMovil recepcionMovil">
+          <strong>🛎️ Recepción</strong>
+          <span>${cuartos.filter((c) => c.ocupada).length}</span>
+          <small>Ocupados</small>
+        </div>
+
+        <div class="servicioMovil cafeteriaMovil">
+          <strong>☕ Cafetería</strong>
+          <span>OK</span>
+          <small>Servicio</small>
+        </div>
+
+        <div class="servicioMovil albercaMovil">
+          <strong>🏊 Alberca</strong>
+          <span>OK</span>
+          <small>Lujo</small>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+
+function generarIconosCuartoMovil(cuarto) {
+  let iconos = "";
+
+  if (cuarto.ocupada) iconos += "🛌 ";
+  if (cuarto.objetos.cama) iconos += "🛏️ ";
+  if (cuarto.objetos.tv) iconos += "📺 ";
+  if (cuarto.objetos.lampara) iconos += "💡 ";
+  if (cuarto.objetos.sabanas) iconos += "🧺 ";
+  if (cuarto.objetos.internet) iconos += "📶 ";
+  if (cuarto.objetos.clima) iconos += "❄️ ";
+  if (cuarto.objetos.extintor) iconos += "🧯 ";
+
+  return iconos;
+}
+
+function tocarCuartoMovil(cuartoId) {
+  const cuarto = cuartos.find((c) => c.id === cuartoId);
+  if (!cuarto || !cuarto.comprada) return;
+
+  if (itemSeleccionadoMovil) {
+    soltarItemSeleccionadoEnCuarto(cuartoId);
+    return;
+  }
+
+  cuartoSeleccionado = cuartoId;
+  mostrarDetalleCuarto();
+}
+
+function mostrarPanelMovil(panel, boton) {
+  if (window.innerWidth > 900) return;
+
+  document.querySelectorAll(".tarjetaMovil").forEach((btn) => {
+    btn.classList.remove("activa");
+  });
+
+  if (boton) {
+    boton.classList.add("activa");
+  }
+
+  const paneles = {
+    hotel: document.querySelector(".hotelBox"),
+    inventario: document.querySelector(".inventarioLateral"),
+    catalogo: document.querySelector(".panelDerecho"),
+    empleados: document
+      .getElementById("contenidoEmpleados")
+      ?.closest("section"),
+    indicadores: document.querySelector(".mantenimientoPanel"),
+    materiales: document
+      .getElementById("contenidoMateriales")
+      ?.closest("section"),
+    aguaGas: document.querySelector(".panelAguaGas"),
+    basuraDrenaje: document.querySelector(".panelBasuraDrenaje"),
+    movimiento: document.querySelector(".mensajesBox"),
+    finanzas: document
+      .getElementById("historialResultados")
+      ?.closest("section"),
+  };
+
+  Object.values(paneles).forEach((p) => {
+    if (p) p.style.display = "none";
+  });
+
+  if (paneles[panel]) {
+    paneles[panel].style.display = "block";
+    paneles[panel].scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+}
+
 function crearDivCuarto(cuarto) {
   const div = document.createElement("div");
   div.classList.add("cuarto");
@@ -1699,14 +1863,16 @@ function soltarItemSeleccionadoEnCuarto(cuartoId) {
       if (reputacion > 100) reputacion = 100;
 
       agregarMensaje(
-        `⬆️ Mejoraste ${item.tipo} del cuarto ${cuarto.numero}: ${objetoActual.nombre} → ${item.nombre}.`
+        `⬆️ Mejoraste ${item.tipo} del cuarto ${cuarto.numero}: ${objetoActual.nombre} → ${item.nombre}.`,
       );
 
       itemSeleccionadoMovil = null;
       actualizarPantalla();
       return;
     } else {
-      agregarMensaje(`❌ El cuarto ${cuarto.numero} ya tiene un objeto igual o mejor.`);
+      agregarMensaje(
+        `❌ El cuarto ${cuarto.numero} ya tiene un objeto igual o mejor.`,
+      );
       itemSeleccionadoMovil = null;
       actualizarPantalla();
       return;
@@ -1723,6 +1889,76 @@ function soltarItemSeleccionadoEnCuarto(cuartoId) {
 
   itemSeleccionadoMovil = null;
   actualizarPantalla();
+}
+
+function mostrarSeccionMovil(panel, boton = null) {
+  if (window.innerWidth > 900) return;
+
+  window.seccionMovilActual = panel;
+
+  const panelesSecundarios = [
+    "panelCatalogo",
+    "panelInventario",
+    "panelVentaUsado",
+    "panelCuartoSeleccionado",
+    "panelEmpleados",
+    "panelMateriales",
+    "panelAgua",
+    "panelGas",
+    "panelBasura",
+    "panelDrenaje",
+    "panelIndicadores",
+    "panelFinanzas",
+    "panelPrestamo",
+    "panelControles",
+    "panelMovimiento",
+  ];
+
+  panelesSecundarios.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.remove("panelMovilActivo");
+      el.style.display = "none";
+    }
+  });
+
+  const mapa = {
+    hotel: null,
+    catalogo: "panelCatalogo",
+    inventario: "panelInventario",
+    venta: "panelVentaUsado",
+    cuarto: "panelCuartoSeleccionado",
+    empleados: "panelEmpleados",
+    materiales: "panelMateriales",
+    agua: "panelAgua",
+    gas: "panelGas",
+    basura: "panelBasura",
+    drenaje: "panelDrenaje",
+    indicadores: "panelIndicadores",
+    finanzas: "panelFinanzas",
+    prestamo: "panelPrestamo",
+    controles: "panelControles",
+    movimiento: "panelMovimiento",
+  };
+
+  const idMostrar = mapa[panel];
+
+  if (idMostrar) {
+    const el = document.getElementById(idMostrar);
+    const zona = document.getElementById("zonaPanelMovil");
+
+    if (el && zona) {
+      zona.appendChild(el);
+      el.style.display = "block";
+      el.classList.add("panelMovilActivo");
+    }
+  }
+
+  document.querySelectorAll(".tarjetaMovil").forEach((t) => {
+    t.classList.remove("activa");
+  });
+
+  if (boton) boton.classList.add("activa");
 }
 
 function generarContenidoCuarto(cuarto) {
@@ -3131,54 +3367,79 @@ function obtenerFactorDemanda() {
   let demanda = 1;
 
   switch (clima.mes) {
-    case 1: demanda = 0.80; break;
-    case 2: demanda = 0.90; break;
-    case 3: demanda = 1.00; break;
-    case 4: demanda = 1.10; break;
-    case 5: demanda = 1.15; break;
-    case 6: demanda = 1.20; break;
-    case 7: demanda = 1.45; break;
-    case 8: demanda = 1.35; break;
-    case 9: demanda = 0.95; break;
-    case 10: demanda = 1.05; break;
-    case 11: demanda = 1.10; break;
-    case 12: demanda = 1.50; break;
-    default: demanda = 1;
+    case 1:
+      demanda = 0.8;
+      break;
+    case 2:
+      demanda = 0.9;
+      break;
+    case 3:
+      demanda = 1.0;
+      break;
+    case 4:
+      demanda = 1.1;
+      break;
+    case 5:
+      demanda = 1.15;
+      break;
+    case 6:
+      demanda = 1.2;
+      break;
+    case 7:
+      demanda = 1.45;
+      break;
+    case 8:
+      demanda = 1.35;
+      break;
+    case 9:
+      demanda = 0.95;
+      break;
+    case 10:
+      demanda = 1.05;
+      break;
+    case 11:
+      demanda = 1.1;
+      break;
+    case 12:
+      demanda = 1.5;
+      break;
+    default:
+      demanda = 1;
   }
 
   // Clima agradable
   if (clima.maxima >= 22 && clima.maxima <= 29 && !clima.lluvia) {
-    demanda *= 1.10;
+    demanda *= 1.1;
   }
 
   // Calor fuerte
   if (clima.maxima >= 33 && clima.maxima <= 34) {
     demanda *= 0.95;
   } else if (clima.maxima > 34) {
-    demanda *= 0.90;
+    demanda *= 0.9;
   }
 
   // Frío
   if (clima.minima >= 10 && clima.minima <= 14) {
     demanda *= 0.95;
   } else if (clima.minima >= 5 && clima.minima <= 9) {
-    demanda *= 0.90;
+    demanda *= 0.9;
   } else if (clima.minima >= 0 && clima.minima <= 4) {
-    demanda *= 0.80;
+    demanda *= 0.8;
   } else if (clima.minima < 0) {
-    demanda *= 0.70;
+    demanda *= 0.7;
   }
 
   // Lluvia
   if (clima.lluvia) {
-    demanda *= 0.90;
+    demanda *= 0.9;
   }
 
   return demanda;
 }
 
 function obtenerClimaDelDia() {
-    return climaSaltillo[(dia - 1) % climaSaltillo.length];
+  return climaSaltillo[(dia - 1) % climaSaltillo.length];
 }
 
 function calcularClientes() {
@@ -4093,7 +4354,6 @@ window.cerrarRanking = function () {
   }
 };
 
-
 function mostrarAlertaEvento(titulo, mensaje, imagen) {
   const modal = document.getElementById("alertaEvento");
   const tituloEvento = document.getElementById("tituloEvento");
@@ -4282,4 +4542,77 @@ function revisarContingencias() {
       return;
     }
   }
+}
+
+let itemMovil = null;
+let fantasmaMovil = null;
+
+document.querySelectorAll(".itemInventario, .itemCatalogo").forEach((item) => {
+  item.addEventListener("touchstart", iniciarToqueMovil, { passive: false });
+});
+
+function iniciarToqueMovil(e) {
+  e.preventDefault();
+
+  itemMovil = e.currentTarget;
+
+  const touch = e.touches[0];
+
+  fantasmaMovil = itemMovil.cloneNode(true);
+  fantasmaMovil.style.position = "fixed";
+  fantasmaMovil.style.left = touch.clientX + "px";
+  fantasmaMovil.style.top = touch.clientY + "px";
+  fantasmaMovil.style.zIndex = "99999";
+  fantasmaMovil.style.pointerEvents = "none";
+  fantasmaMovil.style.opacity = "0.85";
+  fantasmaMovil.style.transform = "translate(-50%, -50%) scale(1.1)";
+  document.body.appendChild(fantasmaMovil);
+
+  document.addEventListener("touchmove", moverToqueMovil, { passive: false });
+  document.addEventListener("touchend", soltarToqueMovil, { passive: false });
+}
+
+function moverToqueMovil(e) {
+  e.preventDefault();
+
+  if (!fantasmaMovil) return;
+
+  const touch = e.touches[0];
+
+  fantasmaMovil.style.left = touch.clientX + "px";
+  fantasmaMovil.style.top = touch.clientY + "px";
+}
+
+function soltarToqueMovil(e) {
+  e.preventDefault();
+
+  if (!itemMovil) return;
+
+  const touch = e.changedTouches[0];
+
+  if (fantasmaMovil) {
+    fantasmaMovil.remove();
+    fantasmaMovil = null;
+  }
+
+  const elementoDebajo = document.elementFromPoint(
+    touch.clientX,
+    touch.clientY,
+  );
+
+  const cuarto = elementoDebajo?.closest(".cuarto");
+
+  if (cuarto && !cuarto.classList.contains("bloqueado")) {
+    const idCuarto = cuarto.dataset.id || cuarto.id;
+    const tipo = itemMovil.dataset.tipo || itemMovil.dataset.item;
+
+    if (typeof soltarEnCuarto === "function") {
+      soltarEnCuarto(idCuarto, tipo);
+    }
+  }
+
+  itemMovil = null;
+
+  document.removeEventListener("touchmove", moverToqueMovil);
+  document.removeEventListener("touchend", soltarToqueMovil);
 }

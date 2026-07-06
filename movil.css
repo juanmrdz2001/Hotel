@@ -1,0 +1,814 @@
+/* =========================
+   📱 MODO CELULAR
+========================= */
+
+@media (max-width: 900px) {
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 0 75px 0 !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .encabezadoFijo {
+    padding: 2px !important;
+  }
+
+  header {
+    padding: 3px !important;
+    margin-bottom: 2px !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+  }
+
+  .imgTitulo {
+    width: 135px !important;
+    max-width: 135px !important;
+  }
+
+  header h1,
+  header p {
+    display: none !important;
+  }
+
+  .panel {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 3px !important;
+    padding: 2px !important;
+    margin-bottom: 2px !important;
+    font-size: 10px !important;
+  }
+
+  .panel div {
+    padding: 3px 2px !important;
+    font-size: 10px !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    white-space: nowrap !important;
+    min-height: auto !important;
+  }
+
+  .panel div:nth-child(6) {
+    grid-column: 1 / 4;
+  }
+
+  .bandaMensajes {
+    padding: 2px !important;
+    font-size: 10px !important;
+  }
+
+  .principal,
+  .layout,
+  .contenedorPrincipal {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .hotelBox {
+  order: 1 !important;
+  width: 100% !important;
+  margin: 2px 0 8px 0 !important;
+  padding: 3px !important;
+  border-radius: 8px !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+}
+
+#panelHotel {
+  margin-top: 4px !important;
+  padding-top: 0 !important;
+}
+
+#hotelMovil {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.inventarioLateral {
+  order: 2 !important;
+}
+
+.panelDerecho {
+  order: 3 !important;
+}
+
+  .hotelBox h2 {
+    display: none !important;
+  }
+
+  .hotelVisual {
+  width: 520px !important;
+  min-width: 520px !important;
+  max-width: 520px !important;
+  min-height: 520px !important;
+  grid-template-columns: 1fr 90px 1fr !important;
+  grid-template-rows: 1fr 65px !important;
+  border-width: 5px !important;
+  border-radius: 8px !important;
+}
+  .centroHotel {
+    width: 90px !important;
+  }
+
+  .cuarto {
+    height: 95px !important;
+    min-width: 65px !important;
+    min-height: 70px !important;
+    touch-action: none !important;
+  }
+
+  .zonaServicios {
+    grid-template-columns: 1.4fr 1.4fr 0.6fr 0.6fr 80px 2.2fr 1.2fr !important;
+    min-width: 520px !important;
+  }
+
+  .servicio {
+    height: 65px !important;
+    font-size: 10px !important;
+  }
+
+  #entradaHotel {
+    height: 165px !important;
+  }
+
+  .inventarioLateral {
+    order: 2 !important;
+    width: 100% !important;
+    margin: 0 0 8px 0 !important;
+  }
+
+  #inventario,
+  .inventario {
+    display: flex !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    padding: 8px !important;
+  }
+
+  .itemInventario {
+    min-width: 70px !important;
+    max-width: 70px !important;
+    font-size: 12px !important;
+    text-align: center !important;
+    touch-action: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+
+  .panelDerecho {
+    order: 3 !important;
+    width: 100% !important;
+  }
+
+  #catalogo,
+  .catalogo {
+    max-height: 320px !important;
+    overflow-y: auto !important;
+  }
+
+  .itemCatalogo {
+    font-size: 12px !important;
+    padding: 8px !important;
+    touch-action: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+
+  .barraMovil {
+    display: grid !important;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 65px !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    background: white !important;
+    border-top: 2px solid #ccc !important;
+    box-shadow: 0 -4px 12px rgba(0,0,0,.25) !important;
+    z-index: 999999 !important;
+  }
+
+  .barraMovil button {
+    border: none !important;
+    background: white !important;
+    color: #333 !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    padding: 6px 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  .hotelVisual {
+  display: none !important;
+}
+
+#hotelMovil {
+  display: block !important;
+  width: 100%;
+}
+
+.filaPisoMovil {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 8px;
+  background: #f4f4f4;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid #ccc;
+}
+
+.elevadorMovil {
+  width: 55px;
+  min-width: 55px;
+  background: #333;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.cuartosScrollMovil {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 6px;
+}
+
+.cuartoMovil {
+  min-width: 85px;
+  height: 85px;
+  background: white;
+  border: 2px solid #999;
+  border-radius: 8px;
+  position: relative;
+  text-align: center;
+  font-size: 13px;
+}
+
+.cuartoMovil.bloqueado {
+  background: #ddd;
+  color: #777;
+}
+
+.numeroCuartoMovil {
+  font-weight: bold;
+  display: block;
+  margin-top: 4px;
+}
+
+.zonaServicios,
+.serviciosHotel,
+.fachadaHotel,
+.entradaHotel,
+#entradaHotel {
+  display: none !important;
+}
+
+#hotelMovil {
+  margin-top: 0px !important;
+}
+
+.filaPisoMovil {
+  margin-bottom: 8px !important;
+}
+
+.cuartosScrollMovil {
+  width: calc(100% - 55px) !important;
+}
+
+.cuartoMovil {
+  min-width: 82px !important;
+  height: 82px !important;
+}
+
+.servicioMovil {
+  min-width: 92px !important;
+  height: 82px !important;
+  border: 2px solid #999 !important;
+  border-radius: 8px !important;
+  background: linear-gradient(#ffffff, #eeeeee) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  font-size: 11px !important;
+  box-sizing: border-box !important;
+}
+
+.servicioMovil strong {
+  font-size: 11px !important;
+}
+
+.servicioMovil span {
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.servicioMovil small {
+  font-size: 10px !important;
+}
+
+.plantaMovil {
+  border-color: #5a8dff !important;
+}
+
+.lavanderiaMovil {
+  border-color: #2ca7df !important;
+}
+
+.recepcionMovil {
+  border-color: #c58b3b !important;
+}
+
+.cafeteriaMovil {
+  border-color: #8b5a2b !important;
+}
+
+.albercaMovil {
+  border-color: #28b6d6 !important;
+}
+
+.panelMateriales,
+.materialesBox,
+.almacenMateriales {
+  display: none !important;
+}
+
+.filaPisoMovil {
+  width: 100% !important;
+}
+
+.cuartosScrollMovil {
+  flex: 1 !important;
+  padding: 6px !important;
+}
+
+.cuartoMovil,
+.servicioMovil {
+  min-width: 90px !important;
+  height: 86px !important;
+}
+
+.mantenimientoPanel{
+    display:none !important;
+}
+
+.mensajesBox{
+    display:none !important;
+}
+
+.footerAutor{
+    display:none !important;
+}
+
+.tarjetaMovil {
+  min-width: 78px;
+  height: 62px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  background: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tarjetaMovil span {
+  font-size: 24px;
+}
+
+.tarjetaMovil small {
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.tarjetaMovil.activa {
+  border-color: #198754;
+  background: #e9f8ef;
+}
+
+}
+
+@media (max-width:900px){
+
+  body{
+    padding-bottom:100px !important;
+  }
+
+}
+
+@media (max-width:900px){
+
+  body{
+    padding-bottom:110px !important;
+  }
+
+  .tarjetaMovil{
+    display:flex !important;
+    min-width:78px !important;
+    height:64px !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+  }
+
+}
+
+@media (max-width:900px){
+
+  #panelHotel{
+    display:block !important;
+  }
+
+  #hotelMovil{
+    max-height:230px !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+  }
+
+  body{
+    padding-bottom:110px !important;
+  }
+
+}
+
+@media (max-width:900px){
+
+  html,
+  body{
+    padding-bottom:115px !important;
+    overflow-x:hidden !important;
+  }
+
+  .barraMovilTarjetas{
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    position:fixed !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:0 !important;
+    height:88px !important;
+    padding:8px !important;
+    gap:8px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    background:#ffffff !important;
+    border-top:2px solid #ccc !important;
+    box-shadow:0 -4px 12px rgba(0,0,0,.25) !important;
+    z-index:2147483647 !important;
+  }
+
+  .tarjetaMovil{
+    display:flex !important;
+    min-width:78px !important;
+    height:64px !important;
+    flex-shrink:0 !important;
+  }
+
+}
+
+@media (max-width:900px){
+
+  .barraMovilTarjetas{
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    white-space:nowrap !important;
+  }
+
+  .barraMovilTarjetas .tarjetaMovil{
+    flex:0 0 78px !important;
+    width:78px !important;
+    min-width:78px !important;
+    max-width:78px !important;
+    height:64px !important;
+    pointer-events:auto !important;
+  }
+
+}
+
+@media (max-width:900px){
+
+  #zonaPanelMovil{
+    width:100%;
+    margin-top:8px;
+  }
+
+  .panelMovilActivo{
+    display:block !important;
+  }
+
+#modalInstrucciones.modalInstrucciones {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999999999;
+  background: rgba(0,0,0,0.75);
+}
+
+}
+
+@media (max-width:900px){
+
+  #panelAgua,
+  #panelGas,
+  #panelBasura,
+  #panelDrenaje{
+    display:none;
+  }
+
+  #zonaPanelMovil:empty{
+    display:none !important;
+  }
+
+}
+
+@media (max-width:900px){
+
+  .principal{
+    display:block !important;
+    width:100% !important;
+    gap:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    min-height:0 !important;
+  }
+
+  #panelHotel{
+    margin-top:4px !important;
+  }
+
+  .bandaMensajes{
+    margin-bottom:4px !important;
+  }
+
+}
+
+@media (max-width:900px){
+
+  .contenedor{
+    min-height:0 !important;
+    padding-bottom:95px !important;
+  }
+
+  #panelHotel{
+    height:auto !important;
+    min-height:0 !important;
+    padding-bottom:8px !important;
+  }
+
+  .hotelBox{
+    height:auto !important;
+    min-height:0 !important;
+    padding-bottom:6px !important;
+  }
+
+  #hotelMovil{
+    max-height:260px !important;
+    overflow-y:auto !important;
+  }
+
+}
+
+@media (max-width:900px){
+
+  .contenedor{
+    padding:4px !important;
+  }
+
+  .encabezadoFijo,
+  .hotelBox{
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+}
+
+@media (max-width:900px){
+
+  .aguaContenido,
+  .gasContenido{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    gap:15px !important;
+  }
+
+  .tanqueAgua,
+  .tanqueGas{
+    margin:0 auto !important;
+  }
+
+  .datosAgua,
+  .datosGas{
+    width:100% !important;
+    text-align:center !important;
+  }
+
+  .datosAgua button,
+  .datosGas button{
+    width:90% !important;
+    max-width:260px;
+  }
+
+}
+
+@media (max-width:900px){
+
+  .cuartoMovil{
+    position:relative !important;
+    min-width:92px !important;
+    height:86px !important;
+    background:linear-gradient(#fff7c7, #ffffff 65%, #ffd3a0) !important;
+    border:2px solid #8b5a2b !important;
+    border-radius:8px !important;
+    overflow:hidden !important;
+  }
+
+  .numeroCuartoMovil{
+    position:absolute !important;
+    top:2px !important;
+    left:2px !important;
+    background:#3b1f1f !important;
+    color:white !important;
+    padding:2px 5px !important;
+    border-radius:5px !important;
+    font-size:12px !important;
+    z-index:5 !important;
+  }
+
+  .precioCuartoMovil{
+    position:absolute !important;
+    bottom:4px !important;
+    left:2px !important;
+    background:#07803d !important;
+    color:white !important;
+    padding:1px 4px !important;
+    border-radius:5px !important;
+    font-size:11px !important;
+    font-weight:bold !important;
+  }
+
+  .iconosCuartoMovil{
+    position:absolute !important;
+    inset:18px 4px 16px 4px !important;
+    font-size:13px !important;
+    display:flex !important;
+    flex-wrap:wrap !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:2px !important;
+  }
+
+}
+
+@media (max-width:900px){
+
+  .cuartoMovil{
+    min-width:96px !important;
+    height:88px !important;
+  }
+
+  .cuartoMovil.comprado::after{
+    content:"⚠️";
+    position:absolute;
+    top:6px;
+    right:6px;
+    font-size:13px;
+  }
+
+  .cuartoMovil .iconosCuartoMovil{
+    top:25px !important;
+    left:8px !important;
+    right:8px !important;
+    bottom:20px !important;
+    justify-content:flex-start !important;
+    align-content:center !important;
+  }
+
+  .cuartoMovil .iconosCuartoMovil img{
+    max-width:32px !important;
+    max-height:24px !important;
+  }
+
+  .cuartoMovil.bloqueado{
+    background:#6f6658 !important;
+    border-color:#8b5a2b !important;
+  }
+
+  .cuartoMovil.bloqueado .numeroCuartoMovil{
+    display:none !important;
+  }
+
+  .cuartoMovil.bloqueado::before{
+    content:"🔒";
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+  }
+
+}
+
+@media (max-width:900px){
+
+  .columnaCentroPC{
+    display:block !important;
+    margin:0 !important;
+    padding:0 !important;
+    gap:0 !important;
+    min-height:0 !important;
+  }
+
+  .columnaCentroPC{
+    margin-top:0 !important;
+  }
+
+  #panelHotel{
+    margin-top:2px !important;
+  }
+
+}
+
+@media (max-width:900px){
+
+  .barraMovilTarjetas{
+    bottom:18px !important;
+    height:88px !important;
+  }
+
+  body{
+    padding-bottom:130px !important;
+  }
+
+}
+
+@media (max-width:900px){
+
+  #hotelMovil{
+    display:block !important;
+    width:100% !important;
+    margin-top:0 !important;
+    padding-top:0 !important;
+  }
+
+  .filaPisoMovil{
+    display:flex !important;
+    align-items:stretch !important;
+    width:100% !important;
+    margin-bottom:8px !important;
+    background:#f4f4f4 !important;
+    border:2px solid #ccc !important;
+    border-radius:10px !important;
+    overflow:hidden !important;
+  }
+
+  .elevadorMovil{
+    width:55px !important;
+    min-width:55px !important;
+    background:#333 !important;
+    color:white !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    font-size:24px !important;
+  }
+
+  .cuartosScrollMovil{
+    display:flex !important;
+    flex:1 !important;
+    gap:6px !important;
+    overflow-x:auto !important;
+    padding:6px !important;
+  }
+
+  .cuartoMovil,
+  .servicioMovil{
+    min-width:90px !important;
+    height:86px !important;
+    flex:0 0 90px !important;
+  }
+}
+
+@media (max-width:900px){
+
+  #hotelMovil,
+  #zonaPanelMovil{
+    display:block !important;
+  }
+
+}
