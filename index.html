@@ -70,7 +70,7 @@
     📈 Demanda:
     <span id="demanda">+28%</span>
     </div>
-  </section>
+  </section><!--panelDatos-->
 </div>
 <div class="bandaMensajes">
   <span id="textoBanda">🏨 Bienvenido a Imperio Hotelero</span>
@@ -743,12 +743,38 @@
 
       <!-- panelFinanzas -->
       <section id="panelFinanzas" class="panelResultados">
-
         <h3>📊 Estado Financiero De Los Últimos 10 días</h3>
-
         <div id="historialResultados"></div>
-
       </section><!--panelFinanzas-->
+  
+      <section id="panelClima" class="panelClima">
+      <h3>🌦️ Clima y Demanda</h3>
+      <div class="contenidoClima">
+        <!-- COLUMNA IZQUIERDA -->
+        <div class="columnaClima">
+            <p>☀️ <strong>Estado:  </strong><span id="estadoClima"></span></p>
+            <p>🌡️ <strong>Temperatura:  </strong><span id="tempMin"></span>°/<span id="tempMax"></span>°</p>
+            <p>🌬️ <strong>Viento:  </strong><span id="vientoClima"></span> km/h</p>
+            <p>💧 <strong>Humedad:  </strong><span id="humedadClima"></span>%</p>
+            <p>🌧️ <strong>Lluvia:  </strong><span id="lluviaClima"></span></p>
+        </div><!--columnaClima-->
+        <!-- COLUMNA DERECHA -->
+        <div class="columnaDemanda">
+            <p id="demandaEstado"></p>
+            <p id="demandaTemperatura"></p>
+            <p id="demandaViento"></p>
+            <p id="demandaHumedad"></p>
+            <p id="demandaLluvia"></p>
+        </div><!--ColumnaDemanda-->
+        </div><!--contenidoClima-->
+        <div class="totalDemanda">
+        <h3>
+            📈 Demanda Hotelera:
+            <span id="demandaTotal"></span>
+        </h3>
+        <p id="mensajeClima"></p>
+        </div><!-- totalDemanda-->
+      </section><!--panelClima-->
 
     </div><!-- columnaDerechaInferior -->
 
@@ -986,6 +1012,11 @@
   <button class="tarjetaMovil" onclick="mostrarSeccionMovil('prestamo',this)">
     <span>💵</span>
     <small>Prestamo</small>
+  </button>
+
+  <button class="tarjetaMovil" onclick="mostrarSeccionMovil('clima',this)">
+    <span>🌦️</span>
+    <small>Clima</small>
   </button>
 
   <button class="tarjetaMovil" onclick="mostrarSeccionMovil('controles',this)">

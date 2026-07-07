@@ -1349,6 +1349,7 @@ function actualizarPantalla() {
   actualizarPanelAgua();
   actualizarPanelGas();
   actualizarPanelBasuraDrenaje();
+  actualizarPanelClima();
   verificarQuiebra();
 
   if (window.innerWidth <= 900 && !window.seccionMovilActual) {
@@ -1953,6 +1954,7 @@ function mostrarSeccionMovil(panel, boton = null) {
     "panelIndicadores",
     "panelFinanzas",
     "panelPrestamo",
+    "panelClima",
     "panelControles",
     "panelMovimiento"
   ];
@@ -1981,6 +1983,7 @@ function mostrarSeccionMovil(panel, boton = null) {
     indicadores: "panelIndicadores",
     finanzas: "panelFinanzas",
     prestamo: "panelPrestamo",
+    clima:"panelClima",
     controles: "panelControles",
     movimiento: "panelMovimiento"
   };
@@ -3258,6 +3261,71 @@ function avanzarHora() {
   actualizarPantalla();
 }
 
+function actualizarPanelClima() {
+  const clima = obtenerClimaDelDia();
+
+  let estado = 0;
+  let temperatura = 0;
+  let viento = 0;
+  let humedad = 0;
+  let lluvia = 0;
+
+  if (clima.estado === "Soleado") estado = 20;
+  if (clima.estado === "Parcialmente nublado") estado = 10;
+  if (clima.estado === "Nublado") estado = -10;
+  if (clima.estado === "Lluvioso") estado = -35;
+
+  if (clima.maxima >= 35) temperatura -= 10;
+  if (clima.maxima >= 38) temperatura -= 20;
+  if (clima.minima <= 5) temperatura -= 10;
+  if (clima.minima <= 0) temperatura -= 20;
+  if (clima.minima > 5 && clima.maxima < 35) temperatura += 5;
+
+  if (clima.viento >= 30) viento = -15;
+  else if (clima.viento >= 20) viento = -5;
+
+  if (clima.humedad >= 80) humedad = -10;
+  else if (clima.humedad <= 20) humedad = -5;
+
+  if (clima.lluvia) lluvia = -10;
+
+  const total = estado + temperatura + viento + humedad + lluvia;
+
+  document.getElementById("estadoClima").textContent = clima.estado;
+  document.getElementById("tempMin").textContent = clima.minima;
+  document.getElementById("tempMax").textContent = clima.maxima;
+  document.getElementById("vientoClima").textContent = clima.viento;
+  document.getElementById("humedadClima").textContent = clima.humedad;
+  document.getElementById("lluviaClima").textContent = clima.lluvia ? "Sí" : "No";
+
+  document.getElementById("demandaEstado").textContent =
+    `☀️ Estado: ${estado > 0 ? "+" : ""}${estado}%`;
+
+  document.getElementById("demandaTemperatura").textContent =
+    `🌡️ Temperatura: ${temperatura > 0 ? "+" : ""}${temperatura}%`;
+
+  document.getElementById("demandaViento").textContent =
+    `🌬️ Viento: ${viento > 0 ? "+" : ""}${viento}%`;
+
+  document.getElementById("demandaHumedad").textContent =
+    `💧 Humedad: ${humedad > 0 ? "+" : ""}${humedad}%`;
+
+  document.getElementById("demandaLluvia").textContent =
+    `🌧️ Lluvia: ${lluvia > 0 ? "+" : ""}${lluvia}%`;
+
+  document.getElementById("demandaTotal").textContent =
+    `${total > 0 ? "+" : ""}${total}%`;
+
+  document.getElementById("demanda").textContent =
+    `${total > 0 ? "+" : ""}${total}%`;
+
+  document.getElementById("mensajeClima").textContent =
+    total >= 20 ? "Excelente día para recibir huéspedes." :
+    total >= 0 ? "Día normal para el hotel." :
+    total >= -25 ? "La demanda puede bajar un poco." :
+    "Mal clima: llegarán menos huéspedes.";
+}
+
 function reproducirGrillo() {
   const sonido = document.getElementById("sonidoGrillo");
   sonido.play();
@@ -3491,13 +3559,80 @@ function obtenerClimaDelDia() {
 }
 
 function calcularClientes() {
-  const pisos = Math.max(...cuartos.map((c) => Math.floor(c.numero / 100)));
+
+  const pisos = Math.max(...cuartos.map(c => Math.floor(c.numero / 100)));
 
   const clientesPorPiso = 20;
+  let clientesDia = pisos * clientesPorPiso;
 
-  const clientesDia = pisos * clientesPorPiso;
+  const clima = obtenerClimaDelDia();
 
-  return Math.round(clientesDia / 16);
+  // ===== ESTADO DEL CLIMA =====
+
+  switch (clima.estado) {
+
+    case "Soleado":
+      clientesDia *= 1.20;
+      break;
+
+    case "Parcialmente nublado":
+      clientesDia *= 1.10;
+      break;
+
+    case "Nublado":
+      clientesDia *= 0.90;
+      break;
+
+    case "Lluvioso":
+      clientesDia *= 0.65;
+      break;
+  }
+
+  // ===== LLUVIA =====
+
+  if (clima.lluvia) {
+    clientesDia *= 0.90;
+  }
+
+  // ===== TEMPERATURA =====
+
+  if (clima.maxima >= 35) {
+    clientesDia *= 0.90;
+  }
+
+  if (clima.maxima >= 38) {
+    clientesDia *= 0.80;
+  }
+
+  if (clima.minima <= 0) {
+    clientesDia *= 0.80;
+  }
+
+  if (clima.minima <= 5) {
+    clientesDia *= 0.90;
+  }
+
+  // ===== VIENTO =====
+
+  if (clima.viento >= 20) {
+    clientesDia *= 0.95;
+  }
+
+  if (clima.viento >= 30) {
+    clientesDia *= 0.85;
+  }
+
+  // ===== HUMEDAD =====
+
+  if (clima.humedad >= 80) {
+    clientesDia *= 0.90;
+  }
+
+  if (clima.humedad <= 20) {
+    clientesDia *= 0.95;
+  }
+
+  return Math.max(1, Math.round(clientesDia / 16));
 }
 
 function sonarAmbulancia() {

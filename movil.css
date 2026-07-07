@@ -1020,4 +1020,10 @@
     touch-action: pan-x !important;
   }
 
+#panelClima{
+    display:none;
+}
+
+.panelMovilActivo#panelClima{
+    display:block !important;
 }

@@ -2025,3 +2025,45 @@ header p{
 .estadoAmarillo{
     background:#f1c40f;
 }
+
+.panelClima{
+    background:#fff;
+    border:2px solid #777;
+    border-radius:10px;
+    padding:10px;
+}
+
+.panelClima h3,
+.panelClima h2{
+    text-align:center;
+     margin:0 0 10px 0;
+}
+
+.contenidoClima{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.columnaClima,
+.columnaDemanda{
+    font-size:18px;
+}
+
+.columnaClima p,
+.columnaDemanda p{
+    margin:6px 0;
+}
+
+.totalDemanda{
+    margin-top:10px;
+    padding-top:8px;
+    border-top:2px solid #ccc;
+    text-align:center;
+}
+
+.panelClima{
+    display:block;
+    margin-top:12px;
+}
+
