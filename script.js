@@ -1334,7 +1334,9 @@ function actualizarPantalla() {
   valorHotelSpan.textContent = valorHotel().toLocaleString();
 
   dibujarHotel();
+  guardarScrollHotelMovil();
   dibujarHotelMovil();
+  restaurarScrollHotelMovil();
   dibujarInventario();
   mostrarDetalleCuarto();
   actualizarIndicadoresMantenimiento();
@@ -1611,6 +1613,52 @@ function claseHex(vida) {
   return "hexRojo";
 }
 
+let scrollHotelMovil = {
+  habitaciones: 0,
+  servicios: 0,
+  vertical: 0
+};
+
+function guardarScrollHotelMovil() {
+  if (window.innerWidth > 900) return;
+
+  const filas = document.querySelectorAll(".cuartosScrollMovil");
+
+  if (filas[0]) {
+    scrollHotelMovil.habitaciones = filas[0].scrollLeft;
+  }
+
+  if (filas[1]) {
+    scrollHotelMovil.servicios = filas[1].scrollLeft;
+  }
+
+  const hotelMovil = document.getElementById("hotelMovil");
+  if (hotelMovil) {
+    scrollHotelMovil.vertical = hotelMovil.scrollTop;
+  }
+}
+
+function restaurarScrollHotelMovil() {
+  if (window.innerWidth > 900) return;
+
+  requestAnimationFrame(() => {
+    const filas = document.querySelectorAll(".cuartosScrollMovil");
+
+    if (filas[0]) {
+      filas[0].scrollLeft = scrollHotelMovil.habitaciones;
+    }
+
+    if (filas[1]) {
+      filas[1].scrollLeft = scrollHotelMovil.servicios;
+    }
+
+    const hotelMovil = document.getElementById("hotelMovil");
+    if (hotelMovil) {
+      hotelMovil.scrollTop = scrollHotelMovil.vertical;
+    }
+  });
+}
+
 function dibujarHotel() {
   ladoIzquierdo.innerHTML = "";
   ladoDerecho.innerHTML = "";
@@ -1644,11 +1692,13 @@ function dibujarHotel() {
 
 function dibujarHotelMovil() {
   const contenedor = document.getElementById("hotelMovil");
+
   if (!contenedor) return;
 
   contenedor.innerHTML = "";
 
   const pisos = [...new Set(cuartos.map((c) => Math.floor(c.numero / 100)))];
+
   pisos.sort((a, b) => b - a);
 
   pisos.forEach((piso) => {
@@ -1664,21 +1714,11 @@ function dibujarHotelMovil() {
 
     cuartosDelPiso.forEach((cuarto) => {
       html += `
-        <div 
-          class="cuartoMovil ${cuarto.comprada ? "comprado" : "bloqueado"}"
+        <div
+          class="cuarto cuartoMovil ${cuarto.comprada ? "comprado" : "bloqueado"} ${cuarto.ocupada ? "ocupado" : ""}"
           onclick="tocarCuartoMovil(${cuarto.id})"
         >
-          <span class="numeroCuartoMovil">
-            ${cuarto.comprada ? cuarto.numero : "🔒"}
-          </span>
-
-          <div class="iconosCuartoMovil">
-            ${cuarto.comprada ? generarIconosCuartoMovil(cuarto) : ""}
-          </div>
-
-          <span class="precioCuartoMovil">
-            ${cuarto.comprada ? "$" + precioCuarto(cuarto) : ""}
-          </span>
+          ${cuarto.comprada ? generarContenidoCuarto(cuarto) : "🔒"}
         </div>
       `;
     });
@@ -1735,7 +1775,7 @@ function dibujarHotelMovil() {
 function generarIconosCuartoMovil(cuarto) {
   let iconos = "";
 
-  if (cuarto.ocupada) iconos += "🛌 ";
+  if (cuarto.ocupada) iconos += "🔴";
   if (cuarto.objetos.cama) iconos += "🛏️ ";
   if (cuarto.objetos.tv) iconos += "📺 ";
   if (cuarto.objetos.lampara) iconos += "💡 ";
@@ -1894,6 +1934,9 @@ function soltarItemSeleccionadoEnCuarto(cuartoId) {
 function mostrarSeccionMovil(panel, boton = null) {
   if (window.innerWidth > 900) return;
 
+  // Primero guardamos dónde estaba viendo el usuario
+  guardarScrollHotelMovil();
+
   window.seccionMovilActual = panel;
 
   const panelesSecundarios = [
@@ -1911,11 +1954,12 @@ function mostrarSeccionMovil(panel, boton = null) {
     "panelFinanzas",
     "panelPrestamo",
     "panelControles",
-    "panelMovimiento",
+    "panelMovimiento"
   ];
 
   panelesSecundarios.forEach((id) => {
     const el = document.getElementById(id);
+
     if (el) {
       el.classList.remove("panelMovilActivo");
       el.style.display = "none";
@@ -1938,7 +1982,7 @@ function mostrarSeccionMovil(panel, boton = null) {
     finanzas: "panelFinanzas",
     prestamo: "panelPrestamo",
     controles: "panelControles",
-    movimiento: "panelMovimiento",
+    movimiento: "panelMovimiento"
   };
 
   const idMostrar = mapa[panel];
@@ -1958,7 +2002,11 @@ function mostrarSeccionMovil(panel, boton = null) {
     t.classList.remove("activa");
   });
 
-  if (boton) boton.classList.add("activa");
+  if (boton) {
+    boton.classList.add("activa");
+  }
+  // Restauramos después de que el navegador acomode el panel
+  restaurarScrollHotelMovil();
 }
 
 function generarContenidoCuarto(cuarto) {
@@ -1973,7 +2021,7 @@ function generarContenidoCuarto(cuarto) {
   if (cuarto.ocupada) {
     html += `
       <span class="estadoCuarto">
-        🛌
+        🔴
       </span>
     `;
   } else if (cuartoListo(cuarto)) {
@@ -1985,7 +2033,7 @@ function generarContenidoCuarto(cuarto) {
   } else {
     html += `
       <span class="estadoCuarto">
-        ⚠️
+        🟡
       </span>
     `;
   }
@@ -2937,7 +2985,7 @@ function mostrarDetalleCuarto() {
     <br>
 
     Listo para rentar:
-    ${cuartoListo(cuarto) ? "✅ Sí" : "⚠️ No"}
+    ${cuartoListo(cuarto) ? "✅ Sí" : "🟡 No"}
     <br>
 
     ⭐ Lujo:

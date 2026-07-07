@@ -1974,3 +1974,54 @@ header p{
 #zonaPanelMovil{
   display:none !important;
 }
+
+.panelAgua h3,
+.panelGas h3{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    margin:0 0 15px 0;
+    padding:10px 10px;
+
+    font-size:18px;
+    font-weight:bold;
+
+    border-radius:12px;
+}
+
+.panelAgua h3{
+    background:linear-gradient(to right,#e8f6ff,#ffffff);
+    border:2px solid #8fd3ff;
+    color:#0078c8;
+}
+
+.panelGas h3{
+    background:linear-gradient(to right,#fff7d8,#ffffff);
+    border:2px solid #ffd24d;
+    color:#d07a00;
+}
+
+.indicadorEstado{
+    position:absolute;
+    top:6px;
+    right:6px;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    border:2px solid white;
+    box-shadow:0 0 5px rgba(0,0,0,.35);
+    z-index:100;
+}
+
+.estadoVerde{
+    background:#2ecc71;
+}
+
+.estadoRojo{
+    background:#e74c3c;
+}
+
+.estadoAmarillo{
+    background:#f1c40f;
+}
