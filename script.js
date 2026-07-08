@@ -266,14 +266,18 @@ function clienteAceptaHotel(cliente) {
 
 const catalogo = [
   {
+    key: "comprarCuarto",
+    descKey: "descComprarCuarto",
     nombre: "Comprar Cuarto",
+    descripcion: "Desbloquea el siguiente cuarto disponible.",
     tipo: "cuarto",
     icono: "🚪",
     costo: 15000,
     lujo: 0,
-    descripcion: "Desbloquea el siguiente cuarto disponible.",
   },
   {
+    key: "camaSencilla",
+    descKey: "descCamaSencilla",
     nombre: "Cama Sencilla",
     tipo: "cama",
     icono: "🛏️",
@@ -282,6 +286,8 @@ const catalogo = [
     descripcion: "Necesaria para rentar el cuarto.",
   },
   {
+    key: "camaKing",
+    descKey: "descCamaKing",
     nombre: "Cama King",
     tipo: "cama",
     icono: "🛌",
@@ -289,8 +295,9 @@ const catalogo = [
     lujo: 25,
     descripcion: "Aumenta mucho el valor del cuarto.",
   },
-
   {
+    key: "tvSencilla",
+    descKey: "descTvSencilla",
     nombre: "TV Sencilla",
     tipo: "tv",
     icono: "📺",
@@ -299,6 +306,8 @@ const catalogo = [
     descripcion: "Televisión básica para huéspedes.",
   },
   {
+    key: "tvHd",
+    descKey: "descTvHd",
     nombre: "TV HD",
     tipo: "tv",
     icono: "🖥️",
@@ -307,6 +316,8 @@ const catalogo = [
     descripcion: "Mejora la comodidad del cuarto.",
   },
   {
+    key: "tv5k",
+    descKey: "descTv5k",
     nombre: "TV 5K",
     tipo: "tv",
     icono: "📺",
@@ -314,8 +325,9 @@ const catalogo = [
     lujo: 35,
     descripcion: "Televisión de lujo para clientes VIP.",
   },
-
   {
+    key: "lamparaSencilla",
+    descKey: "descLamparaSencilla",
     nombre: "Lámpara Sencilla",
     tipo: "lampara",
     icono: "💡",
@@ -324,6 +336,8 @@ const catalogo = [
     descripcion: "Iluminación básica.",
   },
   {
+    key: "lamparaElegante",
+    descKey: "descLamparaElegante",
     nombre: "Lámpara Elegante",
     tipo: "lampara",
     icono: "🏮",
@@ -332,6 +346,8 @@ const catalogo = [
     descripcion: "Da elegancia al cuarto.",
   },
   {
+    key: "alfombraBasica",
+    descKey: "descAlfombraBasica",
     nombre: "Alfombra Básica",
     tipo: "alfombra",
     icono: "🟥",
@@ -340,6 +356,8 @@ const catalogo = [
     descripcion: "Decora el piso del cuarto.",
   },
   {
+    key: "alfombraFina",
+    descKey: "descAlfombraFina",
     nombre: "Alfombra Fina",
     tipo: "alfombra",
     icono: "🟫",
@@ -348,6 +366,8 @@ const catalogo = [
     descripcion: "Sube el nivel del cuarto.",
   },
   {
+    key: "sabanasLimpias",
+    descKey: "descSabanasLimpias",
     nombre: "Sábanas Limpias",
     tipo: "sabanas",
     icono: "🧺",
@@ -356,6 +376,8 @@ const catalogo = [
     descripcion: "Necesarias para rentar.",
   },
   {
+    key: "sabanasPremium",
+    descKey: "descSabanasPremium",
     nombre: "Sábanas Premium",
     tipo: "sabanas",
     icono: "✨",
@@ -363,8 +385,9 @@ const catalogo = [
     lujo: 18,
     descripcion: "Mejor descanso y más lujo.",
   },
-
   {
+    key: "extintor",
+    descKey: "descExtintor",
     nombre: "Extintor",
     tipo: "extintor",
     icono: "🧯",
@@ -373,6 +396,8 @@ const catalogo = [
     descripcion: "Seguridad básica del cuarto.",
   },
   {
+    key: "wifiBasico",
+    descKey: "descWifiBasico",
     nombre: "📶 WiFi Básico",
     tipo: "internet",
     icono: "📶",
@@ -381,6 +406,8 @@ const catalogo = [
     descripcion: "Internet para huéspedes.",
   },
   {
+    key: "fibraOptica",
+    descKey: "descFibraOptica",
     nombre: "🚀 Fibra Óptica",
     tipo: "internet",
     icono: "🛰️",
@@ -389,6 +416,8 @@ const catalogo = [
     descripcion: "Internet de alta velocidad.",
   },
   {
+    key: "aireAcondicionado",
+    descKey: "descAireAcondicionado",
     nombre: "❄️ Aire Acondicionado",
     tipo: "clima",
     icono: '<img src="img/Clima.png" class="iconoCatalogoImg">',
@@ -398,6 +427,8 @@ const catalogo = [
     descripcion: "Mejora la comodidad.",
   },
   {
+    key: "climaInteligente",
+    descKey: "descClimaInteligente",
     nombre: "🧊 Clima Inteligente",
     tipo: "clima",
     icono: '<img src="img/Clima2.png" class="iconoCatalogoImg">',
@@ -407,6 +438,8 @@ const catalogo = [
     descripcion: "Sistema premium de climatización.",
   },
   {
+    key: "cuadroSencillo",
+    descKey: "descCuadroSencillo",
     nombre: "🖼️ Cuadro Sencillo",
     tipo: "cuadro",
     icono: "🖼️",
@@ -415,6 +448,8 @@ const catalogo = [
     descripcion: "Decoración básica.",
   },
   {
+    key: "cuadroElegante",
+    descKey: "descCuadroElegante",
     nombre: "🎨 Cuadro Elegante",
     tipo: "cuadro",
     icono: "🎨",
@@ -423,6 +458,8 @@ const catalogo = [
     descripcion: "Da estilo al cuarto.",
   },
   {
+    key: "artePremium",
+    descKey: "descArtePremium",
     nombre: "👑 Arte Premium",
     tipo: "cuadro",
     icono: "🖼️",
@@ -431,6 +468,8 @@ const catalogo = [
     descripcion: "Decoración VIP.",
   },
   {
+    key: "plantaLuz",
+    descKey: "descPlantaLuz",
     nombre: "⚡ Planta de Luz",
     tipo: "plantaLuz",
     icono: "⚡",
@@ -439,6 +478,8 @@ const catalogo = [
     descripcion: "Aumenta la capacidad eléctrica del hotel.",
   },
   {
+    key: "lavadora",
+    descKey: "descLavandora",
     nombre: "Lavadora",
     tipo: "lavadora",
     icono: '<img src="img/Lavadora.png" class="iconoCatalogoImg">',
@@ -447,6 +488,8 @@ const catalogo = [
     descripcion: "Aumenta la capacidad de la Lavandería",
   },
   {
+    key: "elevador",
+    descKey: "descElevador",
     nombre: "Elevador",
     tipo: "elevador",
     icono: "🔼",
@@ -1617,7 +1660,7 @@ function claseHex(vida) {
 let scrollHotelMovil = {
   habitaciones: 0,
   servicios: 0,
-  vertical: 0
+  vertical: 0,
 };
 
 function guardarScrollHotelMovil() {
@@ -1956,7 +1999,7 @@ function mostrarSeccionMovil(panel, boton = null) {
     "panelPrestamo",
     "panelClima",
     "panelControles",
-    "panelMovimiento"
+    "panelMovimiento",
   ];
 
   panelesSecundarios.forEach((id) => {
@@ -1983,9 +2026,9 @@ function mostrarSeccionMovil(panel, boton = null) {
     indicadores: "panelIndicadores",
     finanzas: "panelFinanzas",
     prestamo: "panelPrestamo",
-    clima:"panelClima",
+    clima: "panelClima",
     controles: "panelControles",
-    movimiento: "panelMovimiento"
+    movimiento: "panelMovimiento",
   };
 
   const idMostrar = mapa[panel];
@@ -2141,35 +2184,42 @@ function crearCatalogo() {
     itemsFiltrados = catalogo.filter((item) => item.tipo === filtroCatalogo);
   }
 
-  itemsFiltrados.forEach((item, index) => {
+  itemsFiltrados.forEach((item) => {
     const indexReal = catalogo.indexOf(item);
 
-    const div = document.createElement("div");
+    const nombreTraducido =
+      textos?.[idiomaActual]?.[item.key] ||
+      textos?.[idiomaActual]?.[item.nombre] ||
+      item.nombre;
 
+    const descripcionTraducida =
+      textos?.[idiomaActual]?.[item.descKey] ||
+      textos?.[idiomaActual]?.[item.descripcion] ||
+      item.descripcion;
+
+    const textoComprar = textos?.[idiomaActual]?.comprar || "Comprar";
+
+    const div = document.createElement("div");
     div.classList.add("itemCatalogo");
 
     div.innerHTML = `
-
       <div class="iconoCatalogo">
         ${item.icono}
       </div>
 
       <div>
+        <h3>${nombreTraducido}</h3>
 
-        <h3>${item.nombre}</h3>
-
-        <p>${item.descripcion}</p>
+        <p>${descripcionTraducida}</p>
 
         <p>
           💰 $${item.costo.toLocaleString()}
         </p>
-
       </div>
 
       <button onclick="comprarCatalogo(${indexReal})">
-        Comprar
+        ${textoComprar}
       </button>
-
     `;
 
     catalogoDiv.appendChild(div);
@@ -3296,7 +3346,9 @@ function actualizarPanelClima() {
   document.getElementById("tempMax").textContent = clima.maxima;
   document.getElementById("vientoClima").textContent = clima.viento;
   document.getElementById("humedadClima").textContent = clima.humedad;
-  document.getElementById("lluviaClima").textContent = clima.lluvia ? "Sí" : "No";
+  document.getElementById("lluviaClima").textContent = clima.lluvia
+    ? "Sí"
+    : "No";
 
   document.getElementById("demandaEstado").textContent =
     `☀️ Estado: ${estado > 0 ? "+" : ""}${estado}%`;
@@ -3320,11 +3372,39 @@ function actualizarPanelClima() {
     `${total > 0 ? "+" : ""}${total}%`;
 
   document.getElementById("mensajeClima").textContent =
-    total >= 20 ? "Excelente día para recibir huéspedes." :
-    total >= 0 ? "Día normal para el hotel." :
-    total >= -25 ? "La demanda puede bajar un poco." :
-    "Mal clima: llegarán menos huéspedes.";
+    total >= 20
+      ? "Excelente día para recibir huéspedes."
+      : total >= 0
+        ? "Día normal para el hotel."
+        : total >= -25
+          ? "La demanda puede bajar un poco."
+          : "Mal clima: llegarán menos huéspedes.";
 }
+
+function aplicarIdioma() {
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const clave = el.dataset.i18n;
+    el.textContent = textos[idiomaActual][clave] || el.textContent;
+  });
+}
+
+function cambiarIdioma(idioma) {
+  idiomaActual = idioma;
+
+  aplicarIdioma();
+
+  localStorage.setItem("idiomaHotel", idioma);
+}
+
+const idiomaGuardado = localStorage.getItem("idiomaHotel");
+
+if (idiomaGuardado) {
+  idiomaActual = idiomaGuardado;
+
+  document.getElementById("idioma").value = idiomaGuardado;
+}
+
+aplicarIdioma();
 
 function reproducirGrillo() {
   const sonido = document.getElementById("sonidoGrillo");
@@ -3559,8 +3639,7 @@ function obtenerClimaDelDia() {
 }
 
 function calcularClientes() {
-
-  const pisos = Math.max(...cuartos.map(c => Math.floor(c.numero / 100)));
+  const pisos = Math.max(...cuartos.map((c) => Math.floor(c.numero / 100)));
 
   const clientesPorPiso = 20;
   let clientesDia = pisos * clientesPorPiso;
@@ -3570,17 +3649,16 @@ function calcularClientes() {
   // ===== ESTADO DEL CLIMA =====
 
   switch (clima.estado) {
-
     case "Soleado":
-      clientesDia *= 1.20;
+      clientesDia *= 1.2;
       break;
 
     case "Parcialmente nublado":
-      clientesDia *= 1.10;
+      clientesDia *= 1.1;
       break;
 
     case "Nublado":
-      clientesDia *= 0.90;
+      clientesDia *= 0.9;
       break;
 
     case "Lluvioso":
@@ -3591,25 +3669,25 @@ function calcularClientes() {
   // ===== LLUVIA =====
 
   if (clima.lluvia) {
-    clientesDia *= 0.90;
+    clientesDia *= 0.9;
   }
 
   // ===== TEMPERATURA =====
 
   if (clima.maxima >= 35) {
-    clientesDia *= 0.90;
+    clientesDia *= 0.9;
   }
 
   if (clima.maxima >= 38) {
-    clientesDia *= 0.80;
+    clientesDia *= 0.8;
   }
 
   if (clima.minima <= 0) {
-    clientesDia *= 0.80;
+    clientesDia *= 0.8;
   }
 
   if (clima.minima <= 5) {
-    clientesDia *= 0.90;
+    clientesDia *= 0.9;
   }
 
   // ===== VIENTO =====
@@ -3625,7 +3703,7 @@ function calcularClientes() {
   // ===== HUMEDAD =====
 
   if (clima.humedad >= 80) {
-    clientesDia *= 0.90;
+    clientesDia *= 0.9;
   }
 
   if (clima.humedad <= 20) {

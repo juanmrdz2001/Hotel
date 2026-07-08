@@ -34,41 +34,51 @@
 <div class="contenedor">
   <!-- tituloEncabezado -->
 <div id="tituloEncabezado" class="encabezadoFijo">
-<header>
+<header class="header">
 
   <div class="usuarioActual">
     👤 <span id="nombreJugadorLabel">Invitado</span>
   </div>
- <div class="tituloJuego">
+  <div class="tituloJuego">
 
   <img
     src="img/TituloPrincipal.png"
     alt="Imperio Hotelero"
     class="imgTitulo">
+  
+  <p class="subtitulo">
+  <span data-i18n="consejotitulo">compra cuartos, compra muebles y arrástralos a los cuartos.</span>
+  </p> 
 
-</div>
+  </div>
+  
+  <div class="selectorIdioma">
 
-<p>
-  Compra cuartos, compra muebles y arrástralos donde quieras
-</p> 
-</header>
-    
+    🌐
+
+    <select id="idioma" onchange="cambiarIdioma(this.value)">
+
+        <option value="es">🇲🇽 Español</option>
+        <option value="en">🇺🇸 English</option>
+
+    </select>
+
+  </div><!-- termina selectorIdioma-->
+
+</header><!--aqui termina header--> 
+
     <!-- panelDatos -->
   <section id="panelDatos" class="panel">
-    <div>🏨 Valor Hotel:$<span id="valorHotel">0</span></div>
-    <div>💰 Dinero: $<span id="dinero">100000</span></div>
-    <div>📅 Día: <span id="dia">1</span></div>
-    <div>🕒 Hora: <span id="hora">08:00</span></div>
-    <div>Reputación: <span id="reputacion">50</span></div>
-    <div>
-    🛏️ Ocupación:
-    <span id="ocupacion">0/2</span>
+    <div>🏨 <span data-i18n="valorHotel">Valor Hotel</span>: $ <span id="valorHotel">0</span></div>
+    <div>💰 <span data-i18n="dinero">Dinero</span>: $ <span id="dinero">300000</span></div>
+    <div>📅 <span data-i18n="dia">Día</span>: <span id="dia">1</span></div>
+    <div>🕒 <span data-i18n="hora">Hora</span>: <span id="hora">08:00</span></div>
+    <div><span data-i18n="reputacion">Reputación</span>: <span id="reputacion">50</span></div>
+    <div>🛏️ <span data-i18n="ocupacion">Ocupación</span>: <span id="ocupacion">0/2</span>
     &nbsp;&nbsp;|&nbsp;&nbsp;
-    🌤️ Clima:
-    <span id="clima">☀️ Soleado 5° / 16°C</span>
+    🌤️ <span data-i18n="clima">Clima</span>: <span id="clima">☀️ Soleado 5° / 16°C</span>
     &nbsp;&nbsp;|&nbsp;&nbsp;
-    📈 Demanda:
-    <span id="demanda">+28%</span>
+    📈 <span data-i18n="demanda">Demanda</span>:  <span id="demanda">+28%</span>
     </div>
   </section><!--panelDatos-->
 </div>
@@ -84,10 +94,10 @@
     <section id="panelInventario" class="inventarioLateral">
 
       <div class="inventarioBox">
-        <h2>🎒 Inventario</h2>
+        <h2>🎒 <span data-i18n="inventario">Inventario</span></h2>
 
         <p class="ayuda">
-          Arrastra un objeto hacia un cuarto comprado.
+          <span data-i18n="consejoInventario"> Arrastra un objeto hacia un cuarto comprado.</span>
         </p>
 
         <div id="inventario"></div>
@@ -96,9 +106,9 @@
 
       <!-- panelVentaUsado -->
      <section id="panelVentaUsado" class="ventaUsadosBox">
-     <h2>♻️ Venta de usados</h2>
+     <h2>♻️ <span data-i18n="venta">Venta De Usado</span></h2>
      <p class="ayuda">
-        Arrastra aquí muebles usados para venderlos.
+        <span data-i18n="consejoVenta">Aquí muebles usados para venderlos.</span>
      </p>
      <div id="zonaVentaUsados">
       Soltar aquí
@@ -107,7 +117,7 @@
 
        <!-- panelCuartoSeleccionado -->
       <section id="panelCuartoSeleccionado" class="detalleBox">
-        <h2>📋 Cuarto seleccionado</h2>
+        <h2>📋 <span data-i18n="detalleCuarto">Cuarto Seleccionado</span></h2>
 
         <div id="detalleCuarto">
           Haz clic en un cuarto.
@@ -136,7 +146,7 @@
       <button class="btnDetalleEnergia" onclick="mostrarDetalleEnergia()" title="Detalle de energía">
       ℹ️
       </button>
-      <div class="tituloPlantaLuz">PLANTA LUZ</div>
+      <div class="tituloPlantaLuz"><span data-i18n="planta">Planta Luz</span></div>
       <div class="datosPlantaLuz">
       <span>
       <img src="img/Planta.png" class="iconoPlantaLuz">
@@ -152,7 +162,7 @@
       <div id="torretasEnergia" class="torretasEnergia"></div>
       </div>
       <div class="servicio lavanderia" id="servicioLavanderia">
-      <div class="tituloLavanderia">LAVANDERÍA</div>
+      <div class="tituloLavanderia"><span data-i18n="lavanderia">Lavanderia</span></div>
       <div class="filaCentralLavanderia">
       <img src="img/Lavadora.png" class="iconoLavadora">
       <span id="numLavadoras">1</span>
@@ -197,7 +207,7 @@
 
       <!-- panelEmpleados -->
       <section id="panelEmpleados" class="panelEmpleados">
-        <h3>👨‍💼 Empleados</h3>
+        <h3>👨‍💼 <span data-i18n="empleados">Empleados</span></h3>
         <h5 class="advertencias">
           (A los Empleados se les paga a las 6:00)
         </h5>
@@ -222,7 +232,7 @@
        <!-- panelMateriales -->
       <section id="panelMateriales" class="panelMateriales">
 
-        <h3>📦 Almacén de Materiales</h3>
+        <h3>📦 <span data-i18n="materiales">Almacen De Materiales</span></h3>
 
         <div class="tablaMateriales">
 
@@ -246,7 +256,7 @@
       <!-- panelAgua --> 
       <section id="panelAgua" class="panelAgua">
 
-      <h3>💧 Tanque de Agua</h3>
+      <h3>💧 <span data-i18n="agua">Tanque De Agua</span></h3>
 
       <div class="aguaContenido">
 
@@ -278,7 +288,7 @@
   <!-- panelGas -->
   <section id="panelGas" class="panelGas">
 
-    <h3>🔥 Tanque de Gas</h3>
+    <h3>🔥 <span data-i18n="gas">Tanque De Gas</span></h3>
 
     <div class="gasContenido">
 
@@ -314,7 +324,7 @@
 
    <!-- panelBasura -->
   <section id="panelBasura" class="panelBasura">
-    <h3>🗑️ Basura</h3>
+    <h3>🗑️ <span data-i18n="basura">Basura</span></h3>
 
     <p>Capacidad: <strong><span id="capacidadBasura">500</span> kg</strong></p>
     <p>Acumulado: <strong><span id="existenciaBasura">0</span> kg</strong></p>
@@ -334,7 +344,7 @@
 
   <!-- panelDrenaje -->
   <section id="panelDrenaje" class="panelDrenaje">
-    <h3>🚽 Drenaje</h3>
+    <h3>🚽 <span data-i18n="drenaje">Drenaje</span></h3>
 
     <p>Capacidad: <strong><span id="capacidadDrenaje">1000</span> lts</strong></p>
     <p>Usado: <strong><span id="existenciaDrenaje">0</span> lts</strong></p>
@@ -361,7 +371,7 @@
     <!-- panelIndicadores -->
     <section id="panelIndicadores" class="mantenimientoPanel">
 
-      <h3>🔧 Indicadores</h3>
+      <h3>🔧 <span data-i18n="indicadores">Indicadores</span></h3>
 
       <button class="btnCambiarVista" onclick="cambiarVistaIndicadores()">
         ⬢ Ver Hexágonos
@@ -378,7 +388,7 @@
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>🏨 Cuartos</span>
+      <span>🏨 <span data-i18n="cuarto">Cuarto</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaCuartos">100%</span>
@@ -404,7 +414,7 @@
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>🛏️ Camas</span>
+      <span>🛏️ <span data-i18n="cama">Cama</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaCamas">
@@ -433,7 +443,7 @@
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>📺 TVs</span>
+      <span>📺 <span data-i18n="tvs">TVs</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaTv">
@@ -461,7 +471,7 @@
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>💡 Lámparas</span>
+      <span>💡 <span data-i18n="lampara">Lamparas</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaLamparas">
@@ -489,7 +499,7 @@
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>🧺 Sábanas</span>
+      <span>🧺 <span data-i18n="sabanas">Sábanas</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaSabanas">
@@ -517,7 +527,7 @@
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>📶 Internet</span>
+      <span>📶 <span data-i18n="internet">Internet</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaInternet">
@@ -545,7 +555,7 @@
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>❄️ Clima</span>
+      <span>❄️ <span data-i18n="clima">Climas</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaClima">
@@ -573,7 +583,7 @@
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>🧯 Extintor</span>
+      <span>🧯 <span data-i18n="extintor">Extintor</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaExtintor">
@@ -601,7 +611,7 @@
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>🖼️ Cuadros</span>
+      <span>🖼️ <span data-i18n="cuadro">Cuadros</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaCuadro">
@@ -646,7 +656,7 @@
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>⚡ Plantas de luz</span>
+      <span>⚡ <span data-i18n="plantaLuz">Plantas de Luz</span> de luz</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaPlantasLuzIndicador">100%</span>
@@ -667,7 +677,7 @@
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>🛗 Elevador</span>
+      <span>🛗 <span data-i18n="elevador">Elevador</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaElevador">
@@ -695,7 +705,7 @@
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>🏨 Fachada</span>
+      <span>🏨 <span data-i18n="fachada">Fachada</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaFachada">
@@ -722,7 +732,7 @@
       <!-- panelPrestamo -->
       <section id="panelPrestamo" class="panelPrestamo">
 
-        <h3>🏦 Préstamo Bancario</h3>
+        <h3>🏦 <span data-i18n="prestamo">Préstamo Bancario</span></h3>
 
         <div class="datoPrestamo">
           💰 Saldo insoluto:
@@ -743,12 +753,12 @@
 
       <!-- panelFinanzas -->
       <section id="panelFinanzas" class="panelResultados">
-        <h3>📊 Estado Financiero De Los Últimos 10 días</h3>
+        <h3>📊 <span data-i18n="finanzas">Estado Financiero Ultimos 10 Días</span></h3>
         <div id="historialResultados"></div>
       </section><!--panelFinanzas-->
   
       <section id="panelClima" class="panelClima">
-      <h3>🌦️ Clima y Demanda</h3>
+      <h3>🌦️ <span data-i18n="climaDemanda">Clima Y Demanda</span></h3>
       <div class="contenidoClima">
         <!-- COLUMNA IZQUIERDA -->
         <div class="columnaClima">
@@ -788,34 +798,34 @@
       <!-- panelControles -->
       <section id="panelControles" class="controles">
 
-        <h2>Controles</h2>
+        <h2><span data-i18n="controles">Controles</span></h2>
   
         <button onclick="mostrarInstrucciones()">
-           ❓ Instrucciones
+           ❓ <span data-i18n="instrucciones">Instrucciones</span>
         </button>
 
         <button id="btnIniciar">
-          ▶ Iniciar
+          ▶ <span data-i18n="inicio">Inicio</span>
         </button>
 
         <button id="btnHora">
-          ⏩ Avanzar Hora
+          ⏩ <span data-i18n="avance">Avanzar Hora</span>
         </button>
 
         <button id="btnPausar">
-          ⏸ Pausar
+          ⏸ <span data-i18n="pausa">Pausar</span>
         </button>
 
         <button onclick="guardarPartida()">
-          💾 Guardar Partida
+          💾 <span data-i18n="guardar">Guardar Partida</span>
         </button>
 
         <button onclick="mostrarRankingMensual()">
-          🏆 Ranking
+          🏆 <span data-i18n="ranking">Ranking Mostrar</span>
         </button>
 
         <button onclick="cargarPartida()">
-          📂 Recuperar Partida
+          📂 <span data-i18n="recuperar">Recuperar Partida</span>
         </button>
       </section><!-- panelControles -->
 
@@ -823,7 +833,7 @@
       <!-- panelCatalogo -->
       <section id="panelCatalogo" class="catalogoBox">
 
-        <h2>🛒 Catálogo</h2>
+        <h2>🛒 <span data-i18n="catalogo">Catálogo</span></h2>
 
       <div id="filtrosCatalogo" class="filtrosCatalogo">
 
@@ -1031,6 +1041,7 @@
 
 </div>
 
+<script src="idiomas.js"></script>
 <script src="climaSaltillo.js"></script>
 <script src="script.js"></script>
 <script type="module" src="firebase.js"></script>

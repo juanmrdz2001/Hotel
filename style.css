@@ -2067,3 +2067,100 @@ header p{
     margin-top:12px;
 }
 
+.header{
+    display:grid;
+    grid-template-columns:220px 1fr 220px;
+    align-items:start;
+    padding:10px 15px;
+    background:white;
+    border-radius:10px;
+}
+
+.usuarioActual{
+    justify-self:start;
+    align-self:start;
+    font-weight:bold;
+}
+
+.tituloJuego{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+.imgTitulo{
+    display:block;
+    width:260px;
+    height:auto;
+    margin:0 auto;
+}
+
+.subTitulo{
+    margin-top:4px;
+    font-size:11px;
+    color:#666;
+    line-height:1.2;
+}
+
+.selectorIdioma{
+    justify-self:end;
+    align-self:start;
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.selectorIdioma select{
+    padding:4px 8px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+header.header{
+  display:grid !important;
+  grid-template-columns:220px 1fr 220px !important;
+  align-items:start !important;
+  padding:10px 15px !important;
+  background:white !important;
+  border-radius:10px !important;
+}
+
+header.header .usuarioActual{
+  grid-column:1 !important;
+  justify-self:start !important;
+  align-self:start !important;
+  font-weight:bold !important;
+}
+
+header.header .tituloJuego{
+  grid-column:2 !important;
+  justify-self:center !important;
+  text-align:center !important;
+  width:auto !important;
+}
+
+header.header .imgTitulo{
+  display:block !important;
+  width:260px !important;
+  max-width:260px !important;
+  margin:0 auto !important;
+}
+
+header.header .tituloJuego p{
+  margin:5px 0 0 0 !important;
+  font-size:12px !important;
+  color:#555 !important;
+  text-align:center !important;
+}
+
+header.header .selectorIdioma{
+  grid-column:3 !important;
+  justify-self:end !important;
+  align-self:start !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:6px !important;
+}
