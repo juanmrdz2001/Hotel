@@ -1954,3 +1954,213 @@ header p{
   background: #e6f7ff;
   transform: scale(1.05);
 }
+
+.principal{
+  display:grid;
+  grid-template-columns:260px minmax(600px, 1fr) 280px;
+  gap:10px;
+  align-items:start;
+}
+
+.columnaIzquierdaPC,
+.columnaCentroPC,
+.columnaDerechaPC{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+#hotelMovil,
+#zonaPanelMovil{
+  display:none !important;
+}
+
+.panelAgua h3,
+.panelGas h3{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    margin:0 0 15px 0;
+    padding:10px 10px;
+
+    font-size:18px;
+    font-weight:bold;
+
+    border-radius:12px;
+}
+
+.panelAgua h3{
+    background:linear-gradient(to right,#e8f6ff,#ffffff);
+    border:2px solid #8fd3ff;
+    color:#0078c8;
+}
+
+.panelGas h3{
+    background:linear-gradient(to right,#fff7d8,#ffffff);
+    border:2px solid #ffd24d;
+    color:#d07a00;
+}
+
+.indicadorEstado{
+    position:absolute;
+    top:6px;
+    right:6px;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    border:2px solid white;
+    box-shadow:0 0 5px rgba(0,0,0,.35);
+    z-index:100;
+}
+
+.estadoVerde{
+    background:#2ecc71;
+}
+
+.estadoRojo{
+    background:#e74c3c;
+}
+
+.estadoAmarillo{
+    background:#f1c40f;
+}
+
+.panelClima{
+    background:#fff;
+    border:2px solid #777;
+    border-radius:10px;
+    padding:10px;
+}
+
+.panelClima h3,
+.panelClima h2{
+    text-align:center;
+     margin:0 0 10px 0;
+}
+
+.contenidoClima{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.columnaClima,
+.columnaDemanda{
+    font-size:18px;
+}
+
+.columnaClima p,
+.columnaDemanda p{
+    margin:6px 0;
+}
+
+.totalDemanda{
+    margin-top:10px;
+    padding-top:8px;
+    border-top:2px solid #ccc;
+    text-align:center;
+}
+
+.panelClima{
+    display:block;
+    margin-top:12px;
+}
+
+.header{
+    display:grid;
+    grid-template-columns:220px 1fr 220px;
+    align-items:start;
+    padding:10px 15px;
+    background:white;
+    border-radius:10px;
+}
+
+.usuarioActual{
+    justify-self:start;
+    align-self:start;
+    font-weight:bold;
+}
+
+.tituloJuego{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+.imgTitulo{
+    display:block;
+    width:260px;
+    height:auto;
+    margin:0 auto;
+}
+
+.subTitulo{
+    margin-top:4px;
+    font-size:11px;
+    color:#666;
+    line-height:1.2;
+}
+
+.selectorIdioma{
+    justify-self:end;
+    align-self:start;
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.selectorIdioma select{
+    padding:4px 8px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+header.header{
+  display:grid !important;
+  grid-template-columns:220px 1fr 220px !important;
+  align-items:start !important;
+  padding:10px 15px !important;
+  background:white !important;
+  border-radius:10px !important;
+}
+
+header.header .usuarioActual{
+  grid-column:1 !important;
+  justify-self:start !important;
+  align-self:start !important;
+  font-weight:bold !important;
+}
+
+header.header .tituloJuego{
+  grid-column:2 !important;
+  justify-self:center !important;
+  text-align:center !important;
+  width:auto !important;
+}
+
+header.header .imgTitulo{
+  display:block !important;
+  width:260px !important;
+  max-width:260px !important;
+  margin:0 auto !important;
+}
+
+header.header .tituloJuego p{
+  margin:5px 0 0 0 !important;
+  font-size:12px !important;
+  color:#555 !important;
+  text-align:center !important;
+}
+
+header.header .selectorIdioma{
+  grid-column:3 !important;
+  justify-self:end !important;
+  align-self:start !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:6px !important;
+}

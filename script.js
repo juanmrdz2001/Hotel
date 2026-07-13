@@ -266,14 +266,18 @@ function clienteAceptaHotel(cliente) {
 
 const catalogo = [
   {
+    key: "comprarCuarto",
+    descKey: "descComprarCuarto",
     nombre: "Comprar Cuarto",
+    descripcion: "Desbloquea el siguiente cuarto disponible.",
     tipo: "cuarto",
     icono: "🚪",
     costo: 15000,
     lujo: 0,
-    descripcion: "Desbloquea el siguiente cuarto disponible.",
   },
   {
+    key: "camaSencilla",
+    descKey: "descCamaSencilla",
     nombre: "Cama Sencilla",
     tipo: "cama",
     icono: "🛏️",
@@ -282,6 +286,8 @@ const catalogo = [
     descripcion: "Necesaria para rentar el cuarto.",
   },
   {
+    key: "camaKing",
+    descKey: "descCamaKing",
     nombre: "Cama King",
     tipo: "cama",
     icono: "🛌",
@@ -289,8 +295,9 @@ const catalogo = [
     lujo: 25,
     descripcion: "Aumenta mucho el valor del cuarto.",
   },
-
   {
+    key: "tvSencilla",
+    descKey: "descTvSencilla",
     nombre: "TV Sencilla",
     tipo: "tv",
     icono: "📺",
@@ -299,6 +306,8 @@ const catalogo = [
     descripcion: "Televisión básica para huéspedes.",
   },
   {
+    key: "tvHd",
+    descKey: "descTvHd",
     nombre: "TV HD",
     tipo: "tv",
     icono: "🖥️",
@@ -307,6 +316,8 @@ const catalogo = [
     descripcion: "Mejora la comodidad del cuarto.",
   },
   {
+    key: "tv5k",
+    descKey: "descTv5k",
     nombre: "TV 5K",
     tipo: "tv",
     icono: "📺",
@@ -314,8 +325,9 @@ const catalogo = [
     lujo: 35,
     descripcion: "Televisión de lujo para clientes VIP.",
   },
-
   {
+    key: "lamparaSencilla",
+    descKey: "descLamparaSencilla",
     nombre: "Lámpara Sencilla",
     tipo: "lampara",
     icono: "💡",
@@ -324,6 +336,8 @@ const catalogo = [
     descripcion: "Iluminación básica.",
   },
   {
+    key: "lamparaElegante",
+    descKey: "descLamparaElegante",
     nombre: "Lámpara Elegante",
     tipo: "lampara",
     icono: "🏮",
@@ -332,6 +346,8 @@ const catalogo = [
     descripcion: "Da elegancia al cuarto.",
   },
   {
+    key: "alfombraBasica",
+    descKey: "descAlfombraBasica",
     nombre: "Alfombra Básica",
     tipo: "alfombra",
     icono: "🟥",
@@ -340,6 +356,8 @@ const catalogo = [
     descripcion: "Decora el piso del cuarto.",
   },
   {
+    key: "alfombraFina",
+    descKey: "descAlfombraFina",
     nombre: "Alfombra Fina",
     tipo: "alfombra",
     icono: "🟫",
@@ -348,6 +366,8 @@ const catalogo = [
     descripcion: "Sube el nivel del cuarto.",
   },
   {
+    key: "sabanasLimpias",
+    descKey: "descSabanasLimpias",
     nombre: "Sábanas Limpias",
     tipo: "sabanas",
     icono: "🧺",
@@ -356,6 +376,8 @@ const catalogo = [
     descripcion: "Necesarias para rentar.",
   },
   {
+    key: "sabanasPremium",
+    descKey: "descSabanasPremium",
     nombre: "Sábanas Premium",
     tipo: "sabanas",
     icono: "✨",
@@ -363,8 +385,9 @@ const catalogo = [
     lujo: 18,
     descripcion: "Mejor descanso y más lujo.",
   },
-
   {
+    key: "extintor",
+    descKey: "descExtintor",
     nombre: "Extintor",
     tipo: "extintor",
     icono: "🧯",
@@ -373,6 +396,8 @@ const catalogo = [
     descripcion: "Seguridad básica del cuarto.",
   },
   {
+    key: "wifiBasico",
+    descKey: "descWifiBasico",
     nombre: "📶 WiFi Básico",
     tipo: "internet",
     icono: "📶",
@@ -381,6 +406,8 @@ const catalogo = [
     descripcion: "Internet para huéspedes.",
   },
   {
+    key: "fibraOptica",
+    descKey: "descFibraOptica",
     nombre: "🚀 Fibra Óptica",
     tipo: "internet",
     icono: "🛰️",
@@ -389,6 +416,8 @@ const catalogo = [
     descripcion: "Internet de alta velocidad.",
   },
   {
+    key: "aireAcondicionado",
+    descKey: "descAireAcondicionado",
     nombre: "❄️ Aire Acondicionado",
     tipo: "clima",
     icono: '<img src="img/Clima.png" class="iconoCatalogoImg">',
@@ -398,6 +427,8 @@ const catalogo = [
     descripcion: "Mejora la comodidad.",
   },
   {
+    key: "climaInteligente",
+    descKey: "descClimaInteligente",
     nombre: "🧊 Clima Inteligente",
     tipo: "clima",
     icono: '<img src="img/Clima2.png" class="iconoCatalogoImg">',
@@ -407,6 +438,8 @@ const catalogo = [
     descripcion: "Sistema premium de climatización.",
   },
   {
+    key: "cuadroSencillo",
+    descKey: "descCuadroSencillo",
     nombre: "🖼️ Cuadro Sencillo",
     tipo: "cuadro",
     icono: "🖼️",
@@ -415,6 +448,8 @@ const catalogo = [
     descripcion: "Decoración básica.",
   },
   {
+    key: "cuadroElegante",
+    descKey: "descCuadroElegante",
     nombre: "🎨 Cuadro Elegante",
     tipo: "cuadro",
     icono: "🎨",
@@ -423,6 +458,8 @@ const catalogo = [
     descripcion: "Da estilo al cuarto.",
   },
   {
+    key: "artePremium",
+    descKey: "descArtePremium",
     nombre: "👑 Arte Premium",
     tipo: "cuadro",
     icono: "🖼️",
@@ -431,6 +468,8 @@ const catalogo = [
     descripcion: "Decoración VIP.",
   },
   {
+    key: "plantaLuz",
+    descKey: "descPlantaLuz",
     nombre: "⚡ Planta de Luz",
     tipo: "plantaLuz",
     icono: "⚡",
@@ -439,6 +478,8 @@ const catalogo = [
     descripcion: "Aumenta la capacidad eléctrica del hotel.",
   },
   {
+    key: "lavadora",
+    descKey: "descLavandora",
     nombre: "Lavadora",
     tipo: "lavadora",
     icono: '<img src="img/Lavadora.png" class="iconoCatalogoImg">',
@@ -447,6 +488,8 @@ const catalogo = [
     descripcion: "Aumenta la capacidad de la Lavandería",
   },
   {
+    key: "elevador",
+    descKey: "descElevador",
     nombre: "Elevador",
     tipo: "elevador",
     icono: "🔼",
@@ -1317,10 +1360,10 @@ function actualizarPantalla() {
   horaSpan.textContent = `${hora.toString().padStart(2, "0")}:00`;
   calcularReputacion();
   reputacionSpan.textContent = `${reputacion} ${estrellasHotel()}`;
-  const ocupadas = cuartos.filter(c => c.ocupada).length;
-const compradas = cuartos.filter(c => c.comprada).length;
+  const ocupadas = cuartos.filter((c) => c.ocupada).length;
+  const compradas = cuartos.filter((c) => c.comprada).length;
 
-ocupacionSpan.textContent = `${ocupadas}/${compradas}`;
+  ocupacionSpan.textContent = `${ocupadas}/${compradas}`;
 
   const centroHotel = document.getElementById("centroHotel");
   if (centroHotel) {
@@ -1334,6 +1377,9 @@ ocupacionSpan.textContent = `${ocupadas}/${compradas}`;
   valorHotelSpan.textContent = valorHotel().toLocaleString();
 
   dibujarHotel();
+  guardarScrollHotelMovil();
+  dibujarHotelMovil();
+  restaurarScrollHotelMovil();
   dibujarInventario();
   mostrarDetalleCuarto();
   actualizarIndicadoresMantenimiento();
@@ -1346,28 +1392,31 @@ ocupacionSpan.textContent = `${ocupadas}/${compradas}`;
   actualizarPanelAgua();
   actualizarPanelGas();
   actualizarPanelBasuraDrenaje();
+  actualizarPanelClima();
   verificarQuiebra();
+
+  if (window.innerWidth <= 900 && !window.seccionMovilActual) {
+    window.seccionMovilActual = "hotel";
+    mostrarSeccionMovil("hotel");
+  }
 }
 
 function iconoClima(clima) {
+  if (clima.lluvia) return "🌧️";
 
-    if (clima.lluvia) return "🌧️";
+  switch (clima.estado) {
+    case "Soleado":
+      return "☀️";
 
-    switch (clima.estado) {
+    case "Parcialmente nublado":
+      return "⛅";
 
-        case "Soleado":
-            return "☀️";
+    case "Nublado":
+      return "☁️";
 
-        case "Parcialmente nublado":
-            return "⛅";
-
-        case "Nublado":
-            return "☁️";
-
-        default:
-            return "🌤️";
-    }
-
+    default:
+      return "🌤️";
+  }
 }
 
 function cambiarVistaIndicadores() {
@@ -1608,6 +1657,52 @@ function claseHex(vida) {
   return "hexRojo";
 }
 
+let scrollHotelMovil = {
+  habitaciones: 0,
+  servicios: 0,
+  vertical: 0,
+};
+
+function guardarScrollHotelMovil() {
+  if (window.innerWidth > 900) return;
+
+  const filas = document.querySelectorAll(".cuartosScrollMovil");
+
+  if (filas[0]) {
+    scrollHotelMovil.habitaciones = filas[0].scrollLeft;
+  }
+
+  if (filas[1]) {
+    scrollHotelMovil.servicios = filas[1].scrollLeft;
+  }
+
+  const hotelMovil = document.getElementById("hotelMovil");
+  if (hotelMovil) {
+    scrollHotelMovil.vertical = hotelMovil.scrollTop;
+  }
+}
+
+function restaurarScrollHotelMovil() {
+  if (window.innerWidth > 900) return;
+
+  requestAnimationFrame(() => {
+    const filas = document.querySelectorAll(".cuartosScrollMovil");
+
+    if (filas[0]) {
+      filas[0].scrollLeft = scrollHotelMovil.habitaciones;
+    }
+
+    if (filas[1]) {
+      filas[1].scrollLeft = scrollHotelMovil.servicios;
+    }
+
+    const hotelMovil = document.getElementById("hotelMovil");
+    if (hotelMovil) {
+      hotelMovil.scrollTop = scrollHotelMovil.vertical;
+    }
+  });
+}
+
 function dibujarHotel() {
   ladoIzquierdo.innerHTML = "";
   ladoDerecho.innerHTML = "";
@@ -1637,6 +1732,159 @@ function dibujarHotel() {
       ladoDerecho.appendChild(crearDivCuarto(cuarto));
     });
   });
+}
+
+function dibujarHotelMovil() {
+  const contenedor = document.getElementById("hotelMovil");
+
+  if (!contenedor) return;
+
+  contenedor.innerHTML = "";
+
+  const pisos = [...new Set(cuartos.map((c) => Math.floor(c.numero / 100)))];
+
+  pisos.sort((a, b) => b - a);
+
+  pisos.forEach((piso) => {
+    const cuartosDelPiso = cuartos.filter(
+      (c) => Math.floor(c.numero / 100) === piso,
+    );
+
+    let html = `
+      <div class="filaPisoMovil">
+        <div class="elevadorMovil">🛗</div>
+        <div class="cuartosScrollMovil">
+    `;
+
+    cuartosDelPiso.forEach((cuarto) => {
+      html += `
+        <div
+          class="cuarto cuartoMovil ${cuarto.comprada ? "comprado" : "bloqueado"} ${cuarto.ocupada ? "ocupado" : ""}"
+          onclick="tocarCuartoMovil(${cuarto.id})"
+        >
+          ${cuarto.comprada ? generarContenidoCuarto(cuarto) : "🔒"}
+        </div>
+      `;
+    });
+
+    html += `
+        </div>
+      </div>
+    `;
+
+    contenedor.innerHTML += html;
+  });
+
+  contenedor.innerHTML += `
+    <div class="filaPisoMovil filaServiciosMovil">
+      <div class="elevadorMovil">🏨</div>
+
+      <div class="cuartosScrollMovil">
+
+        <div class="servicioMovil plantaMovil">
+          <strong>⚡ Planta</strong>
+          <span>${plantasLuz.length}</span>
+          <small>${consumoElectricoHotel()} / ${capacidadElectricaHotel()}</small>
+        </div>
+
+        <div class="servicioMovil lavanderiaMovil">
+          <strong>🧺 Lavandería</strong>
+          <span>${lavadoras.length}</span>
+          <small>Pendientes: ${pendientesLavanderia}</small>
+        </div>
+
+        <div class="servicioMovil recepcionMovil">
+          <strong>🛎️ Recepción</strong>
+          <span>${cuartos.filter((c) => c.ocupada).length}</span>
+          <small>Ocupados</small>
+        </div>
+
+        <div class="servicioMovil cafeteriaMovil">
+          <strong>☕ Cafetería</strong>
+          <span>OK</span>
+          <small>Servicio</small>
+        </div>
+
+        <div class="servicioMovil albercaMovil">
+          <strong>🏊 Alberca</strong>
+          <span>OK</span>
+          <small>Lujo</small>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+
+function generarIconosCuartoMovil(cuarto) {
+  let iconos = "";
+
+  if (cuarto.ocupada) iconos += "🔴";
+  if (cuarto.objetos.cama) iconos += "🛏️ ";
+  if (cuarto.objetos.tv) iconos += "📺 ";
+  if (cuarto.objetos.lampara) iconos += "💡 ";
+  if (cuarto.objetos.sabanas) iconos += "🧺 ";
+  if (cuarto.objetos.internet) iconos += "📶 ";
+  if (cuarto.objetos.clima) iconos += "❄️ ";
+  if (cuarto.objetos.extintor) iconos += "🧯 ";
+
+  return iconos;
+}
+
+function tocarCuartoMovil(cuartoId) {
+  const cuarto = cuartos.find((c) => c.id === cuartoId);
+  if (!cuarto || !cuarto.comprada) return;
+
+  if (itemSeleccionadoMovil) {
+    soltarItemSeleccionadoEnCuarto(cuartoId);
+    return;
+  }
+
+  cuartoSeleccionado = cuartoId;
+  mostrarDetalleCuarto();
+}
+
+function mostrarPanelMovil(panel, boton) {
+  if (window.innerWidth > 900) return;
+
+  document.querySelectorAll(".tarjetaMovil").forEach((btn) => {
+    btn.classList.remove("activa");
+  });
+
+  if (boton) {
+    boton.classList.add("activa");
+  }
+
+  const paneles = {
+    hotel: document.querySelector(".hotelBox"),
+    inventario: document.querySelector(".inventarioLateral"),
+    catalogo: document.querySelector(".panelDerecho"),
+    empleados: document
+      .getElementById("contenidoEmpleados")
+      ?.closest("section"),
+    indicadores: document.querySelector(".mantenimientoPanel"),
+    materiales: document
+      .getElementById("contenidoMateriales")
+      ?.closest("section"),
+    aguaGas: document.querySelector(".panelAguaGas"),
+    basuraDrenaje: document.querySelector(".panelBasuraDrenaje"),
+    movimiento: document.querySelector(".mensajesBox"),
+    finanzas: document
+      .getElementById("historialResultados")
+      ?.closest("section"),
+  };
+
+  Object.values(paneles).forEach((p) => {
+    if (p) p.style.display = "none";
+  });
+
+  if (paneles[panel]) {
+    paneles[panel].style.display = "block";
+    paneles[panel].scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
 }
 
 function crearDivCuarto(cuarto) {
@@ -1699,14 +1947,16 @@ function soltarItemSeleccionadoEnCuarto(cuartoId) {
       if (reputacion > 100) reputacion = 100;
 
       agregarMensaje(
-        `⬆️ Mejoraste ${item.tipo} del cuarto ${cuarto.numero}: ${objetoActual.nombre} → ${item.nombre}.`
+        `⬆️ Mejoraste ${item.tipo} del cuarto ${cuarto.numero}: ${objetoActual.nombre} → ${item.nombre}.`,
       );
 
       itemSeleccionadoMovil = null;
       actualizarPantalla();
       return;
     } else {
-      agregarMensaje(`❌ El cuarto ${cuarto.numero} ya tiene un objeto igual o mejor.`);
+      agregarMensaje(
+        `❌ El cuarto ${cuarto.numero} ya tiene un objeto igual o mejor.`,
+      );
       itemSeleccionadoMovil = null;
       actualizarPantalla();
       return;
@@ -1725,6 +1975,86 @@ function soltarItemSeleccionadoEnCuarto(cuartoId) {
   actualizarPantalla();
 }
 
+function mostrarSeccionMovil(panel, boton = null) {
+  if (window.innerWidth > 900) return;
+
+  // Primero guardamos dónde estaba viendo el usuario
+  guardarScrollHotelMovil();
+
+  window.seccionMovilActual = panel;
+
+  const panelesSecundarios = [
+    "panelCatalogo",
+    "panelInventario",
+    "panelVentaUsado",
+    "panelCuartoSeleccionado",
+    "panelEmpleados",
+    "panelMateriales",
+    "panelAgua",
+    "panelGas",
+    "panelBasura",
+    "panelDrenaje",
+    "panelIndicadores",
+    "panelFinanzas",
+    "panelPrestamo",
+    "panelClima",
+    "panelControles",
+    "panelMovimiento",
+  ];
+
+  panelesSecundarios.forEach((id) => {
+    const el = document.getElementById(id);
+
+    if (el) {
+      el.classList.remove("panelMovilActivo");
+      el.style.display = "none";
+    }
+  });
+
+  const mapa = {
+    hotel: null,
+    catalogo: "panelCatalogo",
+    inventario: "panelInventario",
+    venta: "panelVentaUsado",
+    cuarto: "panelCuartoSeleccionado",
+    empleados: "panelEmpleados",
+    materiales: "panelMateriales",
+    agua: "panelAgua",
+    gas: "panelGas",
+    basura: "panelBasura",
+    drenaje: "panelDrenaje",
+    indicadores: "panelIndicadores",
+    finanzas: "panelFinanzas",
+    prestamo: "panelPrestamo",
+    clima: "panelClima",
+    controles: "panelControles",
+    movimiento: "panelMovimiento",
+  };
+
+  const idMostrar = mapa[panel];
+
+  if (idMostrar) {
+    const el = document.getElementById(idMostrar);
+    const zona = document.getElementById("zonaPanelMovil");
+
+    if (el && zona) {
+      zona.appendChild(el);
+      el.style.display = "block";
+      el.classList.add("panelMovilActivo");
+    }
+  }
+
+  document.querySelectorAll(".tarjetaMovil").forEach((t) => {
+    t.classList.remove("activa");
+  });
+
+  if (boton) {
+    boton.classList.add("activa");
+  }
+  // Restauramos después de que el navegador acomode el panel
+  restaurarScrollHotelMovil();
+}
+
 function generarContenidoCuarto(cuarto) {
   let html = `
     <span class="numeroCuarto">
@@ -1737,7 +2067,7 @@ function generarContenidoCuarto(cuarto) {
   if (cuarto.ocupada) {
     html += `
       <span class="estadoCuarto">
-        🛌
+        🔴
       </span>
     `;
   } else if (cuartoListo(cuarto)) {
@@ -1749,7 +2079,7 @@ function generarContenidoCuarto(cuarto) {
   } else {
     html += `
       <span class="estadoCuarto">
-        ⚠️
+        🟡
       </span>
     `;
   }
@@ -1854,35 +2184,42 @@ function crearCatalogo() {
     itemsFiltrados = catalogo.filter((item) => item.tipo === filtroCatalogo);
   }
 
-  itemsFiltrados.forEach((item, index) => {
+  itemsFiltrados.forEach((item) => {
     const indexReal = catalogo.indexOf(item);
 
-    const div = document.createElement("div");
+    const nombreTraducido =
+      textos?.[idiomaActual]?.[item.key] ||
+      textos?.[idiomaActual]?.[item.nombre] ||
+      item.nombre;
 
+    const descripcionTraducida =
+      textos?.[idiomaActual]?.[item.descKey] ||
+      textos?.[idiomaActual]?.[item.descripcion] ||
+      item.descripcion;
+
+    const textoComprar = textos?.[idiomaActual]?.comprar || "Comprar";
+
+    const div = document.createElement("div");
     div.classList.add("itemCatalogo");
 
     div.innerHTML = `
-
       <div class="iconoCatalogo">
         ${item.icono}
       </div>
 
       <div>
+        <h3>${nombreTraducido}</h3>
 
-        <h3>${item.nombre}</h3>
-
-        <p>${item.descripcion}</p>
+        <p>${descripcionTraducida}</p>
 
         <p>
           💰 $${item.costo.toLocaleString()}
         </p>
-
       </div>
 
       <button onclick="comprarCatalogo(${indexReal})">
-        Comprar
+        ${textoComprar}
       </button>
-
     `;
 
     catalogoDiv.appendChild(div);
@@ -2701,7 +3038,7 @@ function mostrarDetalleCuarto() {
     <br>
 
     Listo para rentar:
-    ${cuartoListo(cuarto) ? "✅ Sí" : "⚠️ No"}
+    ${cuartoListo(cuarto) ? "✅ Sí" : "🟡 No"}
     <br>
 
     ⭐ Lujo:
@@ -2974,6 +3311,101 @@ function avanzarHora() {
   actualizarPantalla();
 }
 
+function actualizarPanelClima() {
+  const clima = obtenerClimaDelDia();
+
+  let estado = 0;
+  let temperatura = 0;
+  let viento = 0;
+  let humedad = 0;
+  let lluvia = 0;
+
+  if (clima.estado === "Soleado") estado = 20;
+  if (clima.estado === "Parcialmente nublado") estado = 10;
+  if (clima.estado === "Nublado") estado = -10;
+  if (clima.estado === "Lluvioso") estado = -35;
+
+  if (clima.maxima >= 35) temperatura -= 10;
+  if (clima.maxima >= 38) temperatura -= 20;
+  if (clima.minima <= 5) temperatura -= 10;
+  if (clima.minima <= 0) temperatura -= 20;
+  if (clima.minima > 5 && clima.maxima < 35) temperatura += 5;
+
+  if (clima.viento >= 30) viento = -15;
+  else if (clima.viento >= 20) viento = -5;
+
+  if (clima.humedad >= 80) humedad = -10;
+  else if (clima.humedad <= 20) humedad = -5;
+
+  if (clima.lluvia) lluvia = -10;
+
+  const total = estado + temperatura + viento + humedad + lluvia;
+
+  document.getElementById("estadoClima").textContent = clima.estado;
+  document.getElementById("tempMin").textContent = clima.minima;
+  document.getElementById("tempMax").textContent = clima.maxima;
+  document.getElementById("vientoClima").textContent = clima.viento;
+  document.getElementById("humedadClima").textContent = clima.humedad;
+  document.getElementById("lluviaClima").textContent = clima.lluvia
+    ? "Sí"
+    : "No";
+
+  document.getElementById("demandaEstado").textContent =
+    `☀️ Estado: ${estado > 0 ? "+" : ""}${estado}%`;
+
+  document.getElementById("demandaTemperatura").textContent =
+    `🌡️ Temperatura: ${temperatura > 0 ? "+" : ""}${temperatura}%`;
+
+  document.getElementById("demandaViento").textContent =
+    `🌬️ Viento: ${viento > 0 ? "+" : ""}${viento}%`;
+
+  document.getElementById("demandaHumedad").textContent =
+    `💧 Humedad: ${humedad > 0 ? "+" : ""}${humedad}%`;
+
+  document.getElementById("demandaLluvia").textContent =
+    `🌧️ Lluvia: ${lluvia > 0 ? "+" : ""}${lluvia}%`;
+
+  document.getElementById("demandaTotal").textContent =
+    `${total > 0 ? "+" : ""}${total}%`;
+
+  document.getElementById("demanda").textContent =
+    `${total > 0 ? "+" : ""}${total}%`;
+
+  document.getElementById("mensajeClima").textContent =
+    total >= 20
+      ? "Excelente día para recibir huéspedes."
+      : total >= 0
+        ? "Día normal para el hotel."
+        : total >= -25
+          ? "La demanda puede bajar un poco."
+          : "Mal clima: llegarán menos huéspedes.";
+}
+
+function aplicarIdioma() {
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const clave = el.dataset.i18n;
+    el.textContent = textos[idiomaActual][clave] || el.textContent;
+  });
+}
+
+function cambiarIdioma(idioma) {
+  idiomaActual = idioma;
+
+  aplicarIdioma();
+
+  localStorage.setItem("idiomaHotel", idioma);
+}
+
+const idiomaGuardado = localStorage.getItem("idiomaHotel");
+
+if (idiomaGuardado) {
+  idiomaActual = idiomaGuardado;
+
+  document.getElementById("idioma").value = idiomaGuardado;
+}
+
+aplicarIdioma();
+
 function reproducirGrillo() {
   const sonido = document.getElementById("sonidoGrillo");
   sonido.play();
@@ -3131,64 +3563,154 @@ function obtenerFactorDemanda() {
   let demanda = 1;
 
   switch (clima.mes) {
-    case 1: demanda = 0.80; break;
-    case 2: demanda = 0.90; break;
-    case 3: demanda = 1.00; break;
-    case 4: demanda = 1.10; break;
-    case 5: demanda = 1.15; break;
-    case 6: demanda = 1.20; break;
-    case 7: demanda = 1.45; break;
-    case 8: demanda = 1.35; break;
-    case 9: demanda = 0.95; break;
-    case 10: demanda = 1.05; break;
-    case 11: demanda = 1.10; break;
-    case 12: demanda = 1.50; break;
-    default: demanda = 1;
+    case 1:
+      demanda = 0.8;
+      break;
+    case 2:
+      demanda = 0.9;
+      break;
+    case 3:
+      demanda = 1.0;
+      break;
+    case 4:
+      demanda = 1.1;
+      break;
+    case 5:
+      demanda = 1.15;
+      break;
+    case 6:
+      demanda = 1.2;
+      break;
+    case 7:
+      demanda = 1.45;
+      break;
+    case 8:
+      demanda = 1.35;
+      break;
+    case 9:
+      demanda = 0.95;
+      break;
+    case 10:
+      demanda = 1.05;
+      break;
+    case 11:
+      demanda = 1.1;
+      break;
+    case 12:
+      demanda = 1.5;
+      break;
+    default:
+      demanda = 1;
   }
 
   // Clima agradable
   if (clima.maxima >= 22 && clima.maxima <= 29 && !clima.lluvia) {
-    demanda *= 1.10;
+    demanda *= 1.1;
   }
 
   // Calor fuerte
   if (clima.maxima >= 33 && clima.maxima <= 34) {
     demanda *= 0.95;
   } else if (clima.maxima > 34) {
-    demanda *= 0.90;
+    demanda *= 0.9;
   }
 
   // Frío
   if (clima.minima >= 10 && clima.minima <= 14) {
     demanda *= 0.95;
   } else if (clima.minima >= 5 && clima.minima <= 9) {
-    demanda *= 0.90;
+    demanda *= 0.9;
   } else if (clima.minima >= 0 && clima.minima <= 4) {
-    demanda *= 0.80;
+    demanda *= 0.8;
   } else if (clima.minima < 0) {
-    demanda *= 0.70;
+    demanda *= 0.7;
   }
 
   // Lluvia
   if (clima.lluvia) {
-    demanda *= 0.90;
+    demanda *= 0.9;
   }
 
   return demanda;
 }
 
 function obtenerClimaDelDia() {
-    return climaSaltillo[(dia - 1) % climaSaltillo.length];
+  return climaSaltillo[(dia - 1) % climaSaltillo.length];
 }
 
 function calcularClientes() {
   const pisos = Math.max(...cuartos.map((c) => Math.floor(c.numero / 100)));
 
   const clientesPorPiso = 20;
+  let clientesDia = pisos * clientesPorPiso;
 
-  const clientesDia = pisos * clientesPorPiso;
+  const clima = obtenerClimaDelDia();
 
-  return Math.round(clientesDia / 16);
+  // ===== ESTADO DEL CLIMA =====
+
+  switch (clima.estado) {
+    case "Soleado":
+      clientesDia *= 1.2;
+      break;
+
+    case "Parcialmente nublado":
+      clientesDia *= 1.1;
+      break;
+
+    case "Nublado":
+      clientesDia *= 0.9;
+      break;
+
+    case "Lluvioso":
+      clientesDia *= 0.65;
+      break;
+  }
+
+  // ===== LLUVIA =====
+
+  if (clima.lluvia) {
+    clientesDia *= 0.9;
+  }
+
+  // ===== TEMPERATURA =====
+
+  if (clima.maxima >= 35) {
+    clientesDia *= 0.9;
+  }
+
+  if (clima.maxima >= 38) {
+    clientesDia *= 0.8;
+  }
+
+  if (clima.minima <= 0) {
+    clientesDia *= 0.8;
+  }
+
+  if (clima.minima <= 5) {
+    clientesDia *= 0.9;
+  }
+
+  // ===== VIENTO =====
+
+  if (clima.viento >= 20) {
+    clientesDia *= 0.95;
+  }
+
+  if (clima.viento >= 30) {
+    clientesDia *= 0.85;
+  }
+
+  // ===== HUMEDAD =====
+
+  if (clima.humedad >= 80) {
+    clientesDia *= 0.9;
+  }
+
+  if (clima.humedad <= 20) {
+    clientesDia *= 0.95;
+  }
+
+  return Math.max(1, Math.round(clientesDia / 16));
 }
 
 function sonarAmbulancia() {
@@ -4093,7 +4615,6 @@ window.cerrarRanking = function () {
   }
 };
 
-
 function mostrarAlertaEvento(titulo, mensaje, imagen) {
   const modal = document.getElementById("alertaEvento");
   const tituloEvento = document.getElementById("tituloEvento");
@@ -4282,4 +4803,77 @@ function revisarContingencias() {
       return;
     }
   }
+}
+
+let itemMovil = null;
+let fantasmaMovil = null;
+
+document.querySelectorAll(".itemInventario, .itemCatalogo").forEach((item) => {
+  item.addEventListener("touchstart", iniciarToqueMovil, { passive: false });
+});
+
+function iniciarToqueMovil(e) {
+  e.preventDefault();
+
+  itemMovil = e.currentTarget;
+
+  const touch = e.touches[0];
+
+  fantasmaMovil = itemMovil.cloneNode(true);
+  fantasmaMovil.style.position = "fixed";
+  fantasmaMovil.style.left = touch.clientX + "px";
+  fantasmaMovil.style.top = touch.clientY + "px";
+  fantasmaMovil.style.zIndex = "99999";
+  fantasmaMovil.style.pointerEvents = "none";
+  fantasmaMovil.style.opacity = "0.85";
+  fantasmaMovil.style.transform = "translate(-50%, -50%) scale(1.1)";
+  document.body.appendChild(fantasmaMovil);
+
+  document.addEventListener("touchmove", moverToqueMovil, { passive: false });
+  document.addEventListener("touchend", soltarToqueMovil, { passive: false });
+}
+
+function moverToqueMovil(e) {
+  e.preventDefault();
+
+  if (!fantasmaMovil) return;
+
+  const touch = e.touches[0];
+
+  fantasmaMovil.style.left = touch.clientX + "px";
+  fantasmaMovil.style.top = touch.clientY + "px";
+}
+
+function soltarToqueMovil(e) {
+  e.preventDefault();
+
+  if (!itemMovil) return;
+
+  const touch = e.changedTouches[0];
+
+  if (fantasmaMovil) {
+    fantasmaMovil.remove();
+    fantasmaMovil = null;
+  }
+
+  const elementoDebajo = document.elementFromPoint(
+    touch.clientX,
+    touch.clientY,
+  );
+
+  const cuarto = elementoDebajo?.closest(".cuarto");
+
+  if (cuarto && !cuarto.classList.contains("bloqueado")) {
+    const idCuarto = cuarto.dataset.id || cuarto.id;
+    const tipo = itemMovil.dataset.tipo || itemMovil.dataset.item;
+
+    if (typeof soltarEnCuarto === "function") {
+      soltarEnCuarto(idCuarto, tipo);
+    }
+  }
+
+  itemMovil = null;
+
+  document.removeEventListener("touchmove", moverToqueMovil);
+  document.removeEventListener("touchend", soltarToqueMovil);
 }
