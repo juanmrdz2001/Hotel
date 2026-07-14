@@ -76,8 +76,6 @@
     <div><span data-i18n="reputacion">Reputación</span>: <span id="reputacion">50</span></div>
     <div>🛏️ <span data-i18n="ocupacion">Ocupación</span>: <span id="ocupacion">0/2</span>
     &nbsp;&nbsp;|&nbsp;&nbsp;
-    🌤️ <span data-i18n="clima">Clima</span>: <span id="clima">☀️ Soleado 5° / 16°C</span>
-    &nbsp;&nbsp;|&nbsp;&nbsp;
     📈 <span data-i18n="demanda">Demanda</span>:  <span id="demanda">+28%</span>
     </div>
   </section><!--panelDatos-->
@@ -167,7 +165,7 @@
       <img src="img/Lavadora.png" class="iconoLavadora">
       <span id="numLavadoras">1</span>
       🛏️
-      <span id="cuartosLavanderia">8</span>
+      <span id="cuartosLavanderia">0</span>
       /
       <span id="capacidadLavanderia">20</span>
       </div>
@@ -322,7 +320,6 @@
 <!-- panelBasuraDrenaje -->
 <section id="panelBasuraDrenaje" class="panelBasuraDrenaje">
 
-   <!-- panelBasura -->
   <section id="panelBasura" class="panelBasura">
     <h3>🗑️ <span data-i18n="basura">Basura</span></h3>
 
@@ -333,35 +330,33 @@
       <div id="nivelBasura" class="nivelBasura"></div>
     </div>
 
-    <button onclick="recolectarBasura()">
-      🗑️ Recolectar basura<br>
-      $800
-    </button>
+    <button id="btnLimpiarBasura" onclick="recolectarBasura()"></button>
+
     <p class="textoConsumo">
       Cada cuarto rentado genera <strong>3 kg</strong> de basura.
     </p>
-  </section><!-- panelBasura -->
 
-  <!-- panelDrenaje -->
+    <button id="btnAmpliarBasura" onclick="abrirModalAmpliacionBasura()"></button>
+  </section>
+
   <section id="panelDrenaje" class="panelDrenaje">
     <h3>🚽 <span data-i18n="drenaje">Drenaje</span></h3>
 
-    <p>Capacidad: <strong><span id="capacidadDrenaje">1000</span> lts</strong></p>
+    <p>Capacidad: <strong><span id="capacidadDrenaje">8,000</span> lts</strong></p>
     <p>Usado: <strong><span id="existenciaDrenaje">0</span> lts</strong></p>
 
     <div class="barraDrenaje">
       <div id="nivelDrenaje" class="nivelDrenaje"></div>
     </div>
 
-  <button onclick="limpiarDrenaje()">
-  🚽 Limpiar drenaje<br>
-  $1,200
-  </button>
-  <p class="textoConsumo">
-  Cada cuarto rentado genera <strong>80 lts</strong> de aguas residuales.
-  </p>
+    <button id="btnLimpiarDrenaje" onclick="limpiarDrenaje()"></button>
 
-</section><!-- panelDrenaje -->
+    <p class="textoConsumo">
+      Cada cuarto rentado genera <strong>80 lts</strong> de aguas residuales.
+    </p>
+
+    <button id="btnAmpliarDrenaje" onclick="abrirModalAmpliacionDrenaje()"></button>
+  </section>
 </section><!-- panelBasuraDrenaje -->
 </div> <!-- columnaIzquierdaInferior -->
 
@@ -653,10 +648,12 @@
     💰 $0
   </div>
 </div>
+<!-- PLANTA DE LUZ-->
+
 <div class="indicador">
   <div class="indicadorTitulo">
     <div class="tituloIzquierda">
-      <span>⚡ <span data-i18n="plantaLuz">Plantas de Luz</span> de luz</span>
+      <span>⚡ <span data-i18n="plantaLuz">Plantas de Luz</span>
     </div>
     <div class="zonaDerechaIndicador">
       <span id="vidaPlantasLuzIndicador">100%</span>
@@ -730,26 +727,60 @@
     </section><!--panalIndicadores-->
 
       <!-- panelPrestamo -->
-      <section id="panelPrestamo" class="panelPrestamo">
+<section id="panelPrestamo" class="contenedorFinanzasLaterales">
 
-        <h3>🏦 <span data-i18n="prestamo">Préstamo Bancario</span></h3>
+  <div class="panelPrestamo">
+    <h3>🏦 <span data-i18n="prestamo">Préstamo Bancario</span></h3>
 
-        <div class="datoPrestamo">
-          💰 Saldo insoluto:
-          $<span id="saldoPrestamo">700000</span>
-        </div>
+    <div class="prestamoGrid">
+      <div class="datoPrestamo">
+        <span class="etiquetaPrestamo">Saldo insoluto</span>
+        <strong>$<span id="saldoPrestamo">0</span></strong>
+      </div>
 
-        <div class="datoPrestamo">
-          📅 Siguiente pago:
-          Día <span id="diaPagoPrestamo">10</span>
-        </div>
+      <div class="datoPrestamo">
+        <span class="etiquetaPrestamo">Próximo pago</span>
+        <strong>Día <span id="diaSiguientePago">0</span></strong>
+      </div>
 
-        <div class="datoPrestamo">
-          💵 Monto siguiente pago:
-          $<span id="montoPagoPrestamo">34000</span>
-        </div>
+      <div class="datoPrestamo pagoDestacado">
+        <span class="etiquetaPrestamo">Monto siguiente pago</span>
+        <strong>$<span id="montoSiguientePago">0</span></strong>
+      </div>
+    </div>
 
-      </section><!--panelPrestamo-->
+    <div class="piePrestamo">
+      <span>📅 Pago automático cada 10 días</span>
+    </div>
+  </div>
+
+  <div id="panelImpuesto" class="panelImpuestos">
+    <h3>🏛️ Impuesto Sobre Ganancias</h3>
+
+    <div class="impuestosGrid">
+      <div class="datoImpuesto">
+        <span class="etiquetaImpuesto">Base del impuesto</span>
+        <strong>$<span id="baseImpuestoHoy">0</span></strong>
+      </div>
+
+      <div class="datoImpuesto">
+        <span class="etiquetaImpuesto">Porcentaje</span>
+        <strong><span id="porcentajeImpuestoHoy">0</span>%</strong>
+      </div>
+
+      <div class="datoImpuesto impuestoDestacado">
+        <span class="etiquetaImpuesto">Impuesto a pagar</span>
+        <strong>$<span id="impuestoHoy">0</span></strong>
+      </div>
+    </div>
+
+    <div class="pieImpuestos">
+      <span>🕐 Pago automático: 13:00 horas</span>
+      <strong id="estadoImpuestoHoy">⏳ Pendiente de pago</strong>
+    </div>
+  </div>
+
+</section><!--panelPrestamo-->
 
       <!-- panelFinanzas -->
       <section id="panelFinanzas" class="panelResultados">
@@ -875,6 +906,34 @@
 
   </section>
 
+</div>
+
+<!-- MODAL AMPLIACIÓN BASURA -->
+<div id="modalAmpliacionBasura" class="modalInfraestructura">
+  <div class="modalContenidoInfraestructura">
+    <h2>🗑️ Comprar contenedor mayor</h2>
+    <p>Capacidad actual: <strong><span id="capacidadActualBasuraModal">500</span> kg</strong></p>
+    <p>Nueva capacidad: <strong><span id="capacidadNuevaBasuraModal">1,000</span> kg</strong></p>
+    <p>Costo: <strong>$<span id="costoAmpliacionBasuraModal">60,000</span></strong></p>
+    <div class="accionesModalInfraestructura">
+      <button onclick="comprarContenedorMayor()">Comprar</button>
+      <button class="btnCancelarModal" onclick="cerrarModalAmpliacionBasura()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AMPLIACIÓN DRENAJE -->
+<div id="modalAmpliacionDrenaje" class="modalInfraestructura">
+  <div class="modalContenidoInfraestructura">
+    <h2>🚽 Comprar cisterna mayor</h2>
+    <p>Capacidad actual: <strong><span id="capacidadActualDrenajeModal">8,000</span> lts</strong></p>
+    <p>Nueva capacidad: <strong><span id="capacidadNuevaDrenajeModal">16,000</span> lts</strong></p>
+    <p>Costo: <strong>$<span id="costoAmpliacionDrenajeModal">120,000</span></strong></p>
+    <div class="accionesModalInfraestructura">
+      <button onclick="comprarCisternaMayor()">Comprar</button>
+      <button class="btnCancelarModal" onclick="cerrarModalAmpliacionDrenaje()">Cancelar</button>
+    </div>
+  </div>
 </div>
 
 <!-- VENTANA RANKING -->

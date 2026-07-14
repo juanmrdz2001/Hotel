@@ -29,17 +29,29 @@ let costoGasConsumido = 0;
 
 //================= BASURA =================
 let basuraActual = 0;
-const basuraMaxima = 500;
+const basuraBase = 500;
+const aumentoPorContenedor = 500;
+let cantidadContenedores = 0;
+let basuraMaxima = basuraBase;
 const basuraPorRenta = 3;
-const costoRecoleccionBasura = 800;
 let costoBasuraHoy = 0;
 
 //================= DRENAJE =================
 let drenajeActual = 0;
-const drenajeMaximo = 8000;
+const drenajeBase = 8000;
+const aumentoPorCisterna = 8000;
+let cantidadMejorasDrenaje = 0;
+let drenajeMaximo = drenajeBase;
 const drenajePorRenta = 80;
-const costoServicioDrenaje = 1200;
 let costoDrenajeHoy = 0;
+
+//================= IMPUESTOS =================
+let baseImpuestoPendiente = 0;
+let porcentajeImpuestoPendiente = 0;
+let impuestoPendiente = 0;
+let impuestoPagadoHoy = true;
+let impuestosHoy = 0;
+
 //================Clima ===================
 let temperaturaMinima = 0;
 let temperaturaMaxima = 0;
@@ -620,32 +632,30 @@ function nominaDiaria() {
 }
 
 function actualizarPanelPrestamo() {
-  const saldo = document.getElementById("saldoPrestamo");
+  const saldoElemento = document.getElementById("saldoPrestamo");
+  const diaPagoElemento = document.getElementById("diaSiguientePago");
+  const montoPagoElemento = document.getElementById("montoSiguientePago");
 
-  const diaPago = document.getElementById("diaPagoPrestamo");
+  if (!prestamo) return;
 
-  const montoPago = document.getElementById("montoPagoPrestamo");
+  const saldo = Number(prestamo.saldo) || 0;
+  const intereses = saldo * (Number(prestamo.interes) || 0);
+  const siguientePago = (Number(prestamo.amortizacion) || 0) + intereses;
+  const siguienteDia =
+    ((Number(prestamo.pagosRealizados) || 0) + 1) *
+    (Number(prestamo.frecuenciaDias) || 10);
 
-  if (!prestamo) {
-    return;
+  if (saldoElemento) {
+    saldoElemento.textContent = Math.round(saldo).toLocaleString("es-MX");
   }
 
-  const intereses = prestamo.saldo * prestamo.interes;
-
-  const siguientePago = prestamo.amortizacion + intereses;
-
-  const siguienteDia = (prestamo.pagosRealizados + 1) * prestamo.frecuenciaDias;
-
-  if (saldo) {
-    saldo.textContent = `$${Math.round(prestamo.saldo).toLocaleString()}`;
+  if (diaPagoElemento) {
+    diaPagoElemento.textContent = saldo > 0 ? siguienteDia : "Liquidado";
   }
 
-  if (diaPago) {
-    diaPago.textContent = siguienteDia;
-  }
-
-  if (montoPago) {
-    montoPago.textContent = `$${Math.round(siguientePago).toLocaleString()}`;
+  if (montoPagoElemento) {
+    montoPagoElemento.textContent =
+      saldo > 0 ? Math.round(siguientePago).toLocaleString("es-MX") : "0";
   }
 }
 
@@ -1386,6 +1396,7 @@ function actualizarPantalla() {
   dibujarEmpleados();
   dibujarMateriales();
   actualizarPanelPrestamo();
+  actualizarPanelImpuestos();
   dibujarHistorialResultados();
   actualizarPanelPlantaLuz();
   actualizarPanelLavanderia();
@@ -3179,26 +3190,66 @@ function usarDrenajePorRenta() {
   return true;
 }
 
+function obtenerCostoRecoleccionBasura() {
+  const costos = [800, 1800, 3000, 5000, 8000];
+  if (cantidadContenedores < costos.length) return costos[cantidadContenedores];
+  return (
+    costos[costos.length - 1] +
+    (cantidadContenedores - costos.length + 1) * 4000
+  );
+}
+
+function obtenerCostoContenedorBasura() {
+  const costos = [60000, 120000, 250000, 500000];
+  if (cantidadContenedores < costos.length) return costos[cantidadContenedores];
+  return (
+    costos[costos.length - 1] *
+    Math.pow(2, cantidadContenedores - costos.length + 1)
+  );
+}
+
+function obtenerCostoServicioDrenaje() {
+  const costos = [1200, 3000, 5000, 8000, 12000];
+  if (cantidadMejorasDrenaje < costos.length)
+    return costos[cantidadMejorasDrenaje];
+  return (
+    costos[costos.length - 1] +
+    (cantidadMejorasDrenaje - costos.length + 1) * 5000
+  );
+}
+
+function obtenerCostoMejoraDrenaje() {
+  const costos = [120000, 250000, 500000, 1000000];
+  if (cantidadMejorasDrenaje < costos.length)
+    return costos[cantidadMejorasDrenaje];
+  return (
+    costos[costos.length - 1] *
+    Math.pow(2, cantidadMejorasDrenaje - costos.length + 1)
+  );
+}
+
 function recolectarBasura() {
   if (basuraActual <= 0) {
     agregarMensaje("🗑️ No hay basura para recolectar.");
     return;
   }
 
-  if (dinero < costoRecoleccionBasura) {
-    agregarMensaje("❌ No hay dinero.");
+  const costo = obtenerCostoRecoleccionBasura();
+  if (dinero < costo) {
+    agregarMensaje(
+      `❌ No hay dinero suficiente. Se necesitan $${costo.toLocaleString("es-MX")}.`,
+    );
     return;
   }
 
-  dinero -= costoRecoleccionBasura;
-
-  // ESTE ES EL GASTO DEL DÍA
-  materialesHoy += costoRecoleccionBasura;
-
+  dinero -= costo;
+  costoBasuraHoy += costo;
+  materialesHoy += costo;
   basuraActual = 0;
 
-  agregarMensaje("🗑️ Se recolectó la basura.");
-
+  agregarMensaje(
+    `🗑️ Se recolectó la basura por $${costo.toLocaleString("es-MX")}.`,
+  );
   actualizarPantalla();
 }
 
@@ -3208,20 +3259,100 @@ function limpiarDrenaje() {
     return;
   }
 
-  if (dinero < costoServicioDrenaje) {
-    agregarMensaje("❌ No hay dinero.");
+  const costo = obtenerCostoServicioDrenaje();
+  if (dinero < costo) {
+    agregarMensaje(
+      `❌ No hay dinero suficiente. Se necesitan $${costo.toLocaleString("es-MX")}.`,
+    );
     return;
   }
 
-  dinero -= costoServicioDrenaje;
-
-  // ESTE ES EL GASTO DEL DÍA
-  materialesHoy += costoServicioDrenaje;
-
+  dinero -= costo;
+  costoDrenajeHoy += costo;
+  materialesHoy += costo;
   drenajeActual = 0;
 
-  agregarMensaje("🚽 Se limpió el drenaje.");
+  agregarMensaje(
+    `🚽 Se limpió el drenaje por $${costo.toLocaleString("es-MX")}.`,
+  );
+  actualizarPantalla();
+}
 
+function abrirModalAmpliacionBasura() {
+  const modal = document.getElementById("modalAmpliacionBasura");
+  if (!modal) return;
+
+  document.getElementById("capacidadActualBasuraModal").textContent =
+    basuraMaxima.toLocaleString("es-MX");
+  document.getElementById("capacidadNuevaBasuraModal").textContent = (
+    basuraMaxima + aumentoPorContenedor
+  ).toLocaleString("es-MX");
+  document.getElementById("costoAmpliacionBasuraModal").textContent =
+    obtenerCostoContenedorBasura().toLocaleString("es-MX");
+
+  modal.style.display = "flex";
+}
+
+function cerrarModalAmpliacionBasura() {
+  const modal = document.getElementById("modalAmpliacionBasura");
+  if (modal) modal.style.display = "none";
+}
+
+function comprarContenedorMayor() {
+  const costo = obtenerCostoContenedorBasura();
+  if (dinero < costo) {
+    agregarMensaje(
+      `❌ Necesitas $${costo.toLocaleString("es-MX")} para ampliar el contenedor.`,
+    );
+    return;
+  }
+
+  dinero -= costo;
+  cantidadContenedores++;
+  basuraMaxima = basuraBase + cantidadContenedores * aumentoPorContenedor;
+  cerrarModalAmpliacionBasura();
+  agregarMensaje(
+    `🗑️ Contenedor ampliado a ${basuraMaxima.toLocaleString("es-MX")} kg.`,
+  );
+  actualizarPantalla();
+}
+
+function abrirModalAmpliacionDrenaje() {
+  const modal = document.getElementById("modalAmpliacionDrenaje");
+  if (!modal) return;
+
+  document.getElementById("capacidadActualDrenajeModal").textContent =
+    drenajeMaximo.toLocaleString("es-MX");
+  document.getElementById("capacidadNuevaDrenajeModal").textContent = (
+    drenajeMaximo + aumentoPorCisterna
+  ).toLocaleString("es-MX");
+  document.getElementById("costoAmpliacionDrenajeModal").textContent =
+    obtenerCostoMejoraDrenaje().toLocaleString("es-MX");
+
+  modal.style.display = "flex";
+}
+
+function cerrarModalAmpliacionDrenaje() {
+  const modal = document.getElementById("modalAmpliacionDrenaje");
+  if (modal) modal.style.display = "none";
+}
+
+function comprarCisternaMayor() {
+  const costo = obtenerCostoMejoraDrenaje();
+  if (dinero < costo) {
+    agregarMensaje(
+      `❌ Necesitas $${costo.toLocaleString("es-MX")} para ampliar la cisterna.`,
+    );
+    return;
+  }
+
+  dinero -= costo;
+  cantidadMejorasDrenaje++;
+  drenajeMaximo = drenajeBase + cantidadMejorasDrenaje * aumentoPorCisterna;
+  cerrarModalAmpliacionDrenaje();
+  agregarMensaje(
+    `🚽 Cisterna ampliada a ${drenajeMaximo.toLocaleString("es-MX")} litros.`,
+  );
   actualizarPantalla();
 }
 
@@ -3229,35 +3360,108 @@ function actualizarPanelBasuraDrenaje() {
   const existenciaBasura = document.getElementById("existenciaBasura");
   const capacidadBasura = document.getElementById("capacidadBasura");
   const nivelBasura = document.getElementById("nivelBasura");
-
   const existenciaDrenaje = document.getElementById("existenciaDrenaje");
   const capacidadDrenaje = document.getElementById("capacidadDrenaje");
   const nivelDrenaje = document.getElementById("nivelDrenaje");
+  const btnLimpiarBasura = document.getElementById("btnLimpiarBasura");
+  const btnAmpliarBasura = document.getElementById("btnAmpliarBasura");
+  const btnLimpiarDrenaje = document.getElementById("btnLimpiarDrenaje");
+  const btnAmpliarDrenaje = document.getElementById("btnAmpliarDrenaje");
 
-  if (existenciaBasura) {
-    existenciaBasura.textContent = basuraActual.toLocaleString();
-  }
-
-  if (capacidadBasura) {
-    capacidadBasura.textContent = basuraMaxima.toLocaleString();
-  }
-
+  if (existenciaBasura)
+    existenciaBasura.textContent = basuraActual.toLocaleString("es-MX");
+  if (capacidadBasura)
+    capacidadBasura.textContent = basuraMaxima.toLocaleString("es-MX");
   if (nivelBasura) {
-    const porcentajeBasura = (basuraActual / basuraMaxima) * 100;
-    nivelBasura.style.width = porcentajeBasura + "%";
+    const porcentaje =
+      basuraMaxima > 0 ? (basuraActual / basuraMaxima) * 100 : 0;
+    nivelBasura.style.width = Math.min(porcentaje, 100) + "%";
   }
 
-  if (existenciaDrenaje) {
-    existenciaDrenaje.textContent = drenajeActual.toLocaleString();
+  if (btnLimpiarBasura) {
+    btnLimpiarBasura.innerHTML = `🗑️ Recolectar Basura<br>$${obtenerCostoRecoleccionBasura().toLocaleString("es-MX")}`;
+  }
+  if (btnAmpliarBasura) {
+    btnAmpliarBasura.innerHTML = `🗑️ Comprar Contenedor Mayor<br>+${aumentoPorContenedor.toLocaleString("es-MX")} kg<br>$${obtenerCostoContenedorBasura().toLocaleString("es-MX")}`;
   }
 
-  if (capacidadDrenaje) {
-    capacidadDrenaje.textContent = drenajeMaximo.toLocaleString();
-  }
-
+  if (existenciaDrenaje)
+    existenciaDrenaje.textContent = drenajeActual.toLocaleString("es-MX");
+  if (capacidadDrenaje)
+    capacidadDrenaje.textContent = drenajeMaximo.toLocaleString("es-MX");
   if (nivelDrenaje) {
-    const porcentajeDrenaje = (drenajeActual / drenajeMaximo) * 100;
-    nivelDrenaje.style.width = porcentajeDrenaje + "%";
+    const porcentaje =
+      drenajeMaximo > 0 ? (drenajeActual / drenajeMaximo) * 100 : 0;
+    nivelDrenaje.style.width = Math.min(porcentaje, 100) + "%";
+  }
+
+  if (btnLimpiarDrenaje) {
+    btnLimpiarDrenaje.innerHTML = `🚽 Limpiar Drenaje<br>$${obtenerCostoServicioDrenaje().toLocaleString("es-MX")}`;
+  }
+  if (btnAmpliarDrenaje) {
+    btnAmpliarDrenaje.innerHTML = `🚽 Comprar Cisterna Mayor<br>+${aumentoPorCisterna.toLocaleString("es-MX")} lts<br>$${obtenerCostoMejoraDrenaje().toLocaleString("es-MX")}`;
+  }
+}
+
+function calcularImpuestoResultado(resultado) {
+  let porcentaje = 0;
+  if (resultado > 0 && resultado <= 10000) porcentaje = 3;
+  else if (resultado <= 20000 && resultado > 0) porcentaje = 6;
+  else if (resultado <= 30000 && resultado > 0) porcentaje = 9;
+  else if (resultado <= 40000 && resultado > 0) porcentaje = 12;
+  else if (resultado <= 50000 && resultado > 0) porcentaje = 15;
+  else if (resultado <= 60000 && resultado > 0) porcentaje = 18;
+  else if (resultado <= 70000 && resultado > 0) porcentaje = 21;
+  else if (resultado <= 80000 && resultado > 0) porcentaje = 24;
+  else if (resultado <= 90000 && resultado > 0) porcentaje = 27;
+  else if (resultado > 90000) porcentaje = 30;
+
+  const base = Math.max(0, Math.round(resultado));
+  return { base, porcentaje, impuesto: Math.round((base * porcentaje) / 100) };
+}
+
+function pagarImpuestoPendiente() {
+  if (impuestoPagadoHoy) return;
+
+  if (impuestoPendiente > 0) {
+    dinero -= impuestoPendiente;
+    impuestosHoy += impuestoPendiente;
+    agregarMensaje(
+      `🏛️ Impuesto pagado: base $${baseImpuestoPendiente.toLocaleString("es-MX")}, tasa ${porcentajeImpuestoPendiente}%, total $${impuestoPendiente.toLocaleString("es-MX")}.`,
+    );
+  } else {
+    agregarMensaje(
+      "🏛️ No hubo impuesto por pagar porque el resultado anterior no fue positivo.",
+    );
+  }
+
+  impuestoPagadoHoy = true;
+  actualizarPantalla();
+}
+
+function actualizarPanelImpuestos() {
+  const base = document.getElementById("baseImpuestoHoy");
+  const porcentaje = document.getElementById("porcentajeImpuestoHoy");
+  const impuesto = document.getElementById("impuestoHoy");
+  const estado = document.getElementById("estadoImpuestoHoy");
+
+  if (base) base.textContent = baseImpuestoPendiente.toLocaleString("es-MX");
+  if (porcentaje)
+    porcentaje.textContent =
+      porcentajeImpuestoPendiente.toLocaleString("es-MX");
+  if (impuesto)
+    impuesto.textContent = impuestoPendiente.toLocaleString("es-MX");
+
+  if (estado) {
+    if (impuestoPagadoHoy) {
+      estado.textContent = "✅ Pagado";
+      estado.classList.add("impuestoPagado");
+      estado.classList.remove("impuestoPendiente");
+    } else {
+      estado.textContent = "⏳ Pendiente de pago";
+      estado.classList.add("impuestoPendiente");
+      estado.classList.remove("impuestoPagado");
+    }
   }
 }
 
@@ -3282,6 +3486,10 @@ function avanzarHora() {
 
   if (hora === 12) {
     revisarContingencias();
+  }
+
+  if (hora === 13 && !impuestoPagadoHoy) {
+    pagarImpuestoPendiente();
   }
 
   if (hora === 20) {
@@ -3470,7 +3678,6 @@ function cerrarDiaHotel() {
   } else {
     diasSobrecarga = 0;
   }
-  procesarLavanderiaDiaria();
 }
 
 function guardarResultadoDelDia() {
@@ -3482,7 +3689,14 @@ function guardarResultadoDelDia() {
     nominaHoy -
     materialesHoy -
     interesesHoy -
-    contingenciasHoy;
+    contingenciasHoy -
+    impuestosHoy;
+
+  const calculoImpuesto = calcularImpuestoResultado(resultado);
+  baseImpuestoPendiente = calculoImpuesto.base;
+  porcentajeImpuestoPendiente = calculoImpuesto.porcentaje;
+  impuestoPendiente = calculoImpuesto.impuesto;
+  impuestoPagadoHoy = false;
 
   historialResultados.push({
     dia,
@@ -3492,6 +3706,7 @@ function guardarResultadoDelDia() {
     materiales: Math.round(materialesHoy),
     intereses: Math.round(interesesHoy),
     contingencias: Math.round(contingenciasHoy),
+    impuestos: Math.round(impuestosHoy),
     resultado: Math.round(resultado),
     reputacion: reputacion,
     evento: eventoHoy || "-",
@@ -3507,7 +3722,9 @@ function guardarResultadoDelDia() {
   materialesHoy = 0;
   interesesHoy = 0;
   contingenciasHoy = 0;
+  impuestosHoy = 0;
   eventoHoy = "";
+  actualizarPanelImpuestos();
 }
 
 function dibujarHistorialResultados() {
@@ -3826,6 +4043,8 @@ function recibirClientes() {
         rentasHoy += pago;
         pagosHoy++;
 
+        actualizarPanelLavanderia();
+
         consumirMaterialesPorRenta();
         consumirAguaPorRenta();
         consumirGasPorRenta();
@@ -3854,6 +4073,77 @@ function recibirClientes() {
       actualizarPantalla();
     }, i * 250);
   }
+}
+
+function promedioVidaPlantasLuz() {
+  if (!Array.isArray(plantasLuz) || plantasLuz.length === 0) {
+    return 100;
+  }
+
+  let total = 0;
+
+  plantasLuz.forEach((planta) => {
+    const vida = Number(planta.vida ?? 100);
+    const vidaMaxima = Number(planta.vidaMaxima ?? 100);
+
+    total += (vida / vidaMaxima) * 100;
+  });
+
+  return Math.round(total / plantasLuz.length);
+}
+
+function costoReparacionPlantasLuz() {
+  if (!Array.isArray(plantasLuz) || plantasLuz.length === 0) {
+    return 0;
+  }
+
+  let total = 0;
+
+  plantasLuz.forEach((planta) => {
+    const vida = Number(planta.vida ?? 100);
+    const vidaMaxima = Number(planta.vidaMaxima ?? 100);
+
+    const desgaste = Math.max(0, vidaMaxima - vida);
+
+    total += desgaste * 1600;
+  });
+
+  return Math.round(total);
+}
+
+function repararPlantasLuz() {
+  console.log("Botón reparar planta pulsado", plantasLuz);
+
+  const costo = costoReparacionPlantasLuz();
+
+  if (costo <= 0) {
+    agregarMensaje("✅ Las plantas de luz ya están al 100%.");
+    actualizarPanelPlantaLuz();
+    return;
+  }
+
+  if (dinero < costo) {
+    agregarMensaje(
+      `❌ No alcanza para reparar las plantas de luz. Necesitas $${costo.toLocaleString(
+        "es-MX",
+      )}.`,
+    );
+    return;
+  }
+
+  dinero -= costo;
+
+  plantasLuz.forEach((planta) => {
+    planta.vidaMaxima = Number(planta.vidaMaxima ?? 100);
+    planta.vida = planta.vidaMaxima;
+  });
+
+  agregarMensaje(
+    `⚡ Reparaste las plantas de luz por $${costo.toLocaleString("es-MX")}.`,
+  );
+
+  actualizarPanelPlantaLuz();
+  actualizarPantalla();
 }
 
 function repararFachada() {
@@ -3947,55 +4237,6 @@ function consumoElectricoHotel() {
   consumo += consumoEnergia.alberca;
 
   return consumo;
-}
-
-function promedioVidaPlantasLuz() {
-  if (!plantasLuz || plantasLuz.length === 0) return 100;
-
-  let total = 0;
-
-  plantasLuz.forEach((planta) => {
-    total += (planta.vida / planta.vidaMaxima) * 100;
-  });
-
-  return Math.round(total / plantasLuz.length);
-}
-
-function costoReparacionPlantasLuz() {
-  let total = 0;
-
-  plantasLuz.forEach((planta) => {
-    const desgaste = planta.vidaMaxima - planta.vida;
-    total += desgaste * 1600;
-  });
-
-  return Math.round(total);
-}
-
-function repararPlantasLuz() {
-  const costo = costoReparacionPlantasLuz();
-
-  if (costo <= 0) {
-    agregarMensaje("✅ Las plantas de luz ya están al 100%.");
-    return;
-  }
-
-  if (dinero < costo) {
-    agregarMensaje("❌ No alcanza para reparar las plantas de luz.");
-    return;
-  }
-
-  dinero -= costo;
-
-  plantasLuz.forEach((planta) => {
-    planta.vida = planta.vidaMaxima;
-  });
-
-  agregarMensaje(
-    `⚡ Reparaste las plantas de luz por $${costo.toLocaleString()}.`,
-  );
-
-  actualizarPantalla();
 }
 
 function obtenerTorretasSobrecarga() {
@@ -4147,48 +4388,64 @@ function capacidadLavanderia() {
 }
 
 function actualizarPanelLavanderia() {
-  document.getElementById("numLavadoras").textContent = lavadoras.length;
+  const elementoLavadoras = document.getElementById("numLavadoras");
 
-  document.getElementById("cuartosLavanderia").textContent = cuartos.filter(
-    (c) => c.ocupada,
-  ).length;
+  const elementoRentas = document.getElementById("cuartosLavanderia");
 
-  document.getElementById("capacidadLavanderia").textContent =
-    capacidadLavanderia();
+  const elementoCapacidad = document.getElementById("capacidadLavanderia");
 
-  const pendientes = document.getElementById("pendientesLavanderia");
+  const elementoPendientes = document.getElementById("pendientesLavanderia");
 
-  pendientes.textContent = pendientesLavanderia;
+  const capacidad = capacidadLavanderia();
 
-  pendientes.style.color = pendientesLavanderia > 0 ? "red" : "black";
+  if (elementoLavadoras) {
+    elementoLavadoras.textContent = lavadoras.length;
+  }
+
+  // Rentas realizadas durante el día
+  if (elementoRentas) {
+    elementoRentas.textContent = pagosHoy;
+  }
+
+  if (elementoCapacidad) {
+    elementoCapacidad.textContent = capacidad;
+  }
+
+  if (elementoPendientes) {
+    elementoPendientes.textContent = pendientesLavanderia;
+
+    elementoPendientes.style.color = pendientesLavanderia > 0 ? "red" : "black";
+  }
 }
 
 function cuartosOcupados() {
   return cuartos.filter((c) => c.comprada && c.ocupada).length;
 }
 
-function procesarLavanderiaDiaria() {
-  const rentadosHoy = pagosHoy;
-  pendientesLavanderia += rentadosHoy;
+function procesarLavanderia() {
   const capacidad = capacidadLavanderia();
-  const lavados = Math.min(pendientesLavanderia, capacidad);
-  pendientesLavanderia -= lavados;
+
+  // Se suman las sábanas pendientes anteriores
+  // más todas las rentas realizadas hoy.
+  const trabajoTotal = pendientesLavanderia + pagosHoy;
+
+  const lavadas = Math.min(trabajoTotal, capacidad);
+
+  pendientesLavanderia = Math.max(0, trabajoTotal - capacidad);
+
   if (pendientesLavanderia > 0) {
     agregarMensaje(
-      `🧺 Lavandería saturada. Quedan ${pendientesLavanderia} pendientes.`,
+      `🧺 La lavandería procesó ${lavadas} juegos de sábanas. ` +
+        `Quedaron ${pendientesLavanderia} pendientes.`,
     );
   } else {
-    agregarMensaje("🧺 Lavandería procesó toda la ropa del día.");
+    agregarMensaje(
+      `🧺 La lavandería procesó ${lavadas} juegos de sábanas. ` +
+        `No quedaron pendientes.`,
+    );
   }
-}
 
-function procesarLavanderia() {
-  const ocupados = cuartos.filter((c) => c.ocupada).length;
-  pendientesLavanderia += ocupados;
-  pendientesLavanderia -= capacidadLavanderia();
-  if (pendientesLavanderia < 0) {
-    pendientesLavanderia = 0;
-  }
+  actualizarPanelLavanderia();
 }
 
 function promedioVidaLavadoras() {
@@ -4376,7 +4633,15 @@ async function guardarPartida() {
     costoGasConsumido,
 
     basuraActual,
+    cantidadContenedores,
     drenajeActual,
+    cantidadMejorasDrenaje,
+
+    baseImpuestoPendiente,
+    porcentajeImpuestoPendiente,
+    impuestoPendiente,
+    impuestoPagadoHoy,
+    impuestosHoy,
 
     fechaGuardado: new Date().toLocaleString(),
   };
@@ -4473,7 +4738,20 @@ async function cargarPartida() {
     costoGasConsumido = partida.costoGasConsumido ?? 0;
 
     basuraActual = partida.basuraActual ?? 0;
+    cantidadContenedores = partida.cantidadContenedores ?? 0;
+    basuraMaxima = basuraBase + cantidadContenedores * aumentoPorContenedor;
+    basuraActual = Math.min(basuraActual, basuraMaxima);
+
     drenajeActual = partida.drenajeActual ?? 0;
+    cantidadMejorasDrenaje = partida.cantidadMejorasDrenaje ?? 0;
+    drenajeMaximo = drenajeBase + cantidadMejorasDrenaje * aumentoPorCisterna;
+    drenajeActual = Math.min(drenajeActual, drenajeMaximo);
+
+    baseImpuestoPendiente = partida.baseImpuestoPendiente ?? 0;
+    porcentajeImpuestoPendiente = partida.porcentajeImpuestoPendiente ?? 0;
+    impuestoPendiente = partida.impuestoPendiente ?? 0;
+    impuestoPagadoHoy = partida.impuestoPagadoHoy ?? true;
+    impuestosHoy = partida.impuestosHoy ?? 0;
 
     // ==========================================
     // PRÉSTAMO

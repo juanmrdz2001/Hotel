@@ -1029,3 +1029,11 @@
 }
 
 }
+
+@media (max-width:900px){
+
+   .barraMovilTarjetas{
+      display:flex;
+   }
+
+}

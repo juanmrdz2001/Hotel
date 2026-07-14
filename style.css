@@ -2164,3 +2164,156 @@ header.header .selectorIdioma{
   align-items:center !important;
   gap:6px !important;
 }
+
+
+/* ===== PANELES FINANCIEROS RECONSTRUIDOS ===== */
+.contenedorFinanzasLaterales{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  background:transparent;
+  border:none;
+  padding:0;
+}
+
+.panelPrestamo,
+.panelImpuestos{
+  margin-top:12px;
+  padding:12px;
+  background:#fff;
+  border:1px solid #b8c7d9;
+  border-radius:10px;
+  box-shadow:0 2px 5px rgba(0,0,0,.08);
+}
+
+.panelPrestamo h3,
+.panelImpuestos h3{
+  margin:0 0 12px;
+  padding-bottom:8px;
+  text-align:center;
+  border-bottom:1px solid #d9e1ea;
+}
+
+.prestamoGrid,
+.impuestosGrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+
+.datoPrestamo,
+.datoImpuesto{
+  min-height:62px;
+  padding:8px;
+  margin:0;
+  background:#f4f7fa;
+  border:1px solid #d4dde7;
+  border-radius:8px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.etiquetaPrestamo,
+.etiquetaImpuesto{
+  margin-bottom:5px;
+  font-size:12px;
+  color:#555;
+}
+
+.pagoDestacado,
+.impuestoDestacado{
+  background:#fff4d6;
+  border-color:#e3b341;
+}
+
+.piePrestamo,
+.pieImpuestos{
+  margin-top:10px;
+  padding-top:9px;
+  border-top:1px solid #d9e1ea;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  font-size:12px;
+}
+
+#estadoImpuestoHoy{
+  padding:5px 9px;
+  border-radius:6px;
+  white-space:nowrap;
+}
+
+#estadoImpuestoHoy.impuestoPendiente{
+  background:#fff1c7;
+  color:#7a5700;
+}
+
+#estadoImpuestoHoy.impuestoPagado{
+  background:#d9f5df;
+  color:#176b2c;
+}
+
+/* ===== MODALES DE INFRAESTRUCTURA ===== */
+.modalInfraestructura{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  justify-content:center;
+  align-items:center;
+  z-index:99999;
+}
+
+.modalContenidoInfraestructura{
+  width:360px;
+  max-width:92%;
+  padding:24px;
+  background:#fff;
+  border-radius:14px;
+  text-align:center;
+  box-shadow:0 10px 35px rgba(0,0,0,.35);
+}
+
+.modalContenidoInfraestructura h2{
+  margin:0 0 16px;
+}
+
+.accionesModalInfraestructura{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:18px;
+}
+
+.accionesModalInfraestructura button{
+  margin:0;
+}
+
+.btnCancelarModal{
+  background:#777;
+}
+
+.btnCancelarModal:hover{
+  background:#555;
+}
+
+@media(max-width:700px){
+  .prestamoGrid,
+  .impuestosGrid{
+    grid-template-columns:1fr;
+  }
+
+  .piePrestamo,
+  .pieImpuestos{
+    flex-direction:column;
+    align-items:stretch;
+    text-align:center;
+  }
+}
+
+.barraMovilTarjetas{
+    display:none;
+}
