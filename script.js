@@ -66,6 +66,10 @@ let prestamo = {
   frecuenciaDias: 10,
 };
 
+let historialOcupacion = [];
+let historialPromedioRenta = [];
+let historialGananciaPorCuarto = [];
+
 let cuartoSeleccionado = null;
 let siguienteCarrilCliente = 0;
 let nominaPagadaHoy = false;
@@ -120,6 +124,43 @@ const consumoEnergia = {
   lavanderia: 15,
   cafeteria: 20,
   alberca: 15,
+};
+
+let publicidadHoy = 0;
+let publicidadesActivas = [];
+
+const tiposPublicidad = {
+  redes: {
+    nombre: "Redes Sociales",
+    icono: "📱",
+    costo: 1200,
+    horas: 72,
+    beneficio: 5,
+  },
+
+  pantalla: {
+    nombre: "Pantalla",
+    icono: "🖥️",
+    costo: 3000,
+    horas: 120,
+    beneficio: 10,
+  },
+
+  radio: {
+    nombre: "Radio",
+    icono: "📻",
+    costo: 8000,
+    horas: 168,
+    beneficio: 15,
+  },
+
+  television: {
+    nombre: "Televisión",
+    icono: "📺",
+    costo: 20000,
+    horas: 240,
+    beneficio: 20,
+  },
 };
 
 function mostrarInstrucciones() {
@@ -1397,6 +1438,7 @@ function actualizarPantalla() {
   dibujarMateriales();
   actualizarPanelPrestamo();
   actualizarPanelImpuestos();
+  actualizarPanelPublicidad();
   dibujarHistorialResultados();
   actualizarPanelPlantaLuz();
   actualizarPanelLavanderia();
@@ -3468,6 +3510,22 @@ function actualizarPanelImpuestos() {
 function avanzarHora() {
   hora++;
 
+  if (hora >= 24) {
+    hora = 0;
+    dia++;
+    nominaPagadaHoy = false;
+
+    avanzarHorasPublicidad();
+    actualizarPronostico5Dias();
+
+    reproducirGrillo();
+    cerrarDiaHotel();
+    actualizarPantalla();
+    return;
+  }
+
+  avanzarHorasPublicidad();
+
   if (hora === 3) {
     revisarFantasma();
   }
@@ -3500,19 +3558,16 @@ function avanzarHora() {
   }
 
   if (hora === 23) {
+    registrarOcupacionDiaria();
+    registrarPromedioRentaDiaria();
+
+    // Primero guarda el resultado oficial del día
     guardarResultadoDelDia();
+
+    // Después usa ese mismo resultado para la gráfica
+    registrarGananciaPorCuartoDiaria();
+
     procesarLavanderia();
-  }
-
-  if (hora >= 24) {
-    hora = 0;
-    dia++;
-    nominaPagadaHoy = false;
-
-    reproducirGrillo();
-    cerrarDiaHotel();
-    actualizarPantalla();
-    return;
   }
 
   recibirClientes();
@@ -3547,7 +3602,11 @@ function actualizarPanelClima() {
 
   if (clima.lluvia) lluvia = -10;
 
-  const total = estado + temperatura + viento + humedad + lluvia;
+  const publicidad = obtenerBeneficioPublicidad();
+
+  const totalClima = estado + temperatura + viento + humedad + lluvia;
+
+  const total = totalClima + publicidad;
 
   document.getElementById("estadoClima").textContent = clima.estado;
   document.getElementById("tempMin").textContent = clima.minima;
@@ -3573,6 +3632,12 @@ function actualizarPanelClima() {
   document.getElementById("demandaLluvia").textContent =
     `🌧️ Lluvia: ${lluvia > 0 ? "+" : ""}${lluvia}%`;
 
+  const demandaPublicidad = document.getElementById("demandaPublicidad");
+
+  if (demandaPublicidad) {
+    demandaPublicidad.textContent = `📢 Publicidad: +${publicidad}%`;
+  }
+
   document.getElementById("demandaTotal").textContent =
     `${total > 0 ? "+" : ""}${total}%`;
 
@@ -3587,6 +3652,8 @@ function actualizarPanelClima() {
         : total >= -25
           ? "La demanda puede bajar un poco."
           : "Mal clima: llegarán menos huéspedes.";
+
+  actualizarPronostico5Dias();
 }
 
 function aplicarIdioma() {
@@ -3690,7 +3757,7 @@ function guardarResultadoDelDia() {
     materialesHoy -
     interesesHoy -
     contingenciasHoy -
-    impuestosHoy;
+    publicidadHoy;
 
   const calculoImpuesto = calcularImpuestoResultado(resultado);
   baseImpuestoPendiente = calculoImpuesto.base;
@@ -3707,6 +3774,7 @@ function guardarResultadoDelDia() {
     intereses: Math.round(interesesHoy),
     contingencias: Math.round(contingenciasHoy),
     impuestos: Math.round(impuestosHoy),
+    publicidad: Math.round(publicidadHoy),
     resultado: Math.round(resultado),
     reputacion: reputacion,
     evento: eventoHoy || "-",
@@ -3723,6 +3791,7 @@ function guardarResultadoDelDia() {
   interesesHoy = 0;
   contingenciasHoy = 0;
   impuestosHoy = 0;
+  publicidadHoy = 0;
   eventoHoy = "";
   actualizarPanelImpuestos();
 }
@@ -3734,14 +3803,15 @@ function dibujarHistorialResultados() {
 
   contenedor.innerHTML = `
     <div class="filaResultado encabezadoResultado">
-      <div>Día</div>
-      <div>Rentas</div>
-      <div>-Desg.</div>
-      <div>-Nom.</div>
-      <div>-Mat.</div>
-      <div>-Int.</div>
-      <div>-Cont.</div>
-      <div>Resultado</div>
+      <div>-Día</div>
+      <div>-Rentas</div>
+      <div>-Desg</div>
+      <div>-Nom</div>
+      <div>-Mat</div>
+      <div>-Int</div>
+      <div>-Cont</div>
+      <div>-Pub</div>
+      <div>Result</div>
       <div>⭐Rep</div>
     </div>
   `;
@@ -3759,6 +3829,7 @@ function dibujarHistorialResultados() {
           <div>$${r.materiales.toLocaleString()}</div>
           <div>$${r.intereses.toLocaleString()}</div>
           <div>$${(r.contingencias || 0).toLocaleString()}</div>
+          <div>$${r.publicidad.toLocaleString()}</div>
 
           <div class="${
             r.resultado < 0 ? "resultadoNegativo" : "resultadoPositivo"
@@ -4557,6 +4628,8 @@ btnPausar.addEventListener("click", pausarJuego);
 
 crearCatalogo();
 actualizarPantalla();
+actualizarPronostico5Dias();
+
 agregarMensaje("🏨 Bienvenido a Imperio Hotelero.");
 
 let nombreJugador = localStorage.getItem("nombreJugador");
@@ -4627,6 +4700,9 @@ async function guardarPartida() {
     contingenciasHoy,
     eventoHoy,
     historialResultados,
+    historiaOcupacion,
+    historialPromedioRenta,
+    historialGananciaPorCuarto,
 
     aguaActual,
     gasActual,
@@ -4636,6 +4712,10 @@ async function guardarPartida() {
     cantidadContenedores,
     drenajeActual,
     cantidadMejorasDrenaje,
+
+    publicidadHoy,
+
+    publicidadesActivas,
 
     baseImpuestoPendiente,
     porcentajeImpuestoPendiente,
@@ -4747,6 +4827,9 @@ async function cargarPartida() {
     drenajeMaximo = drenajeBase + cantidadMejorasDrenaje * aumentoPorCisterna;
     drenajeActual = Math.min(drenajeActual, drenajeMaximo);
 
+    publicidadHoy = partida.publicidadHoy ?? 0;
+    publicidadesActivas = partida.publicidadesActivas ?? [];
+
     baseImpuestoPendiente = partida.baseImpuestoPendiente ?? 0;
     porcentajeImpuestoPendiente = partida.porcentajeImpuestoPendiente ?? 0;
     impuestoPendiente = partida.impuestoPendiente ?? 0;
@@ -4811,6 +4894,20 @@ async function cargarPartida() {
         },
       ]),
     );
+
+    historialOcupacion = Array.isArray(partida.historialOcupacion)
+      ? partida.historialOcupacion
+      : [];
+
+    historialPromedioRenta = Array.isArray(partida.historialPromedioRenta)
+      ? partida.historialPromedioRenta
+      : [];
+
+    historialGananciaPorCuarto = Array.isArray(
+      partida.historialGananciaPorCuarto,
+    )
+      ? partida.historialGananciaPorCuarto
+      : [];
 
     actualizarPantalla();
 
@@ -5154,4 +5251,1138 @@ function soltarToqueMovil(e) {
 
   document.removeEventListener("touchmove", moverToqueMovil);
   document.removeEventListener("touchend", soltarToqueMovil);
+}
+
+function comprarPublicidad(tipo) {
+  const publicidad = tiposPublicidad[tipo];
+
+  if (!publicidad) {
+    return;
+  }
+
+  if (dinero < publicidad.costo) {
+    agregarMensaje(
+      `❌ No alcanza para contratar ${publicidad.nombre}. ` +
+        `Necesitas $${publicidad.costo.toLocaleString("es-MX")}.`,
+    );
+    return;
+  }
+
+  dinero -= publicidad.costo;
+  publicidadHoy += publicidad.costo;
+
+  publicidadesActivas.push({
+    id: Date.now() + Math.random(),
+    tipo,
+    nombre: publicidad.nombre,
+    icono: publicidad.icono,
+    horasRestantes: publicidad.horas,
+    beneficio: publicidad.beneficio,
+  });
+
+  agregarMensaje(
+    `${publicidad.icono} Contrataste ${publicidad.nombre} por ` +
+      `$${publicidad.costo.toLocaleString("es-MX")}.`,
+  );
+
+  actualizarPanelPublicidad();
+  actualizarPanelClima();
+  actualizarPantalla();
+}
+
+function obtenerBeneficioPublicidad() {
+  return publicidadesActivas.reduce(
+    (total, campaña) => total + campaña.beneficio,
+    0,
+  );
+}
+
+function actualizarHorasPublicidad() {
+  publicidadesActivas.forEach((campaña) => {
+    campaña.horasRestantes--;
+  });
+
+  const vencidas = publicidadesActivas.filter(
+    (campaña) => campaña.horasRestantes <= 0,
+  );
+
+  vencidas.forEach((campaña) => {
+    agregarMensaje(`${campaña.icono} Terminó la campaña de ${campaña.nombre}.`);
+  });
+
+  publicidadesActivas = publicidadesActivas.filter(
+    (campaña) => campaña.horasRestantes > 0,
+  );
+
+  actualizarPanelPublicidad();
+}
+
+function actualizarPanelPublicidad() {
+  const listas = {
+    redes: document.getElementById("listaPublicidadRedes"),
+    pantalla: document.getElementById("listaPublicidadPantalla"),
+    radio: document.getElementById("listaPublicidadRadio"),
+    television: document.getElementById("listaPublicidadTelevision"),
+  };
+
+  Object.values(listas).forEach((lista) => {
+    if (lista) {
+      lista.innerHTML = "";
+    }
+  });
+
+  Object.keys(listas).forEach((tipo) => {
+    const lista = listas[tipo];
+
+    if (!lista) {
+      return;
+    }
+
+    const campañas = publicidadesActivas.filter(
+      (campaña) => campaña.tipo === tipo,
+    );
+
+    if (campañas.length === 0) {
+      lista.innerHTML = `
+        <div class="campañaPublicidad">
+          Sin campañas activas
+        </div>
+      `;
+      return;
+    }
+
+    campañas.forEach((campaña, index) => {
+      lista.innerHTML += `
+        <div class="campañaPublicidad">
+          ${index + 1}. ${campaña.horasRestantes} horas restantes
+          — +${campaña.beneficio}%
+        </div>
+      `;
+    });
+  });
+
+  const beneficioTotal = document.getElementById("beneficioPublicidadTotal");
+
+  if (beneficioTotal) {
+    beneficioTotal.textContent = obtenerBeneficioPublicidad();
+  }
+}
+
+function avanzarHorasPublicidad() {
+  if (!Array.isArray(publicidadesActivas)) {
+    publicidadesActivas = [];
+  }
+
+  publicidadesActivas.forEach((campania) => {
+    campania.horasRestantes = Math.max(
+      0,
+      Number(campania.horasRestantes || 0) - 1,
+    );
+  });
+
+  const terminadas = publicidadesActivas.filter(
+    (campania) => campania.horasRestantes <= 0,
+  );
+
+  terminadas.forEach((campania) => {
+    agregarMensaje(
+      `${campania.icono || "📢"} Terminó la publicidad de ${campania.nombre}.`,
+    );
+  });
+
+  publicidadesActivas = publicidadesActivas.filter(
+    (campania) => campania.horasRestantes > 0,
+  );
+
+  actualizarPanelPublicidad();
+}
+
+function actualizarPronostico5Dias() {
+  const contenedor = document.getElementById("pronostico5Dias");
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = "";
+
+  for (let i = 0; i < 5; i++) {
+    // Empieza desde mañana
+    const indiceClima = dia + i;
+    const diaClima = climaSaltillo[indiceClima];
+
+    if (!diaClima) {
+      break;
+    }
+
+    let nombreDia;
+
+    if (i === 0) {
+      nombreDia = "Mañana";
+    } else {
+      nombreDia = `Día ${dia + i + 1}`;
+    }
+
+    const icono = obtenerIconoPronostico(diaClima);
+
+    const demanda = calcularDemandaPronostico(diaClima);
+
+    contenedor.innerHTML += `
+      <div class="tarjetaPronostico">
+        <h4>${nombreDia}</h4>
+
+        <div class="iconoPronostico">
+          ${icono}
+        </div>
+
+        <div class="temperaturaPronostico">
+          ${diaClima.minima}° / ${diaClima.maxima}°
+        </div>
+
+        <div class="estadoPronostico">
+          ${diaClima.estado}
+        </div>
+
+        <div class="demandaPronostico">
+          Demanda:
+          ${demanda >= 0 ? "+" : ""}${demanda}%
+        </div>
+      </div>
+    `;
+  }
+}
+
+function obtenerIconoPronostico(clima) {
+  if (clima.lluvia || clima.estado === "Lluvioso") {
+    return "🌧️";
+  }
+
+  if (clima.estado === "Soleado") {
+    return "☀️";
+  }
+
+  if (clima.estado === "Parcialmente nublado") {
+    return "⛅";
+  }
+
+  if (clima.estado === "Nublado") {
+    return "☁️";
+  }
+
+  return "🌤️";
+}
+
+function calcularDemandaPronostico(clima) {
+  let demanda = 0;
+
+  // ESTADO DEL CLIMA
+  if (clima.estado === "Soleado") {
+    demanda += 20;
+  } else if (clima.estado === "Parcialmente nublado") {
+    demanda += 10;
+  } else if (clima.estado === "Nublado") {
+    demanda -= 10;
+  } else if (
+    clima.estado === "Lluvioso" ||
+    clima.estado === "Lluvia" ||
+    clima.lluvia === true ||
+    clima.lluvia === "Sí"
+  ) {
+    demanda -= 15;
+  }
+
+  // TEMPERATURA
+  const minima = Number(clima.minima ?? 0);
+  const maxima = Number(clima.maxima ?? 0);
+
+  if (maxima >= 18 && maxima <= 28) {
+    demanda += 5;
+  } else if (maxima < 10 || maxima > 35) {
+    demanda -= 10;
+  }
+
+  // VIENTO
+  const viento = Number(clima.viento ?? 0);
+
+  if (viento > 30) {
+    demanda -= 5;
+  }
+
+  // HUMEDAD
+  const humedad = Number(clima.humedad ?? 0);
+
+  if (humedad > 75) {
+    demanda -= 5;
+  }
+
+  return demanda;
+}
+
+function registrarOcupacionDiaria() {
+  const cuartosComprados = cuartos.filter((cuarto) => cuarto.comprada).length;
+
+  const cuartosOcupados = Number(cuartosRentados20) || 0;
+
+  const porcentaje =
+    cuartosComprados > 0
+      ? Math.round((cuartosOcupados / cuartosComprados) * 100)
+      : 0;
+
+  historialOcupacion.push({
+    dia,
+    cuartosOcupados,
+    cuartosComprados,
+    porcentaje: Math.min(100, porcentaje),
+  });
+
+  if (historialOcupacion.length > 30) {
+    historialOcupacion.shift();
+  }
+}
+
+function abrirModalOcupacion() {
+  const modal = document.getElementById("modalOcupacion");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.style.display = "flex";
+
+  // Esperar a que el modal ya tenga dimensiones visibles
+  setTimeout(() => {
+    dibujarGraficaOcupacion();
+  }, 50);
+}
+
+function cerrarModalOcupacion() {
+  const modal = document.getElementById("modalOcupacion");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+function dibujarGraficaOcupacion() {
+  const canvas = document.getElementById("graficaOcupacion");
+
+  if (!canvas) {
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+
+  const ancho = canvas.width;
+  const alto = canvas.height;
+
+  ctx.clearRect(0, 0, ancho, alto);
+
+  const margen = {
+    izquierda: 65,
+    derecha: 25,
+    arriba: 35,
+    abajo: 55,
+  };
+
+  const anchoGrafica = ancho - margen.izquierda - margen.derecha;
+
+  const altoGrafica = alto - margen.arriba - margen.abajo;
+
+  // Fondo
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, ancho, alto);
+
+  // Título interno
+  ctx.fillStyle = "#222";
+  ctx.font = "bold 16px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText("Ocupación diaria del hotel", ancho / 2, 23);
+
+  // Líneas horizontales: 0%, 20%, 40%...100%
+  ctx.font = "12px Arial";
+
+  for (let porcentaje = 0; porcentaje <= 100; porcentaje += 20) {
+    const y = margen.arriba + altoGrafica - (porcentaje / 100) * altoGrafica;
+
+    ctx.beginPath();
+    ctx.moveTo(margen.izquierda, y);
+    ctx.lineTo(ancho - margen.derecha, y);
+
+    ctx.strokeStyle = "#dddddd";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = "#555";
+    ctx.textAlign = "right";
+
+    ctx.fillText(porcentaje + "%", margen.izquierda - 10, y + 4);
+  }
+
+  // Ejes
+  ctx.beginPath();
+
+  ctx.moveTo(margen.izquierda, margen.arriba);
+  ctx.lineTo(margen.izquierda, alto - margen.abajo);
+
+  ctx.lineTo(ancho - margen.derecha, alto - margen.abajo);
+
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  if (historialOcupacion.length === 0) {
+    ctx.fillStyle = "#777";
+    ctx.font = "bold 18px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText("Todavía no hay días registrados.", ancho / 2, alto / 2);
+
+    actualizarResumenOcupacion();
+    return;
+  }
+
+  const cantidad = historialOcupacion.length;
+
+  const separacionX =
+    cantidad > 1 ? anchoGrafica / (cantidad - 1) : anchoGrafica / 2;
+
+  const puntos = historialOcupacion.map((registro, index) => {
+    const x =
+      cantidad > 1
+        ? margen.izquierda + index * separacionX
+        : margen.izquierda + anchoGrafica / 2;
+
+    const porcentaje = Math.max(
+      0,
+      Math.min(100, Number(registro.porcentaje) || 0),
+    );
+
+    const y = margen.arriba + altoGrafica - (porcentaje / 100) * altoGrafica;
+
+    return {
+      x,
+      y,
+      registro,
+    };
+  });
+
+  // Línea
+  ctx.beginPath();
+
+  puntos.forEach((punto, index) => {
+    if (index === 0) {
+      ctx.moveTo(punto.x, punto.y);
+    } else {
+      ctx.lineTo(punto.x, punto.y);
+    }
+  });
+
+  ctx.strokeStyle = "#1976d2";
+  ctx.lineWidth = 4;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.stroke();
+
+  // Puntos y etiquetas
+  puntos.forEach((punto, index) => {
+    ctx.beginPath();
+    ctx.arc(punto.x, punto.y, 5, 0, Math.PI * 2);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+
+    ctx.strokeStyle = "#1976d2";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Día en eje X
+    ctx.fillStyle = "#444";
+    ctx.font = "11px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(`D${punto.registro.dia}`, punto.x, alto - margen.abajo + 20);
+
+    // Mostrar porcentaje sobre algunos puntos
+    const mostrarEtiqueta =
+      cantidad <= 15 ||
+      index === 0 ||
+      index === cantidad - 1 ||
+      index % 3 === 0;
+
+    if (mostrarEtiqueta) {
+      ctx.fillStyle = "#0d47a1";
+      ctx.font = "bold 11px Arial";
+
+      ctx.fillText(`${punto.registro.porcentaje}%`, punto.x, punto.y - 12);
+    }
+  });
+
+  ctx.fillStyle = "#333";
+  ctx.font = "bold 12px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText(
+    "Días del hotel",
+    margen.izquierda + anchoGrafica / 2,
+    alto - 10,
+  );
+
+  actualizarResumenOcupacion();
+}
+
+function actualizarResumenOcupacion() {
+  const resumen = document.getElementById("resumenOcupacion");
+
+  if (!resumen) {
+    return;
+  }
+
+  if (historialOcupacion.length === 0) {
+    resumen.innerHTML = "<span>Sin información disponible</span>";
+
+    return;
+  }
+
+  const porcentajes = historialOcupacion.map(
+    (registro) => Number(registro.porcentaje) || 0,
+  );
+
+  const promedio = Math.round(
+    porcentajes.reduce((total, valor) => total + valor, 0) / porcentajes.length,
+  );
+
+  const maxima = Math.max(...porcentajes);
+  const minima = Math.min(...porcentajes);
+
+  resumen.innerHTML = `
+    <span>📊 Promedio: ${promedio}%</span>
+    <span>📈 Máxima: ${maxima}%</span>
+    <span>📉 Mínima: ${minima}%</span>
+  `;
+}
+
+function registrarPromedioRentaDiaria() {
+  const cantidadRentas = Number(pagosHoy) || 0;
+  const ingresosRentas = Number(rentasHoy) || 0;
+
+  const promedio =
+    cantidadRentas > 0 ? Math.round(ingresosRentas / cantidadRentas) : 0;
+
+  historialPromedioRenta.push({
+    dia,
+    cantidadRentas,
+    ingresosRentas,
+    promedio,
+  });
+
+  if (historialPromedioRenta.length > 30) {
+    historialPromedioRenta.shift();
+  }
+}
+
+function abrirModalPromedioRenta() {
+  const modal = document.getElementById("modalPromedioRenta");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.style.display = "flex";
+
+  setTimeout(() => {
+    dibujarGraficaPromedioRenta();
+  }, 50);
+}
+
+function cerrarModalPromedioRenta() {
+  const modal = document.getElementById("modalPromedioRenta");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+function abrirModalPromedioRenta() {
+  const modal = document.getElementById("modalPromedioRenta");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.style.display = "flex";
+
+  setTimeout(() => {
+    dibujarGraficaPromedioRenta();
+  }, 50);
+}
+
+function cerrarModalPromedioRenta() {
+  const modal = document.getElementById("modalPromedioRenta");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+function dibujarGraficaPromedioRenta() {
+  const canvas = document.getElementById("graficaPromedioRenta");
+
+  if (!canvas) {
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+
+  const ancho = canvas.width;
+  const alto = canvas.height;
+
+  ctx.clearRect(0, 0, ancho, alto);
+
+  const margen = {
+    izquierda: 85,
+    derecha: 25,
+    arriba: 35,
+    abajo: 55,
+  };
+
+  const anchoGrafica = ancho - margen.izquierda - margen.derecha;
+
+  const altoGrafica = alto - margen.arriba - margen.abajo;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, ancho, alto);
+
+  ctx.fillStyle = "#222";
+  ctx.font = "bold 16px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText("Promedio diario cobrado por cuarto", ancho / 2, 23);
+
+  if (historialPromedioRenta.length === 0) {
+    ctx.fillStyle = "#777";
+    ctx.font = "bold 18px Arial";
+
+    ctx.fillText("Todavía no hay días registrados.", ancho / 2, alto / 2);
+
+    actualizarResumenPromedioRenta();
+    return;
+  }
+
+  const valores = historialPromedioRenta.map(
+    (registro) => Number(registro.promedio) || 0,
+  );
+
+  const maximoValor = Math.max(...valores, 100);
+
+  const maximoEscala = Math.ceil(maximoValor / 500) * 500;
+
+  // Líneas horizontales
+  const divisiones = 5;
+
+  for (let i = 0; i <= divisiones; i++) {
+    const valor = Math.round((maximoEscala / divisiones) * i);
+
+    const y =
+      margen.arriba + altoGrafica - (valor / maximoEscala) * altoGrafica;
+
+    ctx.beginPath();
+    ctx.moveTo(margen.izquierda, y);
+    ctx.lineTo(ancho - margen.derecha, y);
+
+    ctx.strokeStyle = "#dddddd";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = "#555";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "right";
+
+    ctx.fillText(
+      "$" + valor.toLocaleString("es-MX"),
+      margen.izquierda - 10,
+      y + 4,
+    );
+  }
+
+  // Ejes
+  ctx.beginPath();
+
+  ctx.moveTo(margen.izquierda, margen.arriba);
+  ctx.lineTo(margen.izquierda, alto - margen.abajo);
+
+  ctx.lineTo(ancho - margen.derecha, alto - margen.abajo);
+
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const cantidad = historialPromedioRenta.length;
+
+  const separacionX =
+    cantidad > 1 ? anchoGrafica / (cantidad - 1) : anchoGrafica / 2;
+
+  const puntos = historialPromedioRenta.map((registro, index) => {
+    const x =
+      cantidad > 1
+        ? margen.izquierda + index * separacionX
+        : margen.izquierda + anchoGrafica / 2;
+
+    const promedio = Math.max(0, Number(registro.promedio) || 0);
+
+    const y =
+      margen.arriba + altoGrafica - (promedio / maximoEscala) * altoGrafica;
+
+    return {
+      x,
+      y,
+      registro,
+    };
+  });
+
+  // Línea
+  ctx.beginPath();
+
+  puntos.forEach((punto, index) => {
+    if (index === 0) {
+      ctx.moveTo(punto.x, punto.y);
+    } else {
+      ctx.lineTo(punto.x, punto.y);
+    }
+  });
+
+  ctx.strokeStyle = "#2e7d32";
+  ctx.lineWidth = 4;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.stroke();
+
+  // Puntos y etiquetas
+  puntos.forEach((punto, index) => {
+    ctx.beginPath();
+    ctx.arc(punto.x, punto.y, 5, 0, Math.PI * 2);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+
+    ctx.strokeStyle = "#2e7d32";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.fillStyle = "#444";
+    ctx.font = "11px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(`D${punto.registro.dia}`, punto.x, alto - margen.abajo + 20);
+
+    const mostrarEtiqueta =
+      cantidad <= 15 ||
+      index === 0 ||
+      index === cantidad - 1 ||
+      index % 3 === 0;
+
+    if (mostrarEtiqueta) {
+      ctx.fillStyle = "#1b5e20";
+      ctx.font = "bold 11px Arial";
+
+      ctx.fillText(
+        "$" + Number(punto.registro.promedio).toLocaleString("es-MX"),
+        punto.x,
+        punto.y - 12,
+      );
+    }
+  });
+
+  ctx.fillStyle = "#333";
+  ctx.font = "bold 12px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText(
+    "Días del hotel",
+    margen.izquierda + anchoGrafica / 2,
+    alto - 10,
+  );
+
+  actualizarResumenPromedioRenta();
+}
+
+function actualizarResumenPromedioRenta() {
+  const resumen = document.getElementById("resumenPromedioRenta");
+
+  if (!resumen) {
+    return;
+  }
+
+  if (
+    !Array.isArray(historialPromedioRenta) ||
+    historialPromedioRenta.length === 0
+  ) {
+    resumen.innerHTML = "<span>Sin información disponible</span>";
+
+    return;
+  }
+
+  const valores = historialPromedioRenta.map(
+    (registro) => Number(registro.promedio) || 0,
+  );
+
+  const promedioGeneral = Math.round(
+    valores.reduce((total, valor) => total + valor, 0) / valores.length,
+  );
+
+  const maxima = Math.max(...valores);
+  const minima = Math.min(...valores);
+
+  resumen.innerHTML = `
+    <span>
+      💵 Promedio general:
+      $${promedioGeneral.toLocaleString("es-MX")}
+    </span>
+
+    <span>
+      📈 Máximo:
+      $${maxima.toLocaleString("es-MX")}
+    </span>
+
+    <span>
+      📉 Mínimo:
+      $${minima.toLocaleString("es-MX")}
+    </span>
+  `;
+}
+
+function registrarGananciaPorCuartoDiaria() {
+  const totalCuartosComprados = cuartos.filter(
+    (cuarto) => cuarto.comprada,
+  ).length;
+
+  // Tomar el resultado oficial recién guardado en Finanzas
+  const ultimoResultado = historialResultados[historialResultados.length - 1];
+
+  if (!ultimoResultado || ultimoResultado.dia !== dia) {
+    console.error(
+      "No se encontró el resultado financiero del día para calcular la ganancia por cuarto.",
+    );
+    return;
+  }
+
+  const resultadoDia = Number(ultimoResultado.resultado) || 0;
+
+  const gananciaPorCuarto =
+    totalCuartosComprados > 0
+      ? Math.round(resultadoDia / totalCuartosComprados)
+      : 0;
+
+  const registroExistente = historialGananciaPorCuarto.find(
+    (registro) => registro.dia === dia,
+  );
+
+  const nuevoRegistro = {
+    dia,
+    resultadoDia,
+    totalCuartos: totalCuartosComprados,
+    gananciaPorCuarto,
+  };
+
+  if (registroExistente) {
+    Object.assign(registroExistente, nuevoRegistro);
+  } else {
+    historialGananciaPorCuarto.push(nuevoRegistro);
+  }
+
+  if (historialGananciaPorCuarto.length > 30) {
+    historialGananciaPorCuarto.shift();
+  }
+
+  console.log("Ganancia por cuarto registrada:", {
+    dia,
+    resultadoDia,
+    totalCuartosComprados,
+    gananciaPorCuarto,
+  });
+}
+
+function abrirModalGananciaPorCuarto() {
+  const modal = document.getElementById("modalGananciaPorCuarto");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.style.display = "flex";
+
+  setTimeout(() => {
+    dibujarGraficaGananciaPorCuarto();
+  }, 50);
+}
+
+function cerrarModalGananciaPorCuarto() {
+  const modal = document.getElementById("modalGananciaPorCuarto");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+function dibujarGraficaGananciaPorCuarto() {
+  const canvas = document.getElementById("graficaGananciaPorCuarto");
+
+  if (!canvas) {
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+
+  const ancho = canvas.width;
+  const alto = canvas.height;
+
+  ctx.clearRect(0, 0, ancho, alto);
+
+  const margen = {
+    izquierda: 90,
+    derecha: 25,
+    arriba: 40,
+    abajo: 55,
+  };
+
+  const anchoGrafica = ancho - margen.izquierda - margen.derecha;
+
+  const altoGrafica = alto - margen.arriba - margen.abajo;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, ancho, alto);
+
+  ctx.fillStyle = "#222";
+  ctx.font = "bold 16px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText("Ganancia diaria por cuarto disponible", ancho / 2, 25);
+
+  if (
+    !Array.isArray(historialGananciaPorCuarto) ||
+    historialGananciaPorCuarto.length === 0
+  ) {
+    ctx.fillStyle = "#777";
+    ctx.font = "bold 18px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText("Todavía no hay días registrados.", ancho / 2, alto / 2);
+
+    actualizarResumenGananciaPorCuarto();
+    return;
+  }
+
+  const valores = historialGananciaPorCuarto.map(
+    (registro) => Number(registro.gananciaPorCuarto) || 0,
+  );
+
+  const valorMaximo = Math.max(...valores, 0);
+  const valorMinimo = Math.min(...valores, 0);
+
+  const valorAbsolutoMaximo = Math.max(
+    Math.abs(valorMaximo),
+    Math.abs(valorMinimo),
+    500,
+  );
+
+  const escalaMaxima = Math.ceil(valorAbsolutoMaximo / 500) * 500;
+
+  const minimoEscala = -escalaMaxima;
+  const maximoEscala = escalaMaxima;
+
+  const rangoEscala = maximoEscala - minimoEscala;
+
+  // Líneas horizontales
+  const divisiones = 6;
+
+  for (let i = 0; i <= divisiones; i++) {
+    const valor = minimoEscala + (rangoEscala / divisiones) * i;
+
+    const y =
+      margen.arriba +
+      altoGrafica -
+      ((valor - minimoEscala) / rangoEscala) * altoGrafica;
+
+    ctx.beginPath();
+    ctx.moveTo(margen.izquierda, y);
+    ctx.lineTo(ancho - margen.derecha, y);
+
+    ctx.strokeStyle = Math.round(valor) === 0 ? "#777777" : "#dddddd";
+
+    ctx.lineWidth = Math.round(valor) === 0 ? 2 : 1;
+
+    ctx.stroke();
+
+    ctx.fillStyle = "#555";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "right";
+
+    const valorRedondeado = Math.round(valor);
+
+    const textoValor =
+      valorRedondeado < 0
+        ? `-$${Math.abs(valorRedondeado).toLocaleString("es-MX")}`
+        : `$${valorRedondeado.toLocaleString("es-MX")}`;
+
+    ctx.fillText(textoValor, margen.izquierda - 10, y + 4);
+  }
+
+  // Ejes
+  ctx.beginPath();
+
+  ctx.moveTo(margen.izquierda, margen.arriba);
+  ctx.lineTo(margen.izquierda, alto - margen.abajo);
+
+  ctx.lineTo(ancho - margen.derecha, alto - margen.abajo);
+
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const cantidad = historialGananciaPorCuarto.length;
+
+  const separacionX =
+    cantidad > 1 ? anchoGrafica / (cantidad - 1) : anchoGrafica / 2;
+
+  const puntos = historialGananciaPorCuarto.map((registro, index) => {
+    const x =
+      cantidad > 1
+        ? margen.izquierda + index * separacionX
+        : margen.izquierda + anchoGrafica / 2;
+
+    const valor = Number(registro.gananciaPorCuarto) || 0;
+
+    const y =
+      margen.arriba +
+      altoGrafica -
+      ((valor - minimoEscala) / rangoEscala) * altoGrafica;
+
+    return {
+      x,
+      y,
+      valor,
+      registro,
+    };
+  });
+
+  // Línea
+  ctx.beginPath();
+
+  puntos.forEach((punto, index) => {
+    if (index === 0) {
+      ctx.moveTo(punto.x, punto.y);
+    } else {
+      ctx.lineTo(punto.x, punto.y);
+    }
+  });
+
+  ctx.strokeStyle = "#7b1fa2";
+  ctx.lineWidth = 4;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.stroke();
+
+  // Puntos y etiquetas
+  puntos.forEach((punto, index) => {
+    ctx.beginPath();
+
+    ctx.arc(punto.x, punto.y, 5, 0, Math.PI * 2);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+
+    ctx.strokeStyle = punto.valor >= 0 ? "#2e7d32" : "#d32f2f";
+
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Día
+    ctx.fillStyle = "#444";
+    ctx.font = "11px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(`D${punto.registro.dia}`, punto.x, alto - margen.abajo + 20);
+
+    const mostrarEtiqueta =
+      cantidad <= 15 ||
+      index === 0 ||
+      index === cantidad - 1 ||
+      index % 3 === 0;
+
+    if (mostrarEtiqueta) {
+      ctx.fillStyle = punto.valor >= 0 ? "#1b5e20" : "#b71c1c";
+
+      ctx.font = "bold 11px Arial";
+
+      const texto =
+        punto.valor < 0
+          ? `-$${Math.abs(punto.valor).toLocaleString("es-MX")}`
+          : `$${punto.valor.toLocaleString("es-MX")}`;
+
+      ctx.fillText(texto, punto.x, punto.y - 12);
+    }
+  });
+
+  ctx.fillStyle = "#333";
+  ctx.font = "bold 12px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText(
+    "Días del hotel",
+    margen.izquierda + anchoGrafica / 2,
+    alto - 10,
+  );
+
+  actualizarResumenGananciaPorCuarto();
+}
+
+function actualizarResumenGananciaPorCuarto() {
+  const resumen = document.getElementById("resumenGananciaPorCuarto");
+
+  if (!resumen) {
+    return;
+  }
+
+  if (
+    !Array.isArray(historialGananciaPorCuarto) ||
+    historialGananciaPorCuarto.length === 0
+  ) {
+    resumen.innerHTML = "<span>Sin información disponible</span>";
+
+    return;
+  }
+
+  const valores = historialGananciaPorCuarto.map(
+    (registro) => Number(registro.gananciaPorCuarto) || 0,
+  );
+
+  const promedio = Math.round(
+    valores.reduce((total, valor) => total + valor, 0) / valores.length,
+  );
+
+  const maximo = Math.max(...valores);
+  const minimo = Math.min(...valores);
+
+  const formatoDinero = (valor) => {
+    return valor < 0
+      ? `-$${Math.abs(valor).toLocaleString("es-MX")}`
+      : `$${valor.toLocaleString("es-MX")}`;
+  };
+
+  resumen.innerHTML = `
+    <span>
+      🏨 Promedio:
+      ${formatoDinero(promedio)}
+    </span>
+
+    <span>
+      📈 Máximo:
+      ${formatoDinero(maximo)}
+    </span>
+
+    <span>
+      📉 Mínimo:
+      ${formatoDinero(minimo)}
+    </span>
+  `;
 }

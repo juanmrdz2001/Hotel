@@ -358,6 +358,92 @@
     <button id="btnAmpliarDrenaje" onclick="abrirModalAmpliacionDrenaje()"></button>
   </section>
 </section><!-- panelBasuraDrenaje -->
+
+<section id="panelPublicidad" class="panelPublicidad">
+
+  <h3>📢 Publicidad</h3>
+
+  <div class="publicidadGrid">
+
+    <div class="tarjetaPublicidad">
+      <h4>📱 Redes Sociales</h4>
+
+      <p>Costo: <strong>$1,200</strong></p>
+      <p>Duración: <strong>72 horas</strong></p>
+      <p>Beneficio: <strong>+5%</strong></p>
+
+      <button onclick="comprarPublicidad('redes')">
+        Contratar
+      </button>
+
+      <div
+        id="listaPublicidadRedes"
+        class="listaCampañas">
+      </div>
+    </div>
+
+    <div class="tarjetaPublicidad">
+      <h4>🖥️ Pantalla</h4>
+
+      <p>Costo: <strong>$3,000</strong></p>
+      <p>Duración: <strong>120 horas</strong></p>
+      <p>Beneficio: <strong>+10%</strong></p>
+
+      <button onclick="comprarPublicidad('pantalla')">
+        Contratar
+      </button>
+
+      <div
+        id="listaPublicidadPantalla"
+        class="listaCampañas">
+      </div>
+    </div>
+
+    <div class="tarjetaPublicidad">
+      <h4>📻 Radio</h4>
+
+      <p>Costo: <strong>$8,000</strong></p>
+      <p>Duración: <strong>168 horas</strong></p>
+      <p>Beneficio: <strong>+15%</strong></p>
+
+      <button onclick="comprarPublicidad('radio')">
+        Contratar
+      </button>
+
+      <div
+        id="listaPublicidadRadio"
+        class="listaCampañas">
+      </div>
+    </div>
+
+    <div class="tarjetaPublicidad">
+      <h4>📺 Televisión</h4>
+
+      <p>Costo: <strong>$20,000</strong></p>
+      <p>Duración: <strong>240 horas</strong></p>
+      <p>Beneficio: <strong>+20%</strong></p>
+
+      <button onclick="comprarPublicidad('television')">
+        Contratar
+      </button>
+
+      <div
+        id="listaPublicidadTelevision"
+        class="listaCampañas">
+      </div>
+    </div>
+
+  </div>
+
+  <div class="resumenPublicidad">
+    Beneficio acumulado:
+    <strong>
+      +<span id="beneficioPublicidadTotal">0</span>%
+    </strong>
+  </div>
+
+</section><!----PanelPublicidad-->
+
 </div> <!-- columnaIzquierdaInferior -->
 
     <!-- ColumnaDerechaInferior -->
@@ -783,11 +869,49 @@
 </section><!--panelPrestamo-->
 
       <!-- panelFinanzas -->
-      <section id="panelFinanzas" class="panelResultados">
-        <h3>📊 <span data-i18n="finanzas">Estado Financiero Ultimos 10 Días</span></h3>
-        <div id="historialResultados"></div>
-      </section><!--panelFinanzas-->
-  
+
+<!-- panelFinanzas -->
+<section id="panelFinanzas" class="panelResultados">
+
+<div class="encabezadoFinanzas">
+  <h3>
+    📊
+    <span data-i18n="finanzas">
+      Estado Financiero Últimos 10 Días
+    </span>
+  </h3>
+
+  <div class="botonesGraficasFinanzas">
+
+    <button
+      class="btnGraficaFinanzas"
+      onclick="abrirModalGananciaPorCuarto()"
+      title="Ganancia por cuarto disponible">
+      🏨
+    </button>
+
+    <button
+      class="btnGraficaFinanzas"
+      onclick="abrirModalPromedioRenta()"
+      title="Promedio cobrado por cuarto">
+      💵
+    </button>
+
+    <button
+      class="btnGraficaFinanzas"
+      onclick="abrirModalOcupacion()"
+      title="Tendencia de ocupación">
+      📈
+    </button>
+
+  </div>
+</div>
+
+  <div id="historialResultados"></div>
+
+</section>
+<!-- panelFinanzas -->
+
       <section id="panelClima" class="panelClima">
       <h3>🌦️ <span data-i18n="climaDemanda">Clima Y Demanda</span></h3>
       <div class="contenidoClima">
@@ -806,6 +930,7 @@
             <p id="demandaViento"></p>
             <p id="demandaHumedad"></p>
             <p id="demandaLluvia"></p>
+            <p id="demandaPublicidad"></p>
         </div><!--ColumnaDemanda-->
         </div><!--contenidoClima-->
         <div class="totalDemanda">
@@ -814,6 +939,12 @@
             <span id="demandaTotal"></span>
         </h3>
         <p id="mensajeClima"></p>
+<div class="pronosticoClima">
+  <h3>📅 Pronóstico próximos 5 días</h3>
+
+  <div id="pronostico5Dias" class="pronosticoGrid"></div>
+</div>
+
         </div><!-- totalDemanda-->
       </section><!--panelClima-->
 
@@ -1097,6 +1228,117 @@
     <span>📜</span>
     <small>Movimiento</small>
   </button>
+
+</div>
+
+<!-- MODAL TENDENCIA DE OCUPACIÓN -->
+<div id="modalOcupacion" class="modalOcupacion">
+
+  <div class="contenidoModalOcupacion">
+
+    <div class="encabezadoModalOcupacion">
+      <h2>📈 Tendencia de Ocupación</h2>
+
+      <button
+        class="btnCerrarOcupacion"
+        onclick="cerrarModalOcupacion()">
+        ✖
+      </button>
+    </div>
+
+    <p class="descripcionGraficaOcupacion">
+      Porcentaje de ocupación de los últimos 30 días.
+    </p>
+
+    <div class="contenedorCanvasOcupacion">
+      <canvas
+        id="graficaOcupacion"
+        width="900"
+        height="420">
+      </canvas>
+    </div>
+
+    <div id="resumenOcupacion" class="resumenOcupacion">
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL PROMEDIO DE RENTA -->
+<div id="modalPromedioRenta" class="modalOcupacion">
+
+  <div class="contenidoModalOcupacion">
+
+    <div class="encabezadoModalOcupacion">
+      <h2>💵 Promedio Cobrado por Cuarto</h2>
+
+      <button
+        class="btnCerrarOcupacion"
+        onclick="cerrarModalPromedioRenta()">
+        ✖
+      </button>
+    </div>
+
+    <p class="descripcionGraficaOcupacion">
+      Importe promedio cobrado por cada cuarto rentado durante los últimos 30 días.
+    </p>
+
+    <div class="contenedorCanvasOcupacion">
+      <canvas
+        id="graficaPromedioRenta"
+        width="900"
+        height="420">
+      </canvas>
+    </div>
+
+    <div
+      id="resumenPromedioRenta"
+      class="resumenOcupacion">
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL GANANCIA POR CUARTO -->
+<div id="modalGananciaPorCuarto" class="modalOcupacion">
+
+  <div class="contenidoModalOcupacion">
+
+    <div class="encabezadoModalOcupacion">
+
+      <h2>🏨 Ganancia por Cuarto Disponible</h2>
+
+      <button
+        class="btnCerrarOcupacion"
+        onclick="cerrarModalGananciaPorCuarto()">
+        ✖
+      </button>
+
+    </div>
+
+    <p class="descripcionGraficaOcupacion">
+      Resultado diario dividido entre todos los cuartos comprados del hotel
+      durante los últimos 30 días.
+    </p>
+
+    <div class="contenedorCanvasOcupacion">
+
+      <canvas
+        id="graficaGananciaPorCuarto"
+        width="900"
+        height="420">
+      </canvas>
+
+    </div>
+
+    <div
+      id="resumenGananciaPorCuarto"
+      class="resumenOcupacion">
+    </div>
+
+  </div>
 
 </div>
 
