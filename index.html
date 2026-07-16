@@ -884,6 +884,27 @@
   <div class="botonesGraficasFinanzas">
 
     <button
+    class="btnGraficaFinanzas"
+    onclick="abrirModalRendimientoHotel()"
+    title="Rendimiento neto del hotel">
+    %
+    </button>
+
+  <button
+    class="btnGraficaFinanzas"
+    onclick="abrirModalValorHotel()"
+    title="Evolución del valor del hotel">
+    🏢
+    </button>
+
+    <button
+    class="btnGraficaFinanzas"
+    onclick="abrirModalValorPromedioCuartos()"
+    title="Valor promedio de los cuartos">
+    🛏️
+    </button>
+       
+    <button
       class="btnGraficaFinanzas"
       onclick="abrirModalGananciaPorCuarto()"
       title="Ganancia por cuarto disponible">
@@ -1335,6 +1356,129 @@
 
     <div
       id="resumenGananciaPorCuarto"
+      class="resumenOcupacion">
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL VALOR PROMEDIO DE LOS CUARTOS -->
+<div id="modalValorPromedioCuartos" class="modalOcupacion">
+
+  <div class="contenidoModalOcupacion">
+
+    <div class="encabezadoModalOcupacion">
+
+      <h2>🛏️ Valor Promedio de los Cuartos</h2>
+
+      <button
+        class="btnCerrarOcupacion"
+        onclick="cerrarModalValorPromedioCuartos()">
+        ✖
+      </button>
+
+    </div>
+
+    <p class="descripcionGraficaOcupacion">
+      Valor promedio de los cuartos comprados, incluyendo
+      el costo del cuarto y todos los objetos instalados,
+      durante los últimos 30 días.
+    </p>
+
+    <div class="contenedorCanvasOcupacion">
+
+      <canvas
+        id="graficaValorPromedioCuartos"
+        width="900"
+        height="420">
+      </canvas>
+
+    </div>
+
+    <div
+      id="resumenValorPromedioCuartos"
+      class="resumenOcupacion">
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL VALOR DEL HOTEL -->
+<div id="modalValorHotel" class="modalOcupacion">
+
+  <div class="contenidoModalOcupacion">
+
+    <div class="encabezadoModalOcupacion">
+
+      <h2>🏢 Evolución del Valor del Hotel</h2>
+
+      <button
+        class="btnCerrarOcupacion"
+        onclick="cerrarModalValorHotel()">
+        ✖
+      </button>
+
+    </div>
+
+    <p class="descripcionGraficaOcupacion">
+      Valor total del hotel registrado durante los últimos 30 días.
+    </p>
+
+    <div class="contenedorCanvasOcupacion">
+
+      <canvas
+        id="graficaValorHotel"
+        width="900"
+        height="420">
+      </canvas>
+
+    </div>
+
+    <div
+      id="resumenValorHotel"
+      class="resumenOcupacion">
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL RENDIMIENTO DEL HOTEL -->
+<div id="modalRendimientoHotel" class="modalOcupacion">
+
+  <div class="contenidoModalOcupacion">
+
+    <div class="encabezadoModalOcupacion">
+
+      <h2>📊 Rendimiento Neto del Hotel</h2>
+
+      <button
+        class="btnCerrarOcupacion"
+        onclick="cerrarModalRendimientoHotel()">
+        ✖
+      </button>
+
+    </div>
+
+    <p class="descripcionGraficaOcupacion">
+      Resultado del día menos impuestos, dividido entre
+      el valor total del hotel, durante los últimos 30 días.
+    </p>
+
+    <div class="contenedorCanvasOcupacion">
+
+      <canvas
+        id="graficaRendimientoHotel"
+        width="900"
+        height="420">
+      </canvas>
+
+    </div>
+
+    <div
+      id="resumenRendimientoHotel"
       class="resumenOcupacion">
     </div>
 

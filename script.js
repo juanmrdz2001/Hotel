@@ -69,6 +69,9 @@ let prestamo = {
 let historialOcupacion = [];
 let historialPromedioRenta = [];
 let historialGananciaPorCuarto = [];
+let historialValorPromedioCuartos = [];
+let historialValorHotel = [];
+let historialRendimientoHotel = [];
 
 let cuartoSeleccionado = null;
 let siguienteCarrilCliente = 0;
@@ -3561,11 +3564,13 @@ function avanzarHora() {
     registrarOcupacionDiaria();
     registrarPromedioRentaDiaria();
 
-    // Primero guarda el resultado oficial del día
+    // Primero se obtiene el resultado oficial.
     guardarResultadoDelDia();
 
-    // Después usa ese mismo resultado para la gráfica
     registrarGananciaPorCuartoDiaria();
+    registrarValorPromedioCuartosDiario();
+    registrarValorHotelDiario();
+    registrarRendimientoHotelDiario();
 
     procesarLavanderia();
   }
@@ -4703,6 +4708,9 @@ async function guardarPartida() {
     historiaOcupacion,
     historialPromedioRenta,
     historialGananciaPorCuarto,
+    historialValorPromedioCuartos,
+    historialValorHotel,
+    historialRendimientoHotel,
 
     aguaActual,
     gasActual,
@@ -4907,6 +4915,20 @@ async function cargarPartida() {
       partida.historialGananciaPorCuarto,
     )
       ? partida.historialGananciaPorCuarto
+      : [];
+
+    historialValorPromedioCuartos = Array.isArray(
+      partida.historialValorPromedioCuartos,
+    )
+      ? partida.historialValorPromedioCuartos
+      : [];
+
+    historialValorHotel = Array.isArray(partida.historialValorHotel)
+      ? partida.historialValorHotel
+      : [];
+
+    historialRendimientoHotel = Array.isArray(partida.historialRendimientoHotel)
+      ? partida.historialRendimientoHotel
       : [];
 
     actualizarPantalla();
@@ -6383,6 +6405,913 @@ function actualizarResumenGananciaPorCuarto() {
     <span>
       📉 Mínimo:
       ${formatoDinero(minimo)}
+    </span>
+  `;
+}
+
+function calcularValorIndividualCuarto(cuarto) {
+  if (!cuarto || !cuarto.comprada) {
+    return 0;
+  }
+
+  let valor = Number(cuarto.costo) || 0;
+
+  if (cuarto.objetos) {
+    Object.values(cuarto.objetos).forEach((objeto) => {
+      if (objeto) {
+        valor += Number(objeto.costo) || 0;
+      }
+    });
+  }
+
+  return valor;
+}
+
+function registrarValorPromedioCuartosDiario() {
+  const cuartosComprados = cuartos.filter((cuarto) => cuarto.comprada);
+
+  const cantidadCuartos = cuartosComprados.length;
+
+  const valorTotalCuartos = cuartosComprados.reduce((total, cuarto) => {
+    return total + calcularValorIndividualCuarto(cuarto);
+  }, 0);
+
+  const valorPromedio =
+    cantidadCuartos > 0 ? Math.round(valorTotalCuartos / cantidadCuartos) : 0;
+
+  const nuevoRegistro = {
+    dia,
+    cantidadCuartos,
+    valorTotalCuartos,
+    valorPromedio,
+  };
+
+  const registroExistente = historialValorPromedioCuartos.find(
+    (registro) => registro.dia === dia,
+  );
+
+  if (registroExistente) {
+    Object.assign(registroExistente, nuevoRegistro);
+  } else {
+    historialValorPromedioCuartos.push(nuevoRegistro);
+  }
+
+  if (historialValorPromedioCuartos.length > 30) {
+    historialValorPromedioCuartos.shift();
+  }
+
+  console.log("Valor promedio de cuartos registrado:", nuevoRegistro);
+}
+
+function abrirModalValorPromedioCuartos() {
+  const modal = document.getElementById("modalValorPromedioCuartos");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.style.display = "flex";
+
+  setTimeout(() => {
+    dibujarGraficaValorPromedioCuartos();
+  }, 50);
+}
+
+function cerrarModalValorPromedioCuartos() {
+  const modal = document.getElementById("modalValorPromedioCuartos");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+function dibujarGraficaValorPromedioCuartos() {
+  const canvas = document.getElementById("graficaValorPromedioCuartos");
+
+  if (!canvas) {
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+
+  const ancho = canvas.width;
+  const alto = canvas.height;
+
+  ctx.clearRect(0, 0, ancho, alto);
+
+  const margen = {
+    izquierda: 95,
+    derecha: 25,
+    arriba: 40,
+    abajo: 55,
+  };
+
+  const anchoGrafica = ancho - margen.izquierda - margen.derecha;
+
+  const altoGrafica = alto - margen.arriba - margen.abajo;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, ancho, alto);
+
+  ctx.fillStyle = "#222";
+  ctx.font = "bold 16px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText("Valor promedio diario de los cuartos", ancho / 2, 25);
+
+  if (
+    !Array.isArray(historialValorPromedioCuartos) ||
+    historialValorPromedioCuartos.length === 0
+  ) {
+    ctx.fillStyle = "#777";
+    ctx.font = "bold 18px Arial";
+
+    ctx.fillText("Todavía no hay días registrados.", ancho / 2, alto / 2);
+
+    actualizarResumenValorPromedioCuartos();
+    return;
+  }
+
+  const valores = historialValorPromedioCuartos.map(
+    (registro) => Number(registro.valorPromedio) || 0,
+  );
+
+  const valorMaximo = Math.max(...valores, 1000);
+
+  // Redondear la escala hacia arriba en bloques de $10,000
+  const maximoEscala = Math.ceil(valorMaximo / 10000) * 10000;
+
+  const divisiones = 5;
+
+  for (let i = 0; i <= divisiones; i++) {
+    const valor = Math.round((maximoEscala / divisiones) * i);
+
+    const y =
+      margen.arriba + altoGrafica - (valor / maximoEscala) * altoGrafica;
+
+    ctx.beginPath();
+    ctx.moveTo(margen.izquierda, y);
+    ctx.lineTo(ancho - margen.derecha, y);
+
+    ctx.strokeStyle = "#dddddd";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = "#555";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "right";
+
+    ctx.fillText(
+      `$${valor.toLocaleString("es-MX")}`,
+      margen.izquierda - 10,
+      y + 4,
+    );
+  }
+
+  // Ejes
+  ctx.beginPath();
+
+  ctx.moveTo(margen.izquierda, margen.arriba);
+
+  ctx.lineTo(margen.izquierda, alto - margen.abajo);
+
+  ctx.lineTo(ancho - margen.derecha, alto - margen.abajo);
+
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const cantidad = historialValorPromedioCuartos.length;
+
+  const separacionX =
+    cantidad > 1 ? anchoGrafica / (cantidad - 1) : anchoGrafica / 2;
+
+  const puntos = historialValorPromedioCuartos.map((registro, index) => {
+    const x =
+      cantidad > 1
+        ? margen.izquierda + index * separacionX
+        : margen.izquierda + anchoGrafica / 2;
+
+    const valor = Math.max(0, Number(registro.valorPromedio) || 0);
+
+    const y =
+      margen.arriba + altoGrafica - (valor / maximoEscala) * altoGrafica;
+
+    return {
+      x,
+      y,
+      valor,
+      registro,
+    };
+  });
+
+  // Línea
+  ctx.beginPath();
+
+  puntos.forEach((punto, index) => {
+    if (index === 0) {
+      ctx.moveTo(punto.x, punto.y);
+    } else {
+      ctx.lineTo(punto.x, punto.y);
+    }
+  });
+
+  ctx.strokeStyle = "#ef6c00";
+  ctx.lineWidth = 4;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.stroke();
+
+  // Puntos y etiquetas
+  puntos.forEach((punto, index) => {
+    ctx.beginPath();
+
+    ctx.arc(punto.x, punto.y, 5, 0, Math.PI * 2);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+
+    ctx.strokeStyle = "#ef6c00";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.fillStyle = "#444";
+    ctx.font = "11px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(`D${punto.registro.dia}`, punto.x, alto - margen.abajo + 20);
+
+    const mostrarEtiqueta =
+      cantidad <= 15 ||
+      index === 0 ||
+      index === cantidad - 1 ||
+      index % 3 === 0;
+
+    if (mostrarEtiqueta) {
+      ctx.fillStyle = "#bf360c";
+      ctx.font = "bold 11px Arial";
+
+      ctx.fillText(
+        `$${punto.valor.toLocaleString("es-MX")}`,
+        punto.x,
+        punto.y - 12,
+      );
+    }
+  });
+
+  ctx.fillStyle = "#333";
+  ctx.font = "bold 12px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText(
+    "Días del hotel",
+    margen.izquierda + anchoGrafica / 2,
+    alto - 10,
+  );
+
+  actualizarResumenValorPromedioCuartos();
+}
+
+function actualizarResumenValorPromedioCuartos() {
+  const resumen = document.getElementById("resumenValorPromedioCuartos");
+
+  if (!resumen) {
+    return;
+  }
+
+  if (
+    !Array.isArray(historialValorPromedioCuartos) ||
+    historialValorPromedioCuartos.length === 0
+  ) {
+    resumen.innerHTML = "<span>Sin información disponible</span>";
+
+    return;
+  }
+
+  const valores = historialValorPromedioCuartos.map(
+    (registro) => Number(registro.valorPromedio) || 0,
+  );
+
+  const promedioGeneral = Math.round(
+    valores.reduce((total, valor) => total + valor, 0) / valores.length,
+  );
+
+  const maximo = Math.max(...valores);
+  const minimo = Math.min(...valores);
+
+  const ultimoRegistro =
+    historialValorPromedioCuartos[historialValorPromedioCuartos.length - 1];
+
+  resumen.innerHTML = `
+    <span>
+      🛏️ Promedio actual:
+      $${Number(ultimoRegistro.valorPromedio).toLocaleString("es-MX")}
+    </span>
+
+    <span>
+      📈 Máximo:
+      $${maximo.toLocaleString("es-MX")}
+    </span>
+
+    <span>
+      📉 Mínimo:
+      $${minimo.toLocaleString("es-MX")}
+    </span>
+
+    <span>
+      🏨 Cuartos:
+      ${ultimoRegistro.cantidadCuartos}
+    </span>
+  `;
+}
+
+function registrarValorHotelDiario() {
+  const valorActualHotel = Number(valorHotel()) || 0;
+
+  const nuevoRegistro = {
+    dia,
+    valorHotel: valorActualHotel,
+  };
+
+  const registroExistente = historialValorHotel.find(
+    (registro) => registro.dia === dia,
+  );
+
+  if (registroExistente) {
+    Object.assign(registroExistente, nuevoRegistro);
+  } else {
+    historialValorHotel.push(nuevoRegistro);
+  }
+
+  if (historialValorHotel.length > 30) {
+    historialValorHotel.shift();
+  }
+
+  console.log("Valor del hotel registrado:", nuevoRegistro);
+}
+
+function abrirModalValorHotel() {
+  const modal = document.getElementById("modalValorHotel");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.style.display = "flex";
+
+  setTimeout(() => {
+    dibujarGraficaValorHotel();
+  }, 50);
+}
+
+function cerrarModalValorHotel() {
+  const modal = document.getElementById("modalValorHotel");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+function abrirModalValorHotel() {
+  const modal = document.getElementById("modalValorHotel");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.style.display = "flex";
+
+  setTimeout(() => {
+    dibujarGraficaValorHotel();
+  }, 50);
+}
+
+function cerrarModalValorHotel() {
+  const modal = document.getElementById("modalValorHotel");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+function dibujarGraficaValorHotel() {
+  const canvas = document.getElementById("graficaValorHotel");
+
+  if (!canvas) {
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+
+  const ancho = canvas.width;
+  const alto = canvas.height;
+
+  ctx.clearRect(0, 0, ancho, alto);
+
+  const margen = {
+    izquierda: 110,
+    derecha: 25,
+    arriba: 40,
+    abajo: 55,
+  };
+
+  const anchoGrafica = ancho - margen.izquierda - margen.derecha;
+
+  const altoGrafica = alto - margen.arriba - margen.abajo;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, ancho, alto);
+
+  ctx.fillStyle = "#222";
+  ctx.font = "bold 16px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText("Valor total diario del hotel", ancho / 2, 25);
+
+  if (!Array.isArray(historialValorHotel) || historialValorHotel.length === 0) {
+    ctx.fillStyle = "#777";
+    ctx.font = "bold 18px Arial";
+
+    ctx.fillText("Todavía no hay días registrados.", ancho / 2, alto / 2);
+
+    actualizarResumenValorHotel();
+    return;
+  }
+
+  const valores = historialValorHotel.map(
+    (registro) => Number(registro.valorHotel) || 0,
+  );
+
+  const valorMaximo = Math.max(...valores, 100000);
+
+  const maximoEscala = Math.ceil(valorMaximo / 100000) * 100000;
+
+  const divisiones = 5;
+
+  for (let i = 0; i <= divisiones; i++) {
+    const valor = Math.round((maximoEscala / divisiones) * i);
+
+    const y =
+      margen.arriba + altoGrafica - (valor / maximoEscala) * altoGrafica;
+
+    ctx.beginPath();
+    ctx.moveTo(margen.izquierda, y);
+    ctx.lineTo(ancho - margen.derecha, y);
+
+    ctx.strokeStyle = "#dddddd";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = "#555";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "right";
+
+    ctx.fillText(
+      `$${valor.toLocaleString("es-MX")}`,
+      margen.izquierda - 10,
+      y + 4,
+    );
+  }
+
+  ctx.beginPath();
+
+  ctx.moveTo(margen.izquierda, margen.arriba);
+
+  ctx.lineTo(margen.izquierda, alto - margen.abajo);
+
+  ctx.lineTo(ancho - margen.derecha, alto - margen.abajo);
+
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const cantidad = historialValorHotel.length;
+
+  const separacionX =
+    cantidad > 1 ? anchoGrafica / (cantidad - 1) : anchoGrafica / 2;
+
+  const puntos = historialValorHotel.map((registro, index) => {
+    const x =
+      cantidad > 1
+        ? margen.izquierda + index * separacionX
+        : margen.izquierda + anchoGrafica / 2;
+
+    const valor = Math.max(0, Number(registro.valorHotel) || 0);
+
+    const y =
+      margen.arriba + altoGrafica - (valor / maximoEscala) * altoGrafica;
+
+    return {
+      x,
+      y,
+      valor,
+      registro,
+    };
+  });
+
+  ctx.beginPath();
+
+  puntos.forEach((punto, index) => {
+    if (index === 0) {
+      ctx.moveTo(punto.x, punto.y);
+    } else {
+      ctx.lineTo(punto.x, punto.y);
+    }
+  });
+
+  ctx.strokeStyle = "#1565c0";
+  ctx.lineWidth = 4;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.stroke();
+
+  puntos.forEach((punto, index) => {
+    ctx.beginPath();
+
+    ctx.arc(punto.x, punto.y, 5, 0, Math.PI * 2);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+
+    ctx.strokeStyle = "#1565c0";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.fillStyle = "#444";
+    ctx.font = "11px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(`D${punto.registro.dia}`, punto.x, alto - margen.abajo + 20);
+
+    const mostrarEtiqueta =
+      cantidad <= 15 ||
+      index === 0 ||
+      index === cantidad - 1 ||
+      index % 3 === 0;
+
+    if (mostrarEtiqueta) {
+      ctx.fillStyle = "#0d47a1";
+      ctx.font = "bold 11px Arial";
+
+      ctx.fillText(
+        `$${punto.valor.toLocaleString("es-MX")}`,
+        punto.x,
+        punto.y - 12,
+      );
+    }
+  });
+
+  ctx.fillStyle = "#333";
+  ctx.font = "bold 12px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText(
+    "Días del hotel",
+    margen.izquierda + anchoGrafica / 2,
+    alto - 10,
+  );
+
+  actualizarResumenValorHotel();
+}
+
+function calcularImpuestoParaRendimiento(resultado) {
+  const base = Math.max(0, Number(resultado) || 0);
+
+  let porcentaje = 0;
+
+  if (base <= 0) porcentaje = 0;
+  else if (base <= 10000) porcentaje = 3;
+  else if (base <= 20000) porcentaje = 6;
+  else if (base <= 30000) porcentaje = 9;
+  else if (base <= 40000) porcentaje = 12;
+  else if (base <= 50000) porcentaje = 15;
+  else if (base <= 60000) porcentaje = 18;
+  else if (base <= 70000) porcentaje = 21;
+  else if (base <= 80000) porcentaje = 24;
+  else if (base <= 90000) porcentaje = 27;
+  else porcentaje = 30;
+
+  return {
+    base,
+    porcentaje,
+    impuesto: Math.round(base * (porcentaje / 100)),
+  };
+}
+
+function registrarRendimientoHotelDiario() {
+  const ultimoResultado = historialResultados[historialResultados.length - 1];
+
+  if (!ultimoResultado || ultimoResultado.dia !== dia) {
+    console.error(
+      "No se encontró el resultado financiero del día para registrar el rendimiento.",
+    );
+    return;
+  }
+
+  const resultadoDia = Number(ultimoResultado.resultado) || 0;
+
+  const calculoImpuesto = calcularImpuestoParaRendimiento(resultadoDia);
+
+  const impuesto = Number(calculoImpuesto.impuesto) || 0;
+
+  const resultadoNeto = resultadoDia - impuesto;
+
+  const valorActualHotel = Number(valorHotel()) || 0;
+
+  const rendimiento =
+    valorActualHotel > 0 ? (resultadoNeto / valorActualHotel) * 100 : 0;
+
+  const nuevoRegistro = {
+    dia,
+    resultadoDia,
+    impuesto,
+    porcentajeImpuesto: calculoImpuesto.porcentaje,
+    resultadoNeto,
+    valorHotel: valorActualHotel,
+    rendimiento: Number(rendimiento.toFixed(2)),
+  };
+
+  const registroExistente = historialRendimientoHotel.find(
+    (registro) => registro.dia === dia,
+  );
+
+  if (registroExistente) {
+    Object.assign(registroExistente, nuevoRegistro);
+  } else {
+    historialRendimientoHotel.push(nuevoRegistro);
+  }
+
+  if (historialRendimientoHotel.length > 30) {
+    historialRendimientoHotel.shift();
+  }
+
+  console.log("Rendimiento neto del hotel registrado:", nuevoRegistro);
+}
+
+function abrirModalRendimientoHotel() {
+  const modal = document.getElementById("modalRendimientoHotel");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.style.display = "flex";
+
+  setTimeout(() => {
+    dibujarGraficaRendimientoHotel();
+  }, 50);
+}
+
+function cerrarModalRendimientoHotel() {
+  const modal = document.getElementById("modalRendimientoHotel");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+function dibujarGraficaRendimientoHotel() {
+  const canvas = document.getElementById("graficaRendimientoHotel");
+
+  if (!canvas) {
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+  const ancho = canvas.width;
+  const alto = canvas.height;
+
+  ctx.clearRect(0, 0, ancho, alto);
+
+  const margen = {
+    izquierda: 80,
+    derecha: 25,
+    arriba: 40,
+    abajo: 55,
+  };
+
+  const anchoGrafica = ancho - margen.izquierda - margen.derecha;
+
+  const altoGrafica = alto - margen.arriba - margen.abajo;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, ancho, alto);
+
+  ctx.fillStyle = "#222";
+  ctx.font = "bold 16px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText("Rendimiento neto diario del hotel", ancho / 2, 25);
+
+  if (
+    !Array.isArray(historialRendimientoHotel) ||
+    historialRendimientoHotel.length === 0
+  ) {
+    ctx.fillStyle = "#777";
+    ctx.font = "bold 18px Arial";
+
+    ctx.fillText("Todavía no hay días registrados.", ancho / 2, alto / 2);
+
+    actualizarResumenRendimientoHotel();
+    return;
+  }
+
+  const valores = historialRendimientoHotel.map(
+    (registro) => Number(registro.rendimiento) || 0,
+  );
+
+  const maximo = Math.max(...valores, 0);
+  const minimo = Math.min(...valores, 0);
+
+  const mayorAbsoluto = Math.max(Math.abs(maximo), Math.abs(minimo), 1);
+
+  // Escala simétrica con dos decimales.
+  const limiteEscala = Math.ceil(mayorAbsoluto * 2) / 2;
+
+  const minimoEscala = -limiteEscala;
+  const maximoEscala = limiteEscala;
+  const rangoEscala = maximoEscala - minimoEscala;
+
+  const divisiones = 8;
+
+  for (let i = 0; i <= divisiones; i++) {
+    const valor = minimoEscala + (rangoEscala / divisiones) * i;
+
+    const y =
+      margen.arriba +
+      altoGrafica -
+      ((valor - minimoEscala) / rangoEscala) * altoGrafica;
+
+    ctx.beginPath();
+    ctx.moveTo(margen.izquierda, y);
+    ctx.lineTo(ancho - margen.derecha, y);
+
+    const esCero = Math.abs(valor) < 0.001;
+
+    ctx.strokeStyle = esCero ? "#666666" : "#dddddd";
+
+    ctx.lineWidth = esCero ? 2 : 1;
+    ctx.stroke();
+
+    ctx.fillStyle = "#555";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "right";
+
+    ctx.fillText(`${valor.toFixed(2)}%`, margen.izquierda - 10, y + 4);
+  }
+
+  // Ejes
+  ctx.beginPath();
+
+  ctx.moveTo(margen.izquierda, margen.arriba);
+
+  ctx.lineTo(margen.izquierda, alto - margen.abajo);
+
+  ctx.lineTo(ancho - margen.derecha, alto - margen.abajo);
+
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const cantidad = historialRendimientoHotel.length;
+
+  const separacionX =
+    cantidad > 1 ? anchoGrafica / (cantidad - 1) : anchoGrafica / 2;
+
+  const puntos = historialRendimientoHotel.map((registro, index) => {
+    const x =
+      cantidad > 1
+        ? margen.izquierda + index * separacionX
+        : margen.izquierda + anchoGrafica / 2;
+
+    const rendimiento = Number(registro.rendimiento) || 0;
+
+    const y =
+      margen.arriba +
+      altoGrafica -
+      ((rendimiento - minimoEscala) / rangoEscala) * altoGrafica;
+
+    return {
+      x,
+      y,
+      rendimiento,
+      registro,
+    };
+  });
+
+  // Línea
+  ctx.beginPath();
+
+  puntos.forEach((punto, index) => {
+    if (index === 0) {
+      ctx.moveTo(punto.x, punto.y);
+    } else {
+      ctx.lineTo(punto.x, punto.y);
+    }
+  });
+
+  ctx.strokeStyle = "#00897b";
+  ctx.lineWidth = 4;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.stroke();
+
+  // Puntos, días y porcentajes.
+  puntos.forEach((punto, index) => {
+    ctx.beginPath();
+
+    ctx.arc(punto.x, punto.y, 5, 0, Math.PI * 2);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+
+    ctx.strokeStyle = punto.rendimiento >= 0 ? "#2e7d32" : "#d32f2f";
+
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.fillStyle = "#444";
+    ctx.font = "11px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(`D${punto.registro.dia}`, punto.x, alto - margen.abajo + 20);
+
+    const mostrarEtiqueta =
+      cantidad <= 15 ||
+      index === 0 ||
+      index === cantidad - 1 ||
+      index % 3 === 0;
+
+    if (mostrarEtiqueta) {
+      ctx.fillStyle = punto.rendimiento >= 0 ? "#1b5e20" : "#b71c1c";
+
+      ctx.font = "bold 11px Arial";
+
+      ctx.fillText(`${punto.rendimiento.toFixed(2)}%`, punto.x, punto.y - 12);
+    }
+  });
+
+  ctx.fillStyle = "#333";
+  ctx.font = "bold 12px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText(
+    "Días del hotel",
+    margen.izquierda + anchoGrafica / 2,
+    alto - 10,
+  );
+
+  actualizarResumenRendimientoHotel();
+}
+
+function actualizarResumenRendimientoHotel() {
+  const resumen = document.getElementById("resumenRendimientoHotel");
+
+  if (!resumen) {
+    return;
+  }
+
+  if (
+    !Array.isArray(historialRendimientoHotel) ||
+    historialRendimientoHotel.length === 0
+  ) {
+    resumen.innerHTML = "<span>Sin información disponible</span>";
+
+    return;
+  }
+
+  const valores = historialRendimientoHotel.map(
+    (registro) => Number(registro.rendimiento) || 0,
+  );
+
+  const promedio =
+    valores.reduce((total, valor) => total + valor, 0) / valores.length;
+
+  const maximo = Math.max(...valores);
+  const minimo = Math.min(...valores);
+
+  const ultimoRegistro =
+    historialRendimientoHotel[historialRendimientoHotel.length - 1];
+
+  resumen.innerHTML = `
+    <span>
+      📊 Rendimiento actual:
+      ${Number(ultimoRegistro.rendimiento).toFixed(2)}%
+    </span>
+
+    <span>
+      📈 Promedio:
+      ${promedio.toFixed(2)}%
+    </span>
+
+    <span>
+      🔼 Máximo:
+      ${maximo.toFixed(2)}%
+    </span>
+
+    <span>
+      🔽 Mínimo:
+      ${minimo.toFixed(2)}%
     </span>
   `;
 }
