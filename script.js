@@ -4705,7 +4705,7 @@ async function guardarPartida() {
     contingenciasHoy,
     eventoHoy,
     historialResultados,
-    historiaOcupacion,
+    historialOcupacion,
     historialPromedioRenta,
     historialGananciaPorCuarto,
     historialValorPromedioCuartos,
